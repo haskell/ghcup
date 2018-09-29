@@ -26,6 +26,13 @@ Just place `ghcup.sh` into your PATH anywhere
 
 See `ghcup.sh --help`.
 
+## Contributing
+
+* PR or email
+* this script is POSIX shell
+* use [shellcheck](https://github.com/koalaman/shellcheck) and `checkbashisms.pl` from [debian devscripts](http://http.debian.net/debian/pool/main/d/devscripts/devscripts_2.18.4.tar.xz)
+* whitespaces, no tabs
+
 ## TODO
 
 - [ ] FreeBSD support
