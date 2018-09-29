@@ -41,6 +41,11 @@ See `ghcup.sh --help`.
 - [ ] FreeBSD support
 - [ ] Make fetching tarballs more robust
 
+## Feature considerations
+
+- [ ] Allow to compile from source
+- [ ] Allow to install cabal-install as well
+
 ## Known problems
 
 Since this uses precompiled binaries you may run into
