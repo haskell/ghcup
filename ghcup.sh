@@ -15,7 +15,11 @@ INSTALL_BASE="$HOME/.ghcup"
 ## print help ##
 
 usage() {
-    (>&2 echo "${SCRIPT} [FLAGS] <SUBCOMMAND>
+    (>&2 echo "ghcup ${VERSION}
+GHC up toolchain installer
+
+USAGE:
+    ${SCRIPT} [FLAGS] <SUBCOMMAND>
 
 FLAGS:
     -v, --verbose    Enable verbose output
@@ -31,7 +35,11 @@ SUBCOMMANDS:
 }
 
 install_usage() {
-    (>&2 echo "${SCRIPT} install [FLAGS] <VERSION>
+    (>&2 echo "ghcup-install
+Install the specified GHC version
+
+USAGE:
+    ${SCRIPT} install [FLAGS] <VERSION>
 
 FLAGS:
     -h, --help       Prints help information
@@ -44,7 +52,11 @@ ARGS:
 }
 
 set_ghc_usage() {
-    (>&2 echo "${SCRIPT} set-ghc [FLAGS] <VERSION>
+    (>&2 echo "ghcup-set-ghc
+Set the currently active GHC to the specified version
+
+USAGE:
+    ${SCRIPT} set-ghc [FLAGS] <VERSION>
 
 FLAGS:
     -h, --help       Prints help information
@@ -56,7 +68,11 @@ ARGS:
 }
 
 self_update_usage() {
-    (>&2 echo "${SCRIPT} self-update [FLAGS] [TARGET-LOCATION]
+    (>&2 echo "ghcup-self-update
+Update the ghcup.sh script in-place
+
+USAGE:
+    ${SCRIPT} self-update [FLAGS] [TARGET-LOCATION]
 
 FLAGS:
     -h, --help         Prints help information
