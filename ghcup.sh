@@ -250,9 +250,10 @@ install_ghc() {
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         fn=$(basename "${f}")
-        ln $(echov "-v") -s ../"${myghcver}/bin/${fn}" "${target_location}/${fn}"
+        ln $(echov "-v") -sf ../"${myghcver}/bin/${fn}" "${target_location}/${fn}"
         unset fn
     done
+    ln $(echov "-v") -sf ../"${myghcver}"/bin/runhaskell "${target_location}/runhaskell-${myghcver}"
 
     printf_green "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
 
