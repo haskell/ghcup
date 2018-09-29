@@ -10,6 +10,7 @@ set -e
 # set GHC
 ./ghcup.sh -v set 8.6.1
 ./ghcup.sh -v set 8.4.3
+./ghcup.sh -v set 8.2.2
 
 # install cabal-install
 wget https://www.haskell.org/cabal/release/cabal-install-2.2.0.0/cabal-install-2.2.0.0-x86_64-unknown-linux.tar.gz
