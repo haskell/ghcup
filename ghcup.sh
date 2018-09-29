@@ -95,7 +95,7 @@ get_distro_name() {
         # freedesktop.org and systemd
         . /etc/os-release
         printf "$NAME"
-    elif type lsb_release >/dev/null 2>&1; then
+    elif command -V lsb_release >/dev/null 2>&1; then
         # linuxbase.org
         printf "$(lsb_release -si)"
     elif [ -f /etc/lsb-release ]; then
@@ -116,7 +116,7 @@ get_distro_ver() {
         # freedesktop.org and systemd
         . /etc/os-release
         printf "$VERSION_ID"
-    elif type lsb_release >/dev/null 2>&1; then
+    elif command -V lsb_release >/dev/null 2>&1; then
         # linuxbase.org
         printf "$(lsb_release -sr)"
     elif [ -f /etc/lsb-release ]; then
