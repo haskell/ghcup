@@ -96,7 +96,7 @@ ARGS:
 
 self_update_usage() {
     (>&2 echo "ghcup-self-update
-Update the ghcup.sh script in-place
+Update the ghcup script in-place
 
 USAGE:
     ${SCRIPT} self-update [FLAGS] [TARGET-LOCATION]
@@ -361,7 +361,7 @@ set_ghc() {
 
 self_update() {
     target_location=$1
-    source_url="https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup.sh"
+    source_url="https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup"
     downloader=curl
     downloader_opts="--fail -O"
 
@@ -375,8 +375,8 @@ self_update() {
         echov "Downloading ${source_url}"
         # shellcheck disable=SC2086
         edo ${downloader} ${downloader_opts} "${source_url}"
-        edo mv ghcup.sh "${target_location}"/ghcup.sh
-        edo chmod +x "${target_location}"/ghcup.sh
+        edo mv ghcup "${target_location}"/ghcup
+        edo chmod +x "${target_location}"/ghcup
     )
 
     printf_green "Done, make sure \"${target_location}\" is in your PATH!"

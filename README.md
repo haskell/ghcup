@@ -32,12 +32,12 @@ Inspired by [rustup](https://github.com/rust-lang-nursery/rustup.rs).
 
 ## Installation
 
-Just place `ghcup.sh` into your PATH anywhere
+Just place the `ghcup` shell script into your PATH anywhere
 (preferably `~/.local/bin`).
 
 ## Usage
 
-See `ghcup.sh --help`.
+See `ghcup --help`.
 
 ## Contributing
 
