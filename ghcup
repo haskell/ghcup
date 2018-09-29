@@ -388,7 +388,7 @@ install_ghc() {
     ) || {
         [ -e "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
         [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
-        die "Failed to install"
+        die "Failed to install, consider updating this script via: ${SCRIPT} self-update"
     }
 
     [ -e "${BIN_LOCATION}" ] || mkdir "${BIN_LOCATION}"
