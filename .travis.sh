@@ -18,8 +18,8 @@ tar -xzf cabal-install-2.2.0.0-x86_64-unknown-linux.tar.gz
 export PATH="$HOME/.ghcup/bin:$PATH"
 
 # install shellcheck
-./cabal new-update
-./cabal new-install ShellCheck
+./cabal update
+./cabal install ShellCheck
 
 # check our script for errors
 ~/.cabal/bin/shellcheck ghcup.sh
