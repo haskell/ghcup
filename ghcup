@@ -130,24 +130,24 @@ FLAGS:
 ## utilities ##
 
 die() {
-    (>&2 echo "$1")
+    (>&2 printf "\\033[0;31m%s\\033[0m\\n" "$1")
     exit 2
 }
 
 edo()
 {
     if ${VERBOSE} ; then
-        echo "$@" 1>&2
+        printf "\\033[0;34m%s\\033[0m\\n" "$*" 1>&2
     fi
     "$@" || exit 2
 }
 
 echov() {
     if ${VERBOSE} ; then
-        echo "$1"
+        printf "\\033[0;34m%s\\033[0m\\n" "$1"
     else
         if [ -n "$2" ] ; then
-            echov "$2"
+            printf "\\033[0;34m%s\\033[0m\\n" "$2"
         fi
     fi
 }
@@ -377,7 +377,7 @@ self_update() {
         edo ${downloader} ${downloader_opts} "${source_url}"
         edo mv ghcup "${target_location}"/ghcup
         edo chmod +x "${target_location}"/ghcup
-    )
+    ) || die "failed to install"
 
     printf_green "Done, make sure \"${target_location}\" is in your PATH!"
 
