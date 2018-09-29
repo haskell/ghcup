@@ -29,4 +29,4 @@ export PATH="$HOME/.ghcup/bin:$PATH"
 ./cabal install ShellCheck
 
 # check our script for errors
-~/.cabal/bin/shellcheck ghcup.sh
+~/.cabal/bin/shellcheck ghcup
