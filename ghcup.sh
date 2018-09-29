@@ -283,6 +283,7 @@ install_ghc() {
     }
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
+        [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
         fn=$(basename "${f}")
         # shellcheck disable=SC2046
         edo ln $(echov "-v") -sf ../ghc/"${myghcver}/bin/${fn}" "${target_location}/${fn}"
@@ -310,6 +311,7 @@ set_ghc() {
     printf_green "Setting GHC to ${myghcver}"
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
+        [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
         source_fn=$(basename "${f}")
         target_fn=$(echo "${source_fn}" | sed "s#-${myghcver}##")
         # shellcheck disable=SC2046
