@@ -1,12 +1,18 @@
 #!/bin/sh
 
+# TODO:
+#   - self-update
+
 set -e
+
 
 ## global variables ##
 
 VERSION=0.0.1
 SCRIPT="$(basename $0)"
 VERBOSE=false
+FORCE=false
+INSTALL_BASE="$HOME/.ghcup"
 
 
 ## print help ##
@@ -20,7 +26,9 @@ FLAGS:
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-    install          Update Rust toolchains and rustup
+    install          Install GHC
+    set-ghc          Set current GHC version
+    self-update      Update this script in-place
 ")
     exit 1
 }
@@ -30,9 +38,35 @@ install_usage() {
 
 FLAGS:
     -h, --help       Prints help information
+    -f, --force      Overwrite already existing installation
 
 ARGS:
     <VERSION>        E.g. \"8.4.3\" or \"8.6.1\"
+")
+    exit 1
+}
+
+set_ghc_usage() {
+    (>&2 echo "${SCRIPT} set-ghc [FLAGS] <VERSION>
+
+FLAGS:
+    -h, --help       Prints help information
+
+ARGS:
+    <VERSION>        E.g. \"8.4.3\" or \"8.6.1\"
+")
+    exit 1
+}
+
+self_update_usage() {
+    (>&2 echo "${SCRIPT} self-update [FLAGS] [TARGET-LOCATION]
+
+FLAGS:
+    -h, --help         Prints help information
+
+ARGS:
+    [TARGET-LOCATION]  Where to place the updated script (defaults to ~/.local/bin).
+                       Must be an absolute path!
 ")
     exit 1
 }
@@ -45,18 +79,18 @@ die() {
     exit 2
 }
 
-if_verbose() {
-    if ${VERBOSE} ; then
-        printf "$1"
-    else
-        [ -n "$2" ] && printf "$2"
-    fi
-}
-
 echov() {
     if ${VERBOSE} ; then
         echo "$1"
+    else
+        if [ -n "$2" ] ; then
+            echov "$2"
+        fi
     fi
+}
+
+printf_green() {
+    printf "\033[0;32m${1}\033[0m\n"
 }
 
 get_distro_name() {
@@ -127,11 +161,15 @@ get_download_url() {
     mydistrover=$(get_distro_ver)
     baseurl="https://downloads.haskell.org/~ghc"
 
+    # TODO: awkward, restructure
     case "${mydistro},${mydistrover},${myarch},${myghcver}" in
     Debian,7,i386,8.2.2)
         printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb${mydistrover}-linux.tar.xz"
         break;;
     *,*,i386,*)
+        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        break;;
+    Debian,*,*,8.2.2)
         printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
         break;;
     Debian,8,*,*)
@@ -140,8 +178,14 @@ get_download_url() {
     Debian,*,*,*)
         printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
         break;;
+    Ubuntu,*,*,8.2.2)
+        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        break;;
     Ubuntu,*,*,*)
         printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
+        break;;
+    *,*,*,8.2.2)
+        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
         break;;
     *,*,*,*) # this is our best guess
         printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-fedora27-linux.tar.xz"
@@ -157,39 +201,107 @@ get_download_url() {
 install_ghc() {
     myghcver=$1
     downloader=curl
-    downloader_opts="$(if_verbose "-v") -O"
+    downloader_opts="-O"
     old_pwd=${PWD}
-    inst_location=$HOME/.ghcup/${myghcver}
+    inst_location=${INSTALL_BASE}/${myghcver}
 
-    echov "Installing ghc for $(get_distro_name) on architecture $(get_arch)"
-
-    cd "$(mktemp -d)"
-
-    echov "Downloading $(get_download_url ${myghcver})"
-    ${downloader} ${downloader_opts} "$(get_download_url ${myghcver})"
-
-    tar $(if_verbose "-v") -xf ghc-*-linux.tar.xz
-    cd ghc-${myghcver}
-
-    if [ -z "$HOME" ] ; then
-        die "HOME env not set, cannot install GHC"
-    else
-        echov "Installing GHC into ${inst_location}"
+    if [ -e "${inst_location}" ] ; then
+        if ${FORCE} ; then
+            echo "GHC already installed in ${inst_location}, overwriting!"
+        else
+            die "GHC already installed in ${inst_location}, use --force to overwrite"
+        fi
     fi
 
-    ./configure --prefix="${inst_location}"
-    make install
+    printf_green "Installing GHC for $(get_distro_name) on architecture $(get_arch)"
+    (
+        cd "$(mktemp -d)"
 
-    cd "${old_pwd}"
+        echov "Downloading $(get_download_url ${myghcver})"
+        ${downloader} ${downloader_opts} "$(get_download_url ${myghcver})"
 
-    echo "Done installing, set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
+        tar -xf ghc-*-linux.tar.xz
+        cd ghc-${myghcver}
+
+        echov "Installing GHC into ${inst_location}"
+
+        ./configure --prefix="${inst_location}"
+        make install
+    )
+
+    printf_green "Done installing, set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
 
     unset myghcver downloader downloader_opts old_pwd inst_location
 }
 
 
+## subcommand set-ghc ##
+
+set_ghc() {
+    myghcver=$1
+    target_location=${INSTALL_BASE}/bin
+    inst_location=${INSTALL_BASE}/${myghcver}
+
+    [ -e "${inst_location}" ] || die "GHC ${myghcver} not installed yet, use: ${SCRIPT} install ${myghcver}"
+    [ -e "${target_location}" ] || mkdir "${target_location}"
+
+    printf_green "Setting GHC to ${myghcver}"
+
+    if [ -z "${target_location}" ] ; then
+        die "We are paranoid, because we are deleting files."
+    fi
+
+    find "${target_location}" -type l -delete
+
+    for f in "${inst_location}"/bin/*-${myghcver} ; do
+        source_fn=$(basename ${f})
+        target_fn=$(echo ${source_fn} | sed "s#-${myghcver}##")
+        ln $(echov "-v") -s ../${myghcver}/bin/${source_fn} "${target_location}"/${target_fn}
+        unset source_fn target_fn
+    done
+    ln $(echov "-v") -s runghc "${target_location}"/runhaskell
+
+    printf_green "Done, make sure \"${target_location}\" is in your PATH!"
+
+    unset myghcver target_location inst_location
+}
+
+
+## self-update subcommand ##
+
+self_update() {
+    target_location=$1
+    source_url="https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup.sh"
+    downloader=curl
+    downloader_opts="-O"
+
+    [ -e "${target_location}" ] || die "Destination \"${target_location}\" does not exist, cannot update script"
+
+    printf_green "Updating ${SCRIPT}"
+
+    (
+        cd "$(mktemp -d)"
+
+        echov "Downloading ${source_url}"
+        ${downloader} ${downloader_opts} "${source_url}"
+        cp ghcup.sh "${target_location}"/ghcup.sh
+        chmod +x "${target_location}"/ghcup.sh
+    )
+
+    printf_green "Done, make sure \"${target_location}\" is in your PATH!"
+
+    unset target_location source_url downloader downloader_opts
+}
+
 
 ## command line parsing and entry point ##
+
+# sanity checks
+if [ -z "$HOME" ] ; then
+    die "HOME env not set, cannot operate"
+fi
+
+[ $# -lt 1 ] && usage
 
 while [ $# -gt 0 ] ; do
     case $1 in
@@ -207,12 +319,41 @@ while [ $# -gt 0 ] ; do
            while [ $# -gt 0 ] ; do
                case $1 in
                    -h|--help) install_usage;;
+                   -f|--force) FORCE=true
+                       shift 1;;
                    *) GHC_VER=$1
                       break;;
                esac
            done
            [ "${GHC_VER}" ] || install_usage
            install_ghc ${GHC_VER}
+           break;;
+       set-ghc)
+           shift 1
+           while [ $# -gt 0 ] ; do
+               case $1 in
+                   -h|--help) set_ghc_usage;;
+                   *) GHC_VER=$1
+                      break;;
+               esac
+           done
+           [ "${GHC_VER}" ] || set_ghc_usage
+           set_ghc ${GHC_VER}
+           break;;
+       self-update)
+           shift 1
+           while [ $# -gt 0 ] ; do
+               case $1 in
+                   -h|--help) self_update_usage;;
+                   *) TARGET_LOCATION=$1
+                       break;;
+               esac
+           done
+           if [ "${TARGET_LOCATION}" ] ; then
+               self_update "${TARGET_LOCATION}"
+           else
+               self_update "${HOME}/.local/bin"
+           fi
            break;;
        *) usage;;
        esac
