@@ -48,13 +48,13 @@ See `ghcup.sh --help`.
 
 ## TODO
 
-- [ ] FreeBSD support (#4)
-- [ ] Make fetching tarballs more robust (#5)
+- [ ] FreeBSD support ([#4](https://github.com/hasufell/ghcup/issues/4))
+- [ ] Make fetching tarballs more robust ([#5](https://github.com/hasufell/ghcup/issues/5))
 
 ## Feature considerations
 
-- [ ] Allow to compile from source (#2)
-- [ ] Allow to install cabal-install as well (#3)
+- [ ] Allow to compile from source ([#2](https://github.com/hasufell/ghcup/issues/2))
+- [ ] Allow to install cabal-install as well ([#3](https://github.com/hasufell/ghcup/issues/3))
 
 ## Known problems
 
