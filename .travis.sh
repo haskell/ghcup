@@ -10,6 +10,12 @@ set -e
 # set GHC
 ./ghcup -v set 8.6.1
 ./ghcup -v set 8.4.3
+
+# rm GHC
+./ghcup -v rm 8.6.1
+./ghcup -v rm 8.4.3
+
+# set GHC
 ./ghcup -v set 8.2.2
 
 # install cabal-install
