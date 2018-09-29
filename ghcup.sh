@@ -6,7 +6,7 @@ set -e
 ## global variables ##
 
 VERSION=0.0.1
-SCRIPT="$(basename $0)"
+SCRIPT="$(basename "$0")"
 VERBOSE=false
 FORCE=false
 INSTALL_BASE="$HOME/.ghcup"
@@ -103,27 +103,27 @@ echov() {
 }
 
 printf_green() {
-    printf "\033[0;32m${1}\033[0m\n"
+    printf "\\033[0;32m%s\\033[0m\\n" "$1"
 }
 
 get_distro_name() {
     if [ -f /etc/os-release ]; then
         # freedesktop.org and systemd
         . /etc/os-release
-        printf "$NAME"
+        printf "%s" "$NAME"
     elif command -V lsb_release >/dev/null 2>&1; then
         # linuxbase.org
-        printf "$(lsb_release -si)"
+        printf "%s" "$(lsb_release -si)"
     elif [ -f /etc/lsb-release ]; then
         # For some versions of Debian/Ubuntu without lsb_release command
         . /etc/lsb-release
-        printf "$DISTRIB_ID"
+        printf "%s" "$DISTRIB_ID"
     elif [ -f /etc/debian_version ]; then
         # Older Debian/Ubuntu/etc.
         printf "Debian"
     else
         # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
-        printf "$(uname -s)"
+        printf "%s" "$(uname -s)"
     fi
 }
 
@@ -131,20 +131,20 @@ get_distro_ver() {
     if [ -f /etc/os-release ]; then
         # freedesktop.org and systemd
         . /etc/os-release
-        printf "$VERSION_ID"
+        printf "%s" "$VERSION_ID"
     elif command -V lsb_release >/dev/null 2>&1; then
         # linuxbase.org
-        printf "$(lsb_release -sr)"
+        printf "%s" "$(lsb_release -sr)"
     elif [ -f /etc/lsb-release ]; then
         # For some versions of Debian/Ubuntu without lsb_release command
         . /etc/lsb-release
-        printf "$DISTRIB_RELEASE"
+        printf "%s" "$DISTRIB_RELEASE"
     elif [ -f /etc/debian_version ]; then
         # Older Debian/Ubuntu/etc.
-        printf "$(cat /etc/debian_version)"
+        printf "%s" "$(cat /etc/debian_version)"
     else
         # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
-        printf "$(uname -r)"
+        printf "%s" "$(uname -r)"
     fi
 }
 
@@ -177,32 +177,32 @@ get_download_url() {
     # TODO: awkward, restructure
     case "${mydistro},${mydistrover},${myarch},${myghcver}" in
     Debian,7,i386,8.2.2)
-        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb${mydistrover}-linux.tar.xz"
-        break;;
+        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb${mydistrover}-linux.tar.xz"
+        ;;
     *,*,i386,*)
-        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
-        break;;
+        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        ;;
     Debian,*,*,8.2.2)
-        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
-        break;;
+        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        ;;
     Debian,8,*,*)
-        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
-        break;;
+        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        ;;
     Debian,*,*,*)
-        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
-        break;;
+        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
+        ;;
     Ubuntu,*,*,8.2.2)
-        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
-        break;;
+        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        ;;
     Ubuntu,*,*,*)
-        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
-        break;;
+        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
+        ;;
     *,*,*,8.2.2)
-        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
-        break;;
+        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        ;;
     *,*,*,*) # this is our best guess
-        printf "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-fedora27-linux.tar.xz"
-        break;;
+        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-fedora27-linux.tar.xz"
+        ;;
     esac
 
     unset myghcver myarch mydistro mydistrover baseurl
@@ -215,7 +215,6 @@ install_ghc() {
     myghcver=$1
     downloader=curl
     downloader_opts="--fail -O"
-    old_pwd=${PWD}
     inst_location=${INSTALL_BASE}/${myghcver}
     target_location=${INSTALL_BASE}/bin
 
@@ -233,11 +232,11 @@ install_ghc() {
     (
         cd "$(mktemp -d)"
 
-        echov "Downloading $(get_download_url ${myghcver})"
-        ${downloader} ${downloader_opts} "$(get_download_url ${myghcver})"
+        echov "Downloading $(get_download_url "${myghcver}")"
+        ${downloader} ${downloader_opts} "$(get_download_url "${myghcver}")"
 
         tar -xf ghc-*-linux.tar.xz
-        cd ghc-${myghcver}
+        cd "ghc-${myghcver}"
 
         echov "Installing GHC into ${inst_location}"
 
@@ -246,18 +245,18 @@ install_ghc() {
 
         # clean up
         cd ..
-        rm -r ghc-*-linux.tar.xz ghc-${myghcver}
+        rm -r ghc-*-linux.tar.xz "ghc-${myghcver}"
     )
 
-    for f in "${inst_location}"/bin/*-${myghcver} ; do
-        fn=$(basename ${f})
-        ln $(echov "-v") -s ../${myghcver}/bin/${fn} "${target_location}"/${fn}
+    for f in "${inst_location}"/bin/*-"${myghcver}" ; do
+        fn=$(basename "${f}")
+        ln $(echov "-v") -s ../"${myghcver}/bin/${fn}" "${target_location}/${fn}"
         unset fn
     done
 
     printf_green "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
 
-    unset myghcver downloader downloader_opts old_pwd inst_location target_location f
+    unset myghcver downloader downloader_opts inst_location target_location f
 }
 
 
@@ -273,10 +272,10 @@ set_ghc() {
 
     printf_green "Setting GHC to ${myghcver}"
 
-    for f in "${inst_location}"/bin/*-${myghcver} ; do
-        source_fn=$(basename ${f})
-        target_fn=$(echo ${source_fn} | sed "s#-${myghcver}##")
-        ln $(echov "-v") -sf ../${myghcver}/bin/${source_fn} "${target_location}"/${target_fn}
+    for f in "${inst_location}"/bin/*-"${myghcver}" ; do
+        source_fn=$(basename "${f}")
+        target_fn=$(echo "${source_fn}" | sed "s#-${myghcver}##")
+        ln $(echov "-v") -sf ../"${myghcver}/bin/${source_fn}" "${target_location}/${target_fn}"
         unset source_fn target_fn
     done
     ln $(echov "-v") -sf runghc "${target_location}"/runhaskell
@@ -329,7 +328,7 @@ while [ $# -gt 0 ] ; do
         VERBOSE=true
         shift 1;;
     -V|--version)
-        printf "${VERSION}"
+        printf "%s" "${VERSION}"
         exit 0;;
     -h|--help)
         usage;;
@@ -346,7 +345,7 @@ while [ $# -gt 0 ] ; do
                esac
            done
            [ "${GHC_VER}" ] || install_usage
-           install_ghc ${GHC_VER}
+           install_ghc "${GHC_VER}"
            break;;
        set)
            shift 1
@@ -358,7 +357,7 @@ while [ $# -gt 0 ] ; do
                esac
            done
            [ "${GHC_VER}" ] || set_usage
-           set_ghc ${GHC_VER}
+           set_ghc "${GHC_VER}"
            break;;
        self-update)
            shift 1
