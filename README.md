@@ -12,6 +12,16 @@ This uses precompiled GHC binaries that have been
 compiled on fedora/debian by
 [upstream GHC](https://www.haskell.org/ghc/download_ghc_8_6_1.html#binaries).
 
+## Table of Contents
+
+   * [Why](#why)
+   * [Installation](#installation)
+   * [Usage](#usage)
+   * [Contributing](#contributing)
+   * [TODO](#todo)
+   * [Feature considerations](#feature-considerations)
+   * [Known problems](#known-problems)
+
 ## Why
 
 I don't use stack, but `cabal new-*` and system GHC versions
