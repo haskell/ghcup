@@ -274,8 +274,6 @@ install_ghc() {
     download_url=$(get_download_url "${myghcver}")
     download_tarball_name=$(basename "${download_url}")
 
-    [ -e "${target_location}" ] || mkdir "${target_location}"
-
     if [ -e "${inst_location}" ] ; then
         if ${FORCE} ; then
             echo "GHC already installed in ${inst_location}, overwriting!"
@@ -311,6 +309,8 @@ install_ghc() {
         [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
         die "Failed to install"
     }
+
+    [ -e "${target_location}" ] || mkdir "${target_location}"
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
