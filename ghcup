@@ -167,6 +167,16 @@ echov() {
     fi
 }
 
+optionv() {
+    if ${VERBOSE} ; then
+        echo "$1"
+    else
+        if [ -n "$2" ] ; then
+            echo "$2"
+        fi
+    fi
+}
+
 printf_green() {
     printf "\\033[0;32m%s\\033[0m\\n" "$1"
 }
@@ -331,11 +341,11 @@ install_ghc() {
         [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
         fn=$(basename "${f}")
         # shellcheck disable=SC2046
-        edo ln $(echov "-v") -sf ../ghc/"${myghcver}/bin/${fn}" "${target_location}/${fn}"
+        edo ln $(optionv "-v") -sf ../ghc/"${myghcver}/bin/${fn}" "${target_location}/${fn}"
         unset fn
     done
     # shellcheck disable=SC2046
-    edo ln $(echov "-v") -sf ../ghc/"${myghcver}"/bin/runhaskell "${target_location}/runhaskell-${myghcver}"
+    edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/runhaskell "${target_location}/runhaskell-${myghcver}"
 
     printf_green "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
 
@@ -360,11 +370,11 @@ set_ghc() {
         source_fn=$(basename "${f}")
         target_fn=$(echo "${source_fn}" | sed "s#-${myghcver}##")
         # shellcheck disable=SC2046
-        edo ln $(echov "-v") -sf ../ghc/"${myghcver}/bin/${source_fn}" "${target_location}/${target_fn}"
+        edo ln $(optionv "-v") -sf ../ghc/"${myghcver}/bin/${source_fn}" "${target_location}/${target_fn}"
         unset source_fn target_fn
     done
     # shellcheck disable=SC2046
-    edo ln $(echov "-v") -sf runghc "${target_location}"/runhaskell
+    edo ln $(optionv "-v") -sf runghc "${target_location}"/runhaskell
 
     printf_green "Done, make sure \"${target_location}\" is in your PATH!"
 
