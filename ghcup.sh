@@ -225,7 +225,7 @@ install_ghc() {
     myghcver=$1
     downloader=curl
     downloader_opts="--fail -O"
-    inst_location=${INSTALL_BASE}/${myghcver}
+    inst_location=${INSTALL_BASE}/ghc/${myghcver}
     target_location=${INSTALL_BASE}/bin
 
     [ -e "${target_location}" ] || mkdir "${target_location}"
@@ -269,11 +269,11 @@ install_ghc() {
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         fn=$(basename "${f}")
         # shellcheck disable=SC2046
-        edo ln $(echov "-v") -sf ../"${myghcver}/bin/${fn}" "${target_location}/${fn}"
+        edo ln $(echov "-v") -sf ../ghc/"${myghcver}/bin/${fn}" "${target_location}/${fn}"
         unset fn
     done
     # shellcheck disable=SC2046
-    edo ln $(echov "-v") -sf ../"${myghcver}"/bin/runhaskell "${target_location}/runhaskell-${myghcver}"
+    edo ln $(echov "-v") -sf ../ghc/"${myghcver}"/bin/runhaskell "${target_location}/runhaskell-${myghcver}"
 
     printf_green "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
 
@@ -286,7 +286,7 @@ install_ghc() {
 set_ghc() {
     myghcver=$1
     target_location=${INSTALL_BASE}/bin
-    inst_location=${INSTALL_BASE}/${myghcver}
+    inst_location=${INSTALL_BASE}/ghc/${myghcver}
 
     [ -e "${inst_location}" ] || die "GHC ${myghcver} not installed yet, use: ${SCRIPT} install ${myghcver}"
     [ -e "${target_location}" ] || edo mkdir "${target_location}"
@@ -297,7 +297,7 @@ set_ghc() {
         source_fn=$(basename "${f}")
         target_fn=$(echo "${source_fn}" | sed "s#-${myghcver}##")
         # shellcheck disable=SC2046
-        edo ln $(echov "-v") -sf ../"${myghcver}/bin/${source_fn}" "${target_location}/${target_fn}"
+        edo ln $(echov "-v") -sf ../ghc/"${myghcver}/bin/${source_fn}" "${target_location}/${target_fn}"
         unset source_fn target_fn
     done
     # shellcheck disable=SC2046
