@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# TODO:
-#   - self-update
-
 set -e
 
 
@@ -201,9 +198,12 @@ get_download_url() {
 install_ghc() {
     myghcver=$1
     downloader=curl
-    downloader_opts="-O"
+    downloader_opts="--fail -O"
     old_pwd=${PWD}
     inst_location=${INSTALL_BASE}/${myghcver}
+    target_location=${INSTALL_BASE}/bin
+
+    [ -e "${target_location}" ] || mkdir "${target_location}"
 
     if [ -e "${inst_location}" ] ; then
         if ${FORCE} ; then
@@ -229,9 +229,15 @@ install_ghc() {
         make install
     )
 
-    printf_green "Done installing, set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
+    for f in "${inst_location}"/bin/*-${myghcver} ; do
+        fn=$(basename ${f})
+        ln $(echov "-v") -s ../${myghcver}/bin/${fn} "${target_location}"/${fn}
+        unset fn
+    done
 
-    unset myghcver downloader downloader_opts old_pwd inst_location
+    printf_green "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
+
+    unset myghcver downloader downloader_opts old_pwd inst_location target_location f
 }
 
 
@@ -247,23 +253,17 @@ set_ghc() {
 
     printf_green "Setting GHC to ${myghcver}"
 
-    if [ -z "${target_location}" ] ; then
-        die "We are paranoid, because we are deleting files."
-    fi
-
-    find "${target_location}" -type l -delete
-
     for f in "${inst_location}"/bin/*-${myghcver} ; do
         source_fn=$(basename ${f})
         target_fn=$(echo ${source_fn} | sed "s#-${myghcver}##")
-        ln $(echov "-v") -s ../${myghcver}/bin/${source_fn} "${target_location}"/${target_fn}
+        ln $(echov "-v") -sf ../${myghcver}/bin/${source_fn} "${target_location}"/${target_fn}
         unset source_fn target_fn
     done
-    ln $(echov "-v") -s runghc "${target_location}"/runhaskell
+    ln $(echov "-v") -sf runghc "${target_location}"/runhaskell
 
     printf_green "Done, make sure \"${target_location}\" is in your PATH!"
 
-    unset myghcver target_location inst_location
+    unset myghcver target_location inst_location f
 }
 
 
@@ -273,7 +273,7 @@ self_update() {
     target_location=$1
     source_url="https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup.sh"
     downloader=curl
-    downloader_opts="-O"
+    downloader_opts="--fail -O"
 
     [ -e "${target_location}" ] || die "Destination \"${target_location}\" does not exist, cannot update script"
 
