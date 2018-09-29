@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/hasufell/ghcup.svg?branch=master)](https://travis-ci.org/hasufell/ghcup)
+
 # GHC up
 
 Installs a specified GHC version into `~/.ghcup/<ver>`,
