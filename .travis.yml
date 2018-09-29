@@ -6,7 +6,7 @@ sudo: false
 addons:
   apt:
     sources:
-    - debian-sid    # Grab shellcheck from the Debian repo (o_O)
+    - debian-buster    # Grab shellcheck from the Debian repo (o_O)
     packages:
     - shellcheck
 
