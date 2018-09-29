@@ -243,6 +243,8 @@ install_ghc() {
     downloader_opts="--fail -O"
     inst_location=${INSTALL_BASE}/ghc/${myghcver}
     target_location=${INSTALL_BASE}/bin
+    download_url=$(get_download_url "${myghcver}")
+    download_tarball_name=$(basename "${download_url}")
 
     [ -e "${target_location}" ] || mkdir "${target_location}"
 
@@ -260,9 +262,9 @@ install_ghc() {
     (
         edo cd "${tmp_dir}"
 
-        echov "Downloading $(get_download_url "${myghcver}")"
+        echov "Downloading ${download_url}"
         # shellcheck disable=SC2086
-        edo ${downloader} ${downloader_opts} "$(get_download_url "${myghcver}")"
+        edo ${downloader} ${downloader_opts} "${download_url}"
 
         edo tar -xf ghc-*-linux.tar.xz
         edo cd "ghc-${myghcver}"
@@ -274,12 +276,12 @@ install_ghc() {
 
         # clean up
         edo cd ..
-        rm "${tmp_dir}"/ghc-*-linux.tar.xz
-        rm -r "${tmp_dir}/ghc-${myghcver}"
+        [ -e "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
+        [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
     ) || {
-        rm "${tmp_dir}"/ghc-*-linux.tar.xz
-        rm -r "${tmp_dir}/ghc-${myghcver}"
-        die "Failed to install, cleaning up ${tmp_dir}"
+        [ -e "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
+        [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
+        die "Failed to install"
     }
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
@@ -294,7 +296,7 @@ install_ghc() {
 
     printf_green "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
 
-    unset myghcver downloader downloader_opts inst_location target_location f
+    unset myghcver downloader downloader_opts inst_location target_location f download_url download_tarball_name
 }
 
 
