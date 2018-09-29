@@ -28,7 +28,7 @@ FLAGS:
 
 SUBCOMMANDS:
     install          Install GHC
-    set-ghc          Set current GHC version
+    set              Set currently active GHC version
     self-update      Update this script in-place
 ")
     exit 1
@@ -51,12 +51,12 @@ ARGS:
     exit 1
 }
 
-set_ghc_usage() {
-    (>&2 echo "ghcup-set-ghc
+set_usage() {
+    (>&2 echo "ghcup-set
 Set the currently active GHC to the specified version
 
 USAGE:
-    ${SCRIPT} set-ghc [FLAGS] <VERSION>
+    ${SCRIPT} set [FLAGS] <VERSION>
 
 FLAGS:
     -h, --help       Prints help information
@@ -348,16 +348,16 @@ while [ $# -gt 0 ] ; do
            [ "${GHC_VER}" ] || install_usage
            install_ghc ${GHC_VER}
            break;;
-       set-ghc)
+       set)
            shift 1
            while [ $# -gt 0 ] ; do
                case $1 in
-                   -h|--help) set_ghc_usage;;
+                   -h|--help) set_usage;;
                    *) GHC_VER=$1
                       break;;
                esac
            done
-           [ "${GHC_VER}" ] || set_ghc_usage
+           [ "${GHC_VER}" ] || set_usage
            set_ghc ${GHC_VER}
            break;;
        self-update)
