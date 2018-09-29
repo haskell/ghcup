@@ -36,6 +36,8 @@ SCRIPT="$(basename "$0")"
 VERBOSE=false
 FORCE=false
 INSTALL_BASE="$HOME/.ghcup"
+GHC_LOCATION="$INSTALL_BASE/ghc"
+BIN_LOCATION="$INSTALL_BASE/bin"
 
 
 ## print help ##
@@ -157,7 +159,7 @@ edo()
     "$@" || exit 2
 }
 
-echov() {
+debug_message() {
     if ${VERBOSE} ; then
         printf "\\033[0;34m%s\\033[0m\\n" "$1"
     else
@@ -177,8 +179,12 @@ optionv() {
     fi
 }
 
-printf_green() {
+status_message() {
     printf "\\033[0;32m%s\\033[0m\\n" "$1"
+}
+
+warning_message() {
+    printf "\\033[1;33m%s\\033[0m\\n" "$1"
 }
 
 get_distro_name() {
@@ -287,6 +293,36 @@ get_download_url() {
     unset myghcver myarch mydistro mydistrover baseurl
 }
 
+# @FUNCTION: ghc_already_installed
+# @USAGE: <ghcversion>
+# @DESCRIPTION:
+# Checks whether the specified GHC version
+# has been installed by ghcup already.
+# @RETURN: 0 if GHC is already installed, 1 otherwise
+ghc_already_installed() {
+    if [ -e "$(get_ghc_location "$1")" ] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# @FUNCTION: get_ghc_location
+# @USAGE: <ghcversion>
+# @DESCRIPTION:
+# Gets/prints the location where the specified GHC is or would be installed.
+# Doesn't check whether that directory actually exist. Use
+# 'ghc_already_installed' for that.
+# @STDOUT: ghc location
+get_ghc_location() {
+    myghcver=$1
+    inst_location=${GHC_LOCATION}/${myghcver}
+
+    printf "%s" "${inst_location}"
+
+    unset myghcver unset inst_location
+}
+
 
 ## subcommand install ##
 
@@ -294,12 +330,11 @@ install_ghc() {
     myghcver=$1
     downloader=curl
     downloader_opts="--fail -O"
-    inst_location=${INSTALL_BASE}/ghc/${myghcver}
-    target_location=${INSTALL_BASE}/bin
+    inst_location=$(get_ghc_location "$1")
     download_url=$(get_download_url "${myghcver}")
     download_tarball_name=$(basename "${download_url}")
 
-    if [ -e "${inst_location}" ] ; then
+    if ghc_already_installed "${myghcver}" ; then
         if ${FORCE} ; then
             echo "GHC already installed in ${inst_location}, overwriting!"
         else
@@ -307,20 +342,20 @@ install_ghc() {
         fi
     fi
 
-    printf_green "Installing GHC for $(get_distro_name) on architecture $(get_arch)"
+    status_message "Installing GHC for $(get_distro_name) on architecture $(get_arch)"
     tmp_dir=$(mktemp -d)
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
         edo cd "${tmp_dir}"
 
-        echov "Downloading ${download_url}"
+        debug_message "Downloading ${download_url}"
         # shellcheck disable=SC2086
         edo ${downloader} ${downloader_opts} "${download_url}"
 
         edo tar -xf ghc-*-linux.tar.xz
         edo cd "ghc-${myghcver}"
 
-        echov "Installing GHC into ${inst_location}"
+        debug_message "Installing GHC into ${inst_location}"
 
         edo ./configure --prefix="${inst_location}"
         edo make install
@@ -335,21 +370,21 @@ install_ghc() {
         die "Failed to install"
     }
 
-    [ -e "${target_location}" ] || mkdir "${target_location}"
+    [ -e "${BIN_LOCATION}" ] || mkdir "${BIN_LOCATION}"
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
         fn=$(basename "${f}")
         # shellcheck disable=SC2046
-        edo ln $(optionv "-v") -sf ../ghc/"${myghcver}/bin/${fn}" "${target_location}/${fn}"
+        edo ln $(optionv "-v") -sf ../ghc/"${myghcver}/bin/${fn}" "${BIN_LOCATION}/${fn}"
         unset fn
     done
     # shellcheck disable=SC2046
-    edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/runhaskell "${target_location}/runhaskell-${myghcver}"
+    edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/runhaskell "${BIN_LOCATION}/runhaskell-${myghcver}"
 
-    printf_green "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
+    status_message "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
 
-    unset myghcver downloader downloader_opts inst_location target_location f download_url download_tarball_name
+    unset myghcver downloader downloader_opts inst_location f download_url download_tarball_name
 }
 
 
@@ -357,28 +392,27 @@ install_ghc() {
 
 set_ghc() {
     myghcver=$1
-    target_location=${INSTALL_BASE}/bin
-    inst_location=${INSTALL_BASE}/ghc/${myghcver}
+    inst_location=$(get_ghc_location "$1")
 
     [ -e "${inst_location}" ] || die "GHC ${myghcver} not installed yet, use: ${SCRIPT} install ${myghcver}"
-    [ -e "${target_location}" ] || edo mkdir "${target_location}"
+    [ -e "${BIN_LOCATION}" ] || edo mkdir "${BIN_LOCATION}"
 
-    printf_green "Setting GHC to ${myghcver}"
+    status_message "Setting GHC to ${myghcver}"
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
         source_fn=$(basename "${f}")
         target_fn=$(echo "${source_fn}" | sed "s#-${myghcver}##")
         # shellcheck disable=SC2046
-        edo ln $(optionv "-v") -sf ../ghc/"${myghcver}/bin/${source_fn}" "${target_location}/${target_fn}"
+        edo ln $(optionv "-v") -sf ../ghc/"${myghcver}/bin/${source_fn}" "${BIN_LOCATION}/${target_fn}"
         unset source_fn target_fn
     done
     # shellcheck disable=SC2046
-    edo ln $(optionv "-v") -sf runghc "${target_location}"/runhaskell
+    edo ln $(optionv "-v") -sf runghc "${BIN_LOCATION}"/runhaskell
 
-    printf_green "Done, make sure \"${target_location}\" is in your PATH!"
+    status_message "Done, make sure \"${BIN_LOCATION}\" is in your PATH!"
 
-    unset myghcver target_location inst_location f
+    unset myghcver inst_location f
 }
 
 
@@ -392,19 +426,19 @@ self_update() {
 
     [ -e "${target_location}" ] || die "Destination \"${target_location}\" does not exist, cannot update script"
 
-    printf_green "Updating ${SCRIPT}"
+    status_message "Updating ${SCRIPT}"
 
     (
         edo cd "$(mktemp -d)"
 
-        echov "Downloading ${source_url}"
+        debug_message "Downloading ${source_url}"
         # shellcheck disable=SC2086
         edo ${downloader} ${downloader_opts} "${source_url}"
         edo mv ghcup "${target_location}"/ghcup
         edo chmod +x "${target_location}"/ghcup
     ) || die "failed to install"
 
-    printf_green "Done, make sure \"${target_location}\" is in your PATH!"
+    status_message "Done, make sure \"${target_location}\" is in your PATH!"
 
     unset target_location source_url downloader downloader_opts
 }
@@ -412,11 +446,10 @@ self_update() {
 ## show subcommand ##
 
 show_ghc() {
-    ghc_location=${INSTALL_BASE}/ghc
     current_ghc=$(show_ghc_installed)
 
     echo "Installed GHCs:"
-    for i in "${ghc_location}"/* ; do
+    for i in "${GHC_LOCATION}"/* ; do
         [ -e "${i}" ] || die "Something went wrong, ${i} does not exist!"
         echo "    $(basename "${i}")"
     done
@@ -427,19 +460,18 @@ show_ghc() {
         echo "    ${current_ghc}"
     fi
 
-    unset target_location i
+    unset current_ghc i
 }
 
 show_ghc_installed() {
-    target_location=${INSTALL_BASE}/bin
-    real_ghc=$(realpath "${target_location}/ghc")
+    real_ghc=$(realpath "${BIN_LOCATION}/ghc")
 
     if [ -e "${real_ghc}" ] ; then
         real_ghc="$(basename "${real_ghc}" | sed 's#ghc-##')"
         printf "%s" "${real_ghc}"
     fi
 
-    unset target_location real_ghc
+    unset real_ghc
 }
 
 
