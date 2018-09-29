@@ -26,6 +26,7 @@ FLAGS:
 
 SUBCOMMANDS:
     install          Install GHC
+    show             Show current/installed GHC
     set              Set currently active GHC version
     self-update      Update this script in-place
 ")
@@ -78,6 +79,21 @@ FLAGS:
 ARGS:
     [TARGET-LOCATION]  Where to place the updated script (defaults to ~/.local/bin).
                        Must be an absolute path!
+")
+    exit 1
+}
+
+
+show_usage() {
+    (>&2 echo "ghcup-show
+Show the installed/current GHC versions
+
+USAGE:
+    ${SCRIPT} show [FLAGS]
+
+FLAGS:
+    -h, --help         Prints help information
+    -i, --installed    Show installed GHC version only
 ")
     exit 1
 }
@@ -336,6 +352,39 @@ self_update() {
     unset target_location source_url downloader downloader_opts
 }
 
+## show subcommand ##
+
+show_ghc() {
+    ghc_location=${INSTALL_BASE}/ghc
+    current_ghc=$(show_ghc_installed)
+
+    echo "Installed GHCs:"
+    for i in "${ghc_location}"/* ; do
+        [ -e "${i}" ] || die "Something went wrong, ${i} does not exist!"
+        echo "    $(basename "${i}")"
+    done
+
+    if [ -n "${current_ghc}" ] ; then
+        echo
+        echo "Current GHC"
+        echo "    ${current_ghc}"
+    fi
+
+    unset target_location i
+}
+
+show_ghc_installed() {
+    target_location=${INSTALL_BASE}/bin
+    real_ghc=$(realpath "${target_location}/ghc")
+
+    if [ -e "${real_ghc}" ] ; then
+        real_ghc="$(basename "${real_ghc}" | sed 's#ghc-##')"
+        printf "%s" "${real_ghc}"
+    fi
+
+    unset target_location real_ghc
+}
+
 
 ## command line parsing and entry point ##
 
@@ -396,6 +445,23 @@ while [ $# -gt 0 ] ; do
                self_update "${TARGET_LOCATION}"
            else
                self_update "${HOME}/.local/bin"
+           fi
+           break;;
+       show)
+           SHOW_INSTALLED=false
+           shift 1
+           while [ $# -gt 0 ] ; do
+               case $1 in
+                   -h|--help) show_usage;;
+                   -i|--installed) SHOW_INSTALLED=true
+                       break;;
+                   *) show_usage;;
+               esac
+           done
+           if ${SHOW_INSTALLED} ; then
+               show_ghc_installed
+           else
+               show_ghc
            fi
            break;;
        *) usage;;
