@@ -57,6 +57,11 @@ SUBCOMMANDS:
     show             Show current/installed GHC
     set              Set currently active GHC version
     self-update      Update this script in-place
+
+DISCUSSION:
+    ghcup installs the Glasgow Haskell Compiler from the official
+    release channels, enabling you to easily switch between different
+    versions.
 ")
     exit 1
 }
@@ -74,6 +79,11 @@ FLAGS:
 
 ARGS:
     <VERSION>        E.g. \"8.4.3\" or \"8.6.1\"
+
+DISCUSSION:
+    Installs the specified GHC version into
+    a self-contained \"~/.ghcup/ghc/<ghcver>\" directory
+    and symlinks the ghc binaries to \"~/.ghcup/bin/<binary>-<ghcver>\".
 ")
     exit 1
 }
@@ -90,6 +100,11 @@ FLAGS:
 
 ARGS:
     <VERSION>        E.g. \"8.4.3\" or \"8.6.1\"
+
+DISCUSSION:
+    Sets the the current GHC version by creating non-versioned
+    symlinks for all ghc binaries of the specified version in
+    \"~/.ghcup/bin/<binary>\".
 ")
     exit 1
 }
