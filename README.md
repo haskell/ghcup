@@ -3,7 +3,7 @@
 
 # GHC up
 
-Installs a specified GHC version into `~/.ghcup/<ver>`,
+Installs a specified GHC version into `~/.ghcup/ghc/<ver>`,
 and places `ghc-<ver>` etc. symlinks in `~/.ghcup/bin/`.
 Additionally allows to manage currently selected ghc
 via unversioned symlinks.
