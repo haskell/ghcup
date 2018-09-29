@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 
 ## global variables ##
 
@@ -90,6 +88,14 @@ ARGS:
 die() {
     (>&2 echo "$1")
     exit 2
+}
+
+edo()
+{
+    if ${VERBOSE} ; then
+        echo "$@" 1>&2
+    fi
+    "$@" || exit 2
 }
 
 echov() {
@@ -233,34 +239,41 @@ install_ghc() {
     fi
 
     printf_green "Installing GHC for $(get_distro_name) on architecture $(get_arch)"
+    tmp_dir=$(mktemp -d)
+    [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
-        cd "$(mktemp -d)"
+        edo cd "${tmp_dir}"
 
         echov "Downloading $(get_download_url "${myghcver}")"
         # shellcheck disable=SC2086
-        ${downloader} ${downloader_opts} "$(get_download_url "${myghcver}")"
+        edo ${downloader} ${downloader_opts} "$(get_download_url "${myghcver}")"
 
-        tar -xf ghc-*-linux.tar.xz
-        cd "ghc-${myghcver}"
+        edo tar -xf ghc-*-linux.tar.xz
+        edo cd "ghc-${myghcver}"
 
         echov "Installing GHC into ${inst_location}"
 
-        ./configure --prefix="${inst_location}"
-        make install
+        edo ./configure --prefix="${inst_location}"
+        edo make install
 
         # clean up
-        cd ..
-        rm -r ghc-*-linux.tar.xz "ghc-${myghcver}"
-    )
+        edo cd ..
+        rm "${tmp_dir}"/ghc-*-linux.tar.xz
+        rm -r "${tmp_dir}/ghc-${myghcver}"
+    ) || {
+        rm "${tmp_dir}"/ghc-*-linux.tar.xz
+        rm -r "${tmp_dir}/ghc-${myghcver}"
+        die "Failed to install, cleaning up ${tmp_dir}"
+    }
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         fn=$(basename "${f}")
         # shellcheck disable=SC2046
-        ln $(echov "-v") -sf ../"${myghcver}/bin/${fn}" "${target_location}/${fn}"
+        edo ln $(echov "-v") -sf ../"${myghcver}/bin/${fn}" "${target_location}/${fn}"
         unset fn
     done
     # shellcheck disable=SC2046
-    ln $(echov "-v") -sf ../"${myghcver}"/bin/runhaskell "${target_location}/runhaskell-${myghcver}"
+    edo ln $(echov "-v") -sf ../"${myghcver}"/bin/runhaskell "${target_location}/runhaskell-${myghcver}"
 
     printf_green "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
 
@@ -276,7 +289,7 @@ set_ghc() {
     inst_location=${INSTALL_BASE}/${myghcver}
 
     [ -e "${inst_location}" ] || die "GHC ${myghcver} not installed yet, use: ${SCRIPT} install ${myghcver}"
-    [ -e "${target_location}" ] || mkdir "${target_location}"
+    [ -e "${target_location}" ] || edo mkdir "${target_location}"
 
     printf_green "Setting GHC to ${myghcver}"
 
@@ -284,11 +297,11 @@ set_ghc() {
         source_fn=$(basename "${f}")
         target_fn=$(echo "${source_fn}" | sed "s#-${myghcver}##")
         # shellcheck disable=SC2046
-        ln $(echov "-v") -sf ../"${myghcver}/bin/${source_fn}" "${target_location}/${target_fn}"
+        edo ln $(echov "-v") -sf ../"${myghcver}/bin/${source_fn}" "${target_location}/${target_fn}"
         unset source_fn target_fn
     done
     # shellcheck disable=SC2046
-    ln $(echov "-v") -sf runghc "${target_location}"/runhaskell
+    edo ln $(echov "-v") -sf runghc "${target_location}"/runhaskell
 
     printf_green "Done, make sure \"${target_location}\" is in your PATH!"
 
@@ -309,13 +322,13 @@ self_update() {
     printf_green "Updating ${SCRIPT}"
 
     (
-        cd "$(mktemp -d)"
+        edo cd "$(mktemp -d)"
 
         echov "Downloading ${source_url}"
         # shellcheck disable=SC2086
-        ${downloader} ${downloader_opts} "${source_url}"
-        mv ghcup.sh "${target_location}"/ghcup.sh
-        chmod +x "${target_location}"/ghcup.sh
+        edo ${downloader} ${downloader_opts} "${source_url}"
+        edo mv ghcup.sh "${target_location}"/ghcup.sh
+        edo chmod +x "${target_location}"/ghcup.sh
     )
 
     printf_green "Done, make sure \"${target_location}\" is in your PATH!"
