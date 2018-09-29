@@ -109,6 +109,7 @@ printf_green() {
 get_distro_name() {
     if [ -f /etc/os-release ]; then
         # freedesktop.org and systemd
+        # shellcheck disable=SC1091
         . /etc/os-release
         printf "%s" "$NAME"
     elif command -V lsb_release >/dev/null 2>&1; then
@@ -116,6 +117,7 @@ get_distro_name() {
         printf "%s" "$(lsb_release -si)"
     elif [ -f /etc/lsb-release ]; then
         # For some versions of Debian/Ubuntu without lsb_release command
+        # shellcheck disable=SC1091
         . /etc/lsb-release
         printf "%s" "$DISTRIB_ID"
     elif [ -f /etc/debian_version ]; then
@@ -130,6 +132,7 @@ get_distro_name() {
 get_distro_ver() {
     if [ -f /etc/os-release ]; then
         # freedesktop.org and systemd
+        # shellcheck disable=SC1091
         . /etc/os-release
         printf "%s" "$VERSION_ID"
     elif command -V lsb_release >/dev/null 2>&1; then
@@ -137,6 +140,7 @@ get_distro_ver() {
         printf "%s" "$(lsb_release -sr)"
     elif [ -f /etc/lsb-release ]; then
         # For some versions of Debian/Ubuntu without lsb_release command
+        # shellcheck disable=SC1091
         . /etc/lsb-release
         printf "%s" "$DISTRIB_RELEASE"
     elif [ -f /etc/debian_version ]; then
@@ -233,6 +237,7 @@ install_ghc() {
         cd "$(mktemp -d)"
 
         echov "Downloading $(get_download_url "${myghcver}")"
+        # shellcheck disable=SC2086
         ${downloader} ${downloader_opts} "$(get_download_url "${myghcver}")"
 
         tar -xf ghc-*-linux.tar.xz
@@ -250,9 +255,11 @@ install_ghc() {
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         fn=$(basename "${f}")
+        # shellcheck disable=SC2046
         ln $(echov "-v") -sf ../"${myghcver}/bin/${fn}" "${target_location}/${fn}"
         unset fn
     done
+    # shellcheck disable=SC2046
     ln $(echov "-v") -sf ../"${myghcver}"/bin/runhaskell "${target_location}/runhaskell-${myghcver}"
 
     printf_green "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
@@ -276,9 +283,11 @@ set_ghc() {
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         source_fn=$(basename "${f}")
         target_fn=$(echo "${source_fn}" | sed "s#-${myghcver}##")
+        # shellcheck disable=SC2046
         ln $(echov "-v") -sf ../"${myghcver}/bin/${source_fn}" "${target_location}/${target_fn}"
         unset source_fn target_fn
     done
+    # shellcheck disable=SC2046
     ln $(echov "-v") -sf runghc "${target_location}"/runhaskell
 
     printf_green "Done, make sure \"${target_location}\" is in your PATH!"
@@ -303,6 +312,7 @@ self_update() {
         cd "$(mktemp -d)"
 
         echov "Downloading ${source_url}"
+        # shellcheck disable=SC2086
         ${downloader} ${downloader_opts} "${source_url}"
         mv ghcup.sh "${target_location}"/ghcup.sh
         chmod +x "${target_location}"/ghcup.sh
