@@ -59,6 +59,7 @@ SUBCOMMANDS:
     show             Show current/installed GHC
     set              Set currently active GHC version
     self-update      Update this script in-place
+    rm               Remove an already installed GHC
 
 DISCUSSION:
     ghcup installs the Glasgow Haskell Compiler from the official
@@ -139,6 +140,22 @@ USAGE:
 FLAGS:
     -h, --help         Prints help information
     -i, --installed    Show installed GHC version only
+")
+    exit 1
+}
+
+rm_usage() {
+    (>&2 echo "ghcup-rm
+Remove the given GHC version installed by ghcup
+
+USAGE:
+    ${SCRIPT} rm [FLAGS] <VERSION>
+
+FLAGS:
+    -h, --help       Prints help information
+
+ARGS:
+    <VERSION>        E.g. \"8.4.3\" or \"8.6.1\"
 ")
     exit 1
 }
@@ -474,6 +491,29 @@ show_ghc_installed() {
     unset real_ghc
 }
 
+## rm subcommand ##
+
+rm_ghc() {
+    myghcver=$1
+    inst_location=$(get_ghc_location "${myghcver}")
+
+    [ -z "${myghcver}" ] && die "We are paranoid, ghcver not set"
+
+    if ghc_already_installed "${myghcver}" ; then
+        for f in "${BIN_LOCATION}"/*-"${myghcver}" ; do
+            # https://tanguy.ortolo.eu/blog/article113/test-symlink
+            [ ! -e "${f}" ] && [ ! -h "${f}" ] && die "Something went wrong, ${f} does not exist!"
+            edo rm "${f}"
+        done
+        edo rm -r "${inst_location}"
+    else
+        warning_message "${myghcver} doesn't appear to be installed, skipping"
+    fi
+
+    unset myghcver inst_location f
+}
+
+
 
 ## command line parsing and entry point ##
 
@@ -552,6 +592,18 @@ while [ $# -gt 0 ] ; do
            else
                show_ghc
            fi
+           break;;
+       rm)
+           shift 1
+           while [ $# -gt 0 ] ; do
+               case $1 in
+                   -h|--help) rm_usage;;
+                   *) GHC_VER=$1
+                      break;;
+               esac
+           done
+           [ "${GHC_VER}" ] || rm_usage
+           rm_ghc "${GHC_VER}"
            break;;
        *) usage;;
        esac
