@@ -227,6 +227,10 @@ install_ghc() {
 
         ./configure --prefix="${inst_location}"
         make install
+
+        # clean up
+        cd ..
+        rm -r ghc-*-linux.tar.xz ghc-${myghcver}
     )
 
     for f in "${inst_location}"/bin/*-${myghcver} ; do
@@ -284,7 +288,7 @@ self_update() {
 
         echov "Downloading ${source_url}"
         ${downloader} ${downloader_opts} "${source_url}"
-        cp ghcup.sh "${target_location}"/ghcup.sh
+        mv ghcup.sh "${target_location}"/ghcup.sh
         chmod +x "${target_location}"/ghcup.sh
     )
 
