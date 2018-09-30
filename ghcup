@@ -341,7 +341,7 @@ get_ghc_location() {
 
     printf "%s" "${inst_location}"
 
-    unset myghcver unset inst_location
+    unset myghcver inst_location
 }
 
 
