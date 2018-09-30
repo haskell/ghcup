@@ -284,6 +284,8 @@ get_arch() {
 # and the current distro and architecture (which it tries to discover).
 # @STDOUT: ghc download url
 get_download_url() {
+    [ -z "$1" ] && die "Internal error: no argument given to get_download_url"
+
     myghcver=$1
     myarch=$(get_arch)
     mydistro=$(get_distro_name)
@@ -330,6 +332,8 @@ get_download_url() {
 # has been installed by ghcup already.
 # @RETURN: 0 if GHC is already installed, 1 otherwise
 ghc_already_installed() {
+    [ -z "$1" ] && die "Internal error: no argument given to ghc_already_installed"
+
     if [ -e "$(get_ghc_location "$1")" ] ; then
         return 0
     else
@@ -345,6 +349,8 @@ ghc_already_installed() {
 # 'ghc_already_installed' for that.
 # @STDOUT: ghc location
 get_ghc_location() {
+    [ -z "$1" ] && die "Internal error: no argument given to get_ghc_location"
+
     myghcver=$1
     inst_location=${GHC_LOCATION}/${myghcver}
 
@@ -359,7 +365,7 @@ get_ghc_location() {
 # Downloads the given url as a file into the current directory.
 # @RETURN: status code from the downloader
 download() {
-    [ -z "$1" ] && die "Internal error, no argument given to download"
+    [ -z "$1" ] && die "Internal error: no argument given to download"
     # shellcheck disable=SC2086
     ${DOWNLOADER} ${DOWNLOADER_OPTS} "$1"
     return $?
@@ -373,6 +379,8 @@ download() {
 # @DESCRIPTION:
 # Installs the given ghc version with a lot of side effects.
 install_ghc() {
+    [ -z "$1" ] && die "Internal error: no argument given to install_ghc"
+
     myghcver=$1
     inst_location=$(get_ghc_location "$1")
     download_url=$(get_download_url "${myghcver}")
@@ -437,6 +445,8 @@ install_ghc() {
 # @DESCRIPTION:
 # Sets the current ghc version by creating symlinks.
 set_ghc() {
+    [ -z "$1" ] && die "Internal error: no argument given to set_ghc"
+
     myghcver=$1
     inst_location=$(get_ghc_location "$1")
 
@@ -541,6 +551,8 @@ show_ghc_installed() {
 # @DESCRIPTION:
 # Removes the given GHC version installed by ghcup.
 rm_ghc() {
+    [ -z "$1" ] && die "Internal error: no argument given to rm_ghc"
+
     myghcver=$1
     inst_location=$(get_ghc_location "${myghcver}")
 
