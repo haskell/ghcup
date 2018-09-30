@@ -29,7 +29,11 @@
 
 
 
-## global variables ##
+
+    ##########################
+    #--[ Global Variables ]--#
+    ##########################
+
 
 # @VARIABLE: VERSION
 # @DESCRIPTION:
@@ -87,7 +91,11 @@ SCRIPT_UPDATE_URL="https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup
 GHC_DOWNLOAD_BASEURL="https://downloads.haskell.org/~ghc"
 
 
-## print help ##
+
+    ####################
+    #--[ Print Help ]--#
+    ####################
+
 
 # @FUNCTION: usage
 # @DESCRIPTION:
@@ -230,7 +238,11 @@ ARGS:
 }
 
 
-## utilities ##
+
+    ###########################
+    #--[ Utility functions ]--#
+    ###########################
+
 
 # @FUNCTION: die
 # @USAGE: [msg]
@@ -481,7 +493,11 @@ download() {
 }
 
 
-## subcommand install ##
+
+    ############################
+    #--[ Subcommand install ]--#
+    ############################
+
 
 # @FUNCTION: install_ghc
 # @USAGE: <ghcversion>
@@ -547,7 +563,11 @@ install_ghc() {
 }
 
 
-## subcommand set-ghc ##
+
+    ############################
+    #--[ Subcommand set-ghc ]--#
+    ############################
+
 
 # @FUNCTION: set_ghc
 # @USAGE: <ghcversion>
@@ -581,7 +601,11 @@ set_ghc() {
 }
 
 
-## self-update subcommand ##
+
+    ################################
+    #--[ Subcommand self-update ]--#
+    ################################
+
 
 # @FUNCTION: self_update
 # @USAGE: <install-location>
@@ -607,7 +631,12 @@ self_update() {
     unset target_location
 }
 
-## show subcommand ##
+
+
+    #########################
+    #--[ Subcommand show ]--#
+    #########################
+
 
 # @FUNCTION: show_ghc
 # @DESCRIPTION:
@@ -651,7 +680,12 @@ show_ghc_installed() {
     unset real_ghc current_ghc
 }
 
-## rm subcommand ##
+
+
+    #######################
+    #--[ Subcommand rm ]--#
+    #######################
+
 
 # @FUNCTION: rm_ghc
 # @USAGE: <ghcversion>
@@ -685,12 +719,21 @@ rm_ghc() {
 
 
 
-## command line parsing and entry point ##
+    #######################
+    #--[ Sanity checks ]--#
+    #######################
 
-# sanity checks
+
 if [ -z "$HOME" ] ; then
     die "HOME env not set, cannot operate"
 fi
+
+
+
+    ##############################################
+    #--[ Command line parsing and entry point ]--#
+    ##############################################
+
 
 [ $# -lt 1 ] && usage
 
