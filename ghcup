@@ -128,7 +128,6 @@ FLAGS:
 
 ARGS:
     [TARGET-LOCATION]  Where to place the updated script (defaults to ~/.local/bin).
-                       Must be an absolute path!
 ")
     exit 1
 }
@@ -474,7 +473,6 @@ set_ghc() {
 
 ## self-update subcommand ##
 
-# TODO: relative path
 # @FUNCTION: self_update
 # @USAGE: <install-location>
 # @DESCRIPTION:
@@ -488,10 +486,9 @@ self_update() {
     status_message "Updating ${SCRIPT}"
 
     (
-        edo cd "$(mktemp -d)"
+        edo cd "${target_location}"
 
         edo download "${SCRIPT_UPDATE_URL}"
-        edo mv ghcup "${target_location}"/ghcup
         edo chmod +x "${target_location}"/ghcup
     ) || die "failed to install"
 
