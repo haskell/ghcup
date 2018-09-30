@@ -277,6 +277,12 @@ get_arch() {
     unset myarch
 }
 
+# @FUNCTION: get_download_url
+# @USAGE: <ghcversion>
+# @DESCRIPTION:
+# Gets the right (hopefully) download url for the given ghc version
+# and the current distro and architecture (which it tries to discover).
+# @STDOUT: ghc download url
 get_download_url() {
     myghcver=$1
     myarch=$(get_arch)
@@ -362,6 +368,10 @@ download() {
 
 ## subcommand install ##
 
+# @FUNCTION: install_ghc
+# @USAGE: <ghcversion>
+# @DESCRIPTION:
+# Installs the given ghc version with a lot of side effects.
 install_ghc() {
     myghcver=$1
     inst_location=$(get_ghc_location "$1")
@@ -422,6 +432,10 @@ install_ghc() {
 
 ## subcommand set-ghc ##
 
+# @FUNCTION: set_ghc
+# @USAGE: <ghcversion>
+# @DESCRIPTION:
+# Sets the current ghc version by creating symlinks.
 set_ghc() {
     myghcver=$1
     inst_location=$(get_ghc_location "$1")
@@ -450,6 +464,12 @@ set_ghc() {
 
 ## self-update subcommand ##
 
+# TODO: relative path
+# @FUNCTION: self_update
+# @USAGE: <install-location>
+# @DESCRIPTION:
+# Downloads the latest version of this script and places it into
+# the given directory.
 self_update() {
     target_location=$1
 
@@ -472,6 +492,10 @@ self_update() {
 
 ## show subcommand ##
 
+# @FUNCTION: show_ghc
+# @DESCRIPTION:
+# Prints the currently installed and selected GHC, in human-friendly
+# format.
 show_ghc() {
     current_ghc=$(show_ghc_installed)
 
@@ -490,6 +514,10 @@ show_ghc() {
     unset current_ghc i
 }
 
+# @FUNCTION: show_ghc_installed
+# @DESCRIPTION:
+# Prints the currently selected GHC only as version string.
+# @STDOUT: current GHC version
 show_ghc_installed() {
     current_ghc="${BIN_LOCATION}/ghc"
     real_ghc=$(realpath "${current_ghc}" 2>/dev/null)
@@ -508,6 +536,10 @@ show_ghc_installed() {
 
 ## rm subcommand ##
 
+# @FUNCTION: rm_ghc
+# @USAGE: <ghcversion>
+# @DESCRIPTION:
+# Removes the given GHC version installed by ghcup.
 rm_ghc() {
     myghcver=$1
     inst_location=$(get_ghc_location "${myghcver}")

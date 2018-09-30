@@ -50,7 +50,7 @@ See `ghcup --help`.
 
 - [ ] FreeBSD support ([#4](https://github.com/hasufell/ghcup/issues/4))
 - [ ] Make fetching tarballs more robust ([#5](https://github.com/hasufell/ghcup/issues/5))
-- [ ] More code documentation
+- [x] More code documentation
 
 ## Feature considerations
 
