@@ -263,10 +263,6 @@ edo()
 debug_message() {
     if ${VERBOSE} ; then
         printf "\\033[0;34m%s\\033[0m\\n" "$1"
-    else
-        if [ -n "$2" ] ; then
-            printf "\\033[0;34m%s\\033[0m\\n" "$2"
-        fi
     fi
 }
 
