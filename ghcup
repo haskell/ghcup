@@ -706,13 +706,13 @@ rm_ghc() {
             edo rm "${f}"
         done
         edo rm -r "${inst_location}"
+
+        status_message "Successfully removed GHC ${myghcver}, you might have to"
+        status_message "set the currently active GHC now to fix dangling symlinks:"
+        status_message "    ghcup set <ghcver>"
     else
         warning_message "${myghcver} doesn't appear to be installed, skipping"
     fi
-
-    status_message "Successfully removed GHC ${myghcver}, you might have to"
-    status_message "set the currently active GHC now to fix dangling symlinks:"
-    status_message "    ghcup set <ghcver>"
 
     unset myghcver inst_location f
 }
