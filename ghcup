@@ -27,6 +27,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+# TODO:
+#   - make removal more robust
 
 
 
@@ -96,6 +98,12 @@ GHC_DOWNLOAD_BASEURL="https://downloads.haskell.org/~ghc"
 # which a pre-built binary exists.
 KNOWN_GOOD_CABAL="2.2.0.0"
 
+# @VARIABLE: JOBS
+# @DESCRIPTION:
+# How many jobs to use for compiling GHC.
+JOBS="1"
+
+
 
     ####################
     #--[ Print Help ]--#
@@ -148,6 +156,7 @@ USAGE:
 FLAGS:
     -h, --help       Prints help information
     -f, --force      Overwrite already existing installation
+    -j, --jobs <n>   How many jobs for installation
 
 ARGS:
     <VERSION>        E.g. \"8.4.3\" or \"8.6.1\"
@@ -265,6 +274,37 @@ DISCUSSION:
     Installs the specified cabal-install version (or the default ${KNOWN_GOOD_CABAL})
     into the global \"~/.cabal/bin\" directory, so it can be overwritten
     by later \"cabal new-install cabal-install\".
+")
+    exit 1
+}
+
+# @FUNCTION: compile_usage
+# @DESCRIPTION:
+# Print the help message for 'ghcup compile' to STDERR
+# and exit the script with status code 1.
+compile_usage() {
+    (>&2 echo "ghcup-compile
+Compile and install the specified GHC version
+
+USAGE:
+    ${SCRIPT} compile [FLAGS] <VERSION> <BOOTSTRAP-GHC>
+
+FLAGS:
+    -h, --help       Prints help information
+    -f, --force      Overwrite already existing installation
+    -j, --jobs <n>   How many jobs for compilation
+
+ARGS:
+    <VERSION>        E.g. \"8.4.3\" or \"8.6.1\"
+    <BOOTSTRAP-GHC>  E.g. \"ghc-8.2.2\" or a full path
+
+DISCUSSION:
+    Compiles and installs the specified GHC version into
+    a self-contained \"~/.ghcup/ghc/<ghcver>\" directory
+    and symlinks the ghc binaries to \"~/.ghcup/bin/<binary>-<ghcver>\".
+
+EXAMPLE:
+    ghcup -v compile -f -j 4 8.4.2 ghc-8.2.2
 ")
     exit 1
 }
@@ -566,7 +606,7 @@ install_ghc() {
         debug_message "Installing GHC into ${inst_location}"
 
         edo ./configure --prefix="${inst_location}"
-        edo make install
+        edo make -j${JOBS} install
 
         # clean up
         edo cd ..
@@ -780,7 +820,7 @@ install_cabal() {
 
     (
         edo cd "$(mktemp -d)"
-        edo download "https://www.haskell.org/cabal/release/cabal-install-${mycabalver}/cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
+        edo download "https://downloads.haskell.org/~cabal/cabal-install-${mycabalver}/cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
         edo tar -xzf "cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
         edo mv cabal "${inst_location}"/cabal
     ) || die "Failed to install cabal-install"
@@ -790,6 +830,83 @@ install_cabal() {
     status_message "    cabal new-install cabal-install"
 
     unset mycabalver myarch inst_location
+}
+
+# @FUNCTION: compile_ghc
+# @USAGE: <ghcversion> <bootstrap-ghc>
+# @DESCRIPTION:
+# Compile and installs the given GHC version with the
+# specified GHC bootstrap version.
+compile_ghc() {
+    { [ -z "$1" ] || [ -z "$2" ] ;} && die "Internal error: not enough arguments given to compile_ghc"
+
+    myghcver=$1
+    bootstrap_ghc=$2
+    inst_location=$(get_ghc_location "$1")
+    download_url="https://downloads.haskell.org/~ghc/${myghcver}/ghc-${myghcver}-src.tar.xz"
+    download_tarball_name=$(basename "${download_url}")
+
+    if ghc_already_installed "${myghcver}" ; then
+        if ${FORCE} ; then
+            echo "GHC already installed in ${inst_location}, overwriting!"
+        else
+            die "GHC already installed in ${inst_location}, use --force to overwrite"
+        fi
+    fi
+
+    status_message "Compiling GHC for version ${myghcver} from source"
+    tmp_dir=$(mktemp -d)
+    [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
+    (
+        edo cd "${tmp_dir}"
+
+        edo download "${download_url}"
+
+        edo tar -xf ghc-*-src.tar.xz
+        edo cd "ghc-${myghcver}"
+
+        cat <<-EOF > mk/build.mk || die
+			BuildFlavour = quick
+			V=0
+			BUILD_MAN = NO
+			BUILD_SPHINX_HTML = NO
+			BUILD_SPHINX_PDF = NO
+			HADDOCK_DOCS = YES
+			GhcWithLlvmCodeGen = YES
+			EOF
+
+        edo ./boot
+        edo ./configure --prefix="${inst_location}" --with-ghc="${bootstrap_ghc}"
+        edo make -j${JOBS}
+        edo make install
+
+        # clean up
+        edo cd ..
+        [ -e "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
+        [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
+    ) || {
+        [ -e "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
+        [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
+        die "Failed to install, consider updating this script via:
+    ${SCRIPT} self-update
+Also check https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux for build requirements and follow the instructions."
+    }
+
+    [ -e "${BIN_LOCATION}" ] || mkdir "${BIN_LOCATION}"
+
+    for f in "${inst_location}"/bin/*-"${myghcver}" ; do
+        [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
+        fn=$(basename "${f}")
+        # shellcheck disable=SC2046
+        edo ln $(optionv "-v") -sf ../ghc/"${myghcver}/bin/${fn}" "${BIN_LOCATION}/${fn}"
+        unset fn
+    done
+    # shellcheck disable=SC2046
+    edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/runhaskell "${BIN_LOCATION}/runhaskell-${myghcver}"
+
+    status_message "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set ${myghcver}"
+
+    unset myghcver bootstrap_ghc inst_location f download_url download_tarball_name
 }
 
 
@@ -835,6 +952,8 @@ while [ $# -gt 0 ] ; do
                    -h|--help) install_usage;;
                    -f|--force) FORCE=true
                        shift 1;;
+                   -j|--jobs) JOBS=$1
+                       shift 2;;
                    *) GHC_VER=$1
                       break;;
                esac
@@ -914,6 +1033,24 @@ while [ $# -gt 0 ] ; do
            else
                install_cabal "${KNOWN_GOOD_CABAL}"
            fi
+           break;;
+       compile)
+           shift 1
+           while [ $# -gt 0 ] ; do
+               case $1 in
+                   -h|--help) compile_usage;;
+                   -f|--force) FORCE=true
+                       shift 1;;
+                   -j|--jobs) JOBS=$2
+                       shift 2;;
+                   *) GHC_VER=$1
+                      BOOTSTRAP_GHC=$2
+                      break;;
+               esac
+           done
+           [ "${GHC_VER}" ] || compile_usage
+           [ "${BOOTSTRAP_GHC}" ] || compile_usage
+           compile_ghc "${GHC_VER}" "${BOOTSTRAP_GHC}"
            break;;
        *) usage;;
        esac

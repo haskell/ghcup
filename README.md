@@ -12,6 +12,8 @@ This uses precompiled GHC binaries that have been
 compiled on fedora/debian by
 [upstream GHC](https://www.haskell.org/ghc/download_ghc_8_6_1.html#binaries).
 
+Alternatively, you can also tell it to compile from source (note that this might
+fail due to missing requirements).
 
 In addition this script can also install `cabal-install`.
 
@@ -57,7 +59,7 @@ See `ghcup --help`.
 
 ## Feature considerations
 
-- [ ] Allow to compile from source ([#2](https://github.com/hasufell/ghcup/issues/2))
+- [x] Allow to compile from source ([#2](https://github.com/hasufell/ghcup/issues/2))
 - [x] Allow to install cabal-install as well ([#3](https://github.com/hasufell/ghcup/issues/3))
 
 ## Known problems

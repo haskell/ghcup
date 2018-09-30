@@ -18,6 +18,9 @@ set -e
 # set GHC
 ./ghcup -v set 8.2.2
 
+# compile GHC from source
+./ghcup -v compile 8.4.3 ghc-8.2.2
+
 # install cabal-install
 ./ghcup -v install-cabal
 
