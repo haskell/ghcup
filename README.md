@@ -12,6 +12,9 @@ This uses precompiled GHC binaries that have been
 compiled on fedora/debian by
 [upstream GHC](https://www.haskell.org/ghc/download_ghc_8_6_1.html#binaries).
 
+
+In addition this script can also install `cabal-install`.
+
 ## Table of Contents
 
    * [Why](#why)
