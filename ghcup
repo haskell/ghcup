@@ -707,9 +707,12 @@ rm_ghc() {
         done
         edo rm -r "${inst_location}"
 
-        status_message "Successfully removed GHC ${myghcver}, you might have to"
-        status_message "set the currently active GHC now to fix dangling symlinks:"
-        status_message "    ghcup set <ghcver>"
+        status_message "Successfully removed GHC ${myghcver}."
+
+        if [ ! -e "${BIN_LOCATION}"/ghc ] ; then
+            warning_message "Currently active GHC is a dangling symlink, run:"
+            warning_message "    ghcup set <ghcver>"
+        fi
     else
         warning_message "${myghcver} doesn't appear to be installed, skipping"
     fi
