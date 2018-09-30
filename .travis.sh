@@ -18,13 +18,13 @@ set -e
 # set GHC
 ./ghcup -v set 8.2.2
 
+export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
+
 # compile GHC from source
 ./ghcup -v compile 8.4.3 ghc-8.2.2
 
 # install cabal-install
 ./ghcup -v install-cabal
-
-export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
 
 # install shellcheck
 cabal update
