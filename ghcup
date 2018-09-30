@@ -41,7 +41,7 @@ BIN_LOCATION="$INSTALL_BASE/bin"
 DOWNLOADER="curl"
 DOWNLOADER_OPTS="--fail -O"
 SCRIPT_UPDATE_URL="https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup"
-
+GHC_DOWNLOAD_BASEURL="https://downloads.haskell.org/~ghc"
 
 
 ## print help ##
@@ -282,40 +282,39 @@ get_download_url() {
     myarch=$(get_arch)
     mydistro=$(get_distro_name)
     mydistrover=$(get_distro_ver)
-    baseurl="https://downloads.haskell.org/~ghc"
 
     # TODO: awkward, restructure
     case "${mydistro},${mydistrover},${myarch},${myghcver}" in
     Debian,7,i386,8.2.2)
-        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb${mydistrover}-linux.tar.xz"
+        printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb${mydistrover}-linux.tar.xz"
         ;;
     *,*,i386,*)
-        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
         ;;
     Debian,*,*,8.2.2)
-        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
         ;;
     Debian,8,*,*)
-        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
         ;;
     Debian,*,*,*)
-        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
+        printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
         ;;
     Ubuntu,*,*,8.2.2)
-        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
         ;;
     Ubuntu,*,*,*)
-        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
+        printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
         ;;
     *,*,*,8.2.2)
-        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
+        printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
         ;;
     *,*,*,*) # this is our best guess
-        printf "%s" "${baseurl}/${myghcver}/ghc-${myghcver}-${myarch}-fedora27-linux.tar.xz"
+        printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-fedora27-linux.tar.xz"
         ;;
     esac
 
-    unset myghcver myarch mydistro mydistrover baseurl
+    unset myghcver myarch mydistro mydistrover
 }
 
 # @FUNCTION: ghc_already_installed
