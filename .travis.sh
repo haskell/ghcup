@@ -20,8 +20,9 @@ set -e
 
 export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
 
+# TODO: exceeds maximum time limit of travis
 # compile GHC from source
-./ghcup -v compile 8.4.3 ghc-8.2.2
+#./ghcup -v compile 8.4.3 ghc-8.2.2
 
 # install cabal-install
 ./ghcup -v install-cabal
