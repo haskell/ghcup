@@ -40,6 +40,8 @@ GHC_LOCATION="$INSTALL_BASE/ghc"
 BIN_LOCATION="$INSTALL_BASE/bin"
 DOWNLOADER="curl"
 DOWNLOADER_OPTS="--fail -O"
+SCRIPT_UPDATE_URL="https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup"
+
 
 
 ## print help ##
@@ -451,7 +453,6 @@ set_ghc() {
 
 self_update() {
     target_location=$1
-    source_url="https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup"
 
     [ -e "${target_location}" ] || die "Destination \"${target_location}\" does not exist, cannot update script"
 
@@ -460,14 +461,14 @@ self_update() {
     (
         edo cd "$(mktemp -d)"
 
-        edo download "${source_url}"
+        edo download "${SCRIPT_UPDATE_URL}"
         edo mv ghcup "${target_location}"/ghcup
         edo chmod +x "${target_location}"/ghcup
     ) || die "failed to install"
 
     status_message "Done, make sure \"${target_location}\" is in your PATH!"
 
-    unset target_location source_url
+    unset target_location
 }
 
 ## show subcommand ##
