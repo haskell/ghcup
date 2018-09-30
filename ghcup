@@ -90,6 +90,11 @@ SCRIPT_UPDATE_URL="https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup
 # Base URL for all GHC tarballs.
 GHC_DOWNLOAD_BASEURL="https://downloads.haskell.org/~ghc"
 
+# @VARIABLE: KNOWN_GOOD_CABAL
+# @DESCRIPTION:
+# The latests known good cabal-install version for
+# which a pre-built binary exists.
+KNOWN_GOOD_CABAL="2.2.0.0"
 
 
     ####################
@@ -119,6 +124,7 @@ SUBCOMMANDS:
     set              Set currently active GHC version
     self-update      Update this script in-place
     rm               Remove an already installed GHC
+    install-cabal    Install cabal-install
 
 DISCUSSION:
     ghcup installs the Glasgow Haskell Compiler from the official
@@ -236,6 +242,33 @@ ARGS:
 ")
     exit 1
 }
+
+# @FUNCTION: install_cabal_usage
+# @DESCRIPTION:
+# Print the help message for 'ghcup install-cabal' to STDERR
+# and exit the script with status code 1.
+install_cabal_usage() {
+    (>&2 echo "ghcup-install-cabal
+Install the specified or a default cabal version
+
+USAGE:
+    ${SCRIPT} install-cabal [FLAGS] [VERSION]
+
+FLAGS:
+    -h, --help       Prints help information
+    -f, --force      Overwrite already existing installation
+
+ARGS:
+    <VERSION>        E.g. \"2.4.0.0\"
+
+DISCUSSION:
+    Installs the specified cabal-install version (or the default ${KNOWN_GOOD_CABAL})
+    into the global \"~/.cabal/bin\" directory, so it can be overwritten
+    by later \"cabal new-install cabal-install\".
+")
+    exit 1
+}
+
 
 
 
@@ -720,6 +753,46 @@ rm_ghc() {
     unset myghcver inst_location f
 }
 
+    ############################
+    #--[ Subcommand install ]--#
+    ############################
+
+
+# @FUNCTION: install_cabal
+# @USAGE: <cabalversion>
+# @DESCRIPTION:
+# Installs the given cabal version.
+install_cabal() {
+    [ -z "$1" ] && die "Internal error: no argument given to install_cabal"
+
+    mycabalver=$1
+    myarch=$(get_arch)
+    inst_location=$HOME/.cabal/bin
+
+    if [ -e "${inst_location}"/cabal ] && ! ${FORCE} ; then
+        die "\"${inst_location}/cabal\" already exist, use --force to overwrite"
+    fi
+
+    [ -e "${inst_location}" ] || {
+        edo mkdir "$HOME"/.cabal
+        edo mkdir "$HOME"/.cabal/bin
+    }
+
+    (
+        edo cd "$(mktemp -d)"
+        edo download "https://www.haskell.org/cabal/release/cabal-install-${mycabalver}/cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
+        edo tar -xzf "cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
+        edo mv cabal "${inst_location}"/cabal
+    ) || die "Failed to install cabal-install"
+
+    status_message "Successfully installed cabal-install, you may want to run the following"
+    status_message "to get the really latest version:"
+    status_message "    cabal new-install cabal-install"
+
+    unset mycabalver myarch inst_location
+}
+
+
 
 
     #######################
@@ -824,6 +897,23 @@ while [ $# -gt 0 ] ; do
            done
            [ "${GHC_VER}" ] || rm_usage
            rm_ghc "${GHC_VER}"
+           break;;
+       install-cabal)
+           shift 1
+           while [ $# -gt 0 ] ; do
+               case $1 in
+                   -h|--help) install_cabal_usage;;
+                   -f|--force) FORCE=true
+                       shift 1;;
+                   *) CABAL_VER=$1
+                      break;;
+               esac
+           done
+           if [ "${CABAL_VER}" ] ; then
+               install_cabal "${CABAL_VER}"
+           else
+               install_cabal "${KNOWN_GOOD_CABAL}"
+           fi
            break;;
        *) usage;;
        esac

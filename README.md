@@ -55,7 +55,7 @@ See `ghcup --help`.
 ## Feature considerations
 
 - [ ] Allow to compile from source ([#2](https://github.com/hasufell/ghcup/issues/2))
-- [ ] Allow to install cabal-install as well ([#3](https://github.com/hasufell/ghcup/issues/3))
+- [x] Allow to install cabal-install as well ([#3](https://github.com/hasufell/ghcup/issues/3))
 
 ## Known problems
 
