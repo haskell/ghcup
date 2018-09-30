@@ -38,6 +38,8 @@ FORCE=false
 INSTALL_BASE="$HOME/.ghcup"
 GHC_LOCATION="$INSTALL_BASE/ghc"
 BIN_LOCATION="$INSTALL_BASE/bin"
+DOWNLOADER="curl"
+DOWNLOADER_OPTS="--fail -O"
 
 
 ## print help ##
@@ -344,13 +346,23 @@ get_ghc_location() {
     unset myghcver inst_location
 }
 
+# @FUNCTION: download
+# @USAGE: <url>
+# @DESCRIPTION:
+# Downloads the given url as a file into the current directory.
+# @RETURN: status code from the downloader
+download() {
+    [ -z "$1" ] && die "Internal error, no argument given to download"
+    # shellcheck disable=SC2086
+    ${DOWNLOADER} ${DOWNLOADER_OPTS} "$1"
+    return $?
+}
+
 
 ## subcommand install ##
 
 install_ghc() {
     myghcver=$1
-    downloader=curl
-    downloader_opts="--fail -O"
     inst_location=$(get_ghc_location "$1")
     download_url=$(get_download_url "${myghcver}")
     download_tarball_name=$(basename "${download_url}")
@@ -369,9 +381,7 @@ install_ghc() {
     (
         edo cd "${tmp_dir}"
 
-        debug_message "Downloading ${download_url}"
-        # shellcheck disable=SC2086
-        edo ${downloader} ${downloader_opts} "${download_url}"
+        edo download "${download_url}"
 
         edo tar -xf ghc-*-linux.tar.xz
         edo cd "ghc-${myghcver}"
@@ -405,7 +415,7 @@ install_ghc() {
 
     status_message "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set-ghc ${myghcver}"
 
-    unset myghcver downloader downloader_opts inst_location f download_url download_tarball_name
+    unset myghcver inst_location f download_url download_tarball_name
 }
 
 
@@ -442,8 +452,6 @@ set_ghc() {
 self_update() {
     target_location=$1
     source_url="https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup"
-    downloader=curl
-    downloader_opts="--fail -O"
 
     [ -e "${target_location}" ] || die "Destination \"${target_location}\" does not exist, cannot update script"
 
@@ -452,16 +460,14 @@ self_update() {
     (
         edo cd "$(mktemp -d)"
 
-        debug_message "Downloading ${source_url}"
-        # shellcheck disable=SC2086
-        edo ${downloader} ${downloader_opts} "${source_url}"
+        edo download "${source_url}"
         edo mv ghcup "${target_location}"/ghcup
         edo chmod +x "${target_location}"/ghcup
     ) || die "failed to install"
 
     status_message "Done, make sure \"${target_location}\" is in your PATH!"
 
-    unset target_location source_url downloader downloader_opts
+    unset target_location source_url
 }
 
 ## show subcommand ##
