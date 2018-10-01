@@ -956,7 +956,7 @@ while [ $# -gt 0 ] ; do
                    -h|--help) install_usage;;
                    -f|--force) FORCE=true
                        shift 1;;
-                   -j|--jobs) JOBS=$1
+                   -j|--jobs) JOBS=$2
                        shift 2;;
                    *) GHC_VER=$1
                       break;;
