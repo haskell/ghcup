@@ -156,7 +156,6 @@ USAGE:
 FLAGS:
     -h, --help       Prints help information
     -f, --force      Overwrite already existing installation
-    -j, --jobs <n>   How many jobs for installation
 
 ARGS:
     <VERSION>        E.g. \"8.4.3\" or \"8.6.1\"
@@ -606,7 +605,7 @@ install_ghc() {
         debug_message "Installing GHC into ${inst_location}"
 
         edo ./configure --prefix="${inst_location}"
-        edo make -j${JOBS} install
+        edo make install
 
         # clean up
         edo cd ..
@@ -956,8 +955,6 @@ while [ $# -gt 0 ] ; do
                    -h|--help) install_usage;;
                    -f|--force) FORCE=true
                        shift 1;;
-                   -j|--jobs) JOBS=$2
-                       shift 2;;
                    *) GHC_VER=$1
                       break;;
                esac
