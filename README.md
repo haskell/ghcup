@@ -64,9 +64,19 @@ See `ghcup --help`.
 
 ## Known problems
 
+### Precompiled binaries
+
 Since this uses precompiled binaries you may run into
 problems with ncurses and missing libtinfo, in case
 your distribution doesn't use the legacy way of building
 ncurses and has no compatibility symlinks in place.
 
 Ask your distributor on how to solve this.
+
+### Compilation
+
+Although this script can compile GHC for you, it's just a very thing
+wrapper around the build system. It makes no effort in trying
+to figure out whether you have the current toolchain and
+the correct dependencies. Refer to [the official docs](https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux)
+on how to prepare your environment for building GHC.
