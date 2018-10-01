@@ -720,8 +720,12 @@ show_ghc() {
 
     echo "Installed GHCs:"
     for i in "${GHC_LOCATION}"/* ; do
-        [ -e "${i}" ] || die "Something went wrong, ${i} does not exist!"
-        echo "    $(basename "${i}")"
+        if [ -e "${i}" ] ; then
+            echo "    $(basename "${i}")"
+        else # directory is empty
+            echo "    None"
+            exit 0
+        fi
     done
 
     if [ -n "${current_ghc}" ] ; then
