@@ -27,6 +27,7 @@ export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
 # install cabal-install
 ./ghcup -v install-cabal
 
+cabal update
 cabal install cabal-install
 
 # install shellcheck
