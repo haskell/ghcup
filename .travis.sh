@@ -33,3 +33,6 @@ cabal install ShellCheck
 
 # check our script for errors
 shellcheck ghcup
+
+# self update
+ghcup self-update
