@@ -24,7 +24,6 @@ In addition this script can also install `cabal-install`.
    * [Usage](#usage)
    * [Contributing](#contributing)
    * [TODO](#todo)
-   * [Feature considerations](#feature-considerations)
    * [Known problems](#known-problems)
 
 ## Why
@@ -56,9 +55,6 @@ See `ghcup --help`.
 - [ ] FreeBSD support ([#4](https://github.com/hasufell/ghcup/issues/4))
 - [ ] Make fetching tarballs more robust ([#5](https://github.com/hasufell/ghcup/issues/5))
 - [x] More code documentation
-
-## Feature considerations
-
 - [x] Allow to compile from source ([#2](https://github.com/hasufell/ghcup/issues/2))
 - [x] Allow to install cabal-install as well ([#3](https://github.com/hasufell/ghcup/issues/3))
 
@@ -73,9 +69,19 @@ ncurses and has no compatibility symlinks in place.
 
 Ask your distributor on how to solve this.
 
+### Unreliable download location
+
+There is no single reliable URL where to download future
+GHC binary releases from, since the tarball names contain
+the distro name and version they were built on. As such,
+we cannot foresee what will be the next tarball name.
+
+In such a case, consider to update this script via
+`ghcup self-update`.
+
 ### Compilation
 
-Although this script can compile GHC for you, it's just a very thing
+Although this script can compile GHC for you, it's just a very thin
 wrapper around the build system. It makes no effort in trying
 to figure out whether you have the correct toolchain and
 the correct dependencies. Refer to [the official docs](https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux)
