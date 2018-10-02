@@ -781,6 +781,7 @@ rm_ghc() {
             [ ! -e "${f}" ] && [ ! -h "${f}" ] && die "Something went wrong, ${f} does not exist!"
             edo rm "${f}"
         done
+        [ -z "${inst_location}" ] && die "internal error: inst_location empty!"
         edo rm -r "${inst_location}"
 
         status_message "Successfully removed GHC ${myghcver}."
