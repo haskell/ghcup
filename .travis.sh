@@ -27,8 +27,14 @@ export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
 # install cabal-install
 ./ghcup -v install-cabal
 
-cabal update
-cabal install cabal-install
+cabal new-update
+
+# https://github.com/haskell/cabal/issues/5516
+mkdir -p ~/.cabal/store/ghc-8.2.2/package.db
+
+# this shouldn't be necessary, file bug upstream
+cabal new-install --symlink-bindir="$HOME"/.ghcup/bin cabal-install
+mv -f "$HOME"/.ghcup/bin/cabal "$HOME"/.cabal/bin/cabal
 
 # install shellcheck
 cabal new-update
