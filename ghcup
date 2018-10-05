@@ -128,6 +128,7 @@ FLAGS:
 
 SUBCOMMANDS:
     install          Install GHC
+    compile          Compile and install GHC from source
     show             Show current/installed GHC
     set              Set currently active GHC version
     self-update      Update this script in-place
