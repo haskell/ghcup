@@ -65,11 +65,13 @@ INSTALL_BASE="$HOME/.ghcup"
 # @VARIABLE: GHC_LOCATION
 # @DESCRIPTION:
 # The location where ghcup will install different ghc versions.
+# This is expected to be a subdirectory of INSTALL_BASE.
 GHC_LOCATION="$INSTALL_BASE/ghc"
 
 # @VARIABLE: BIN_LOCATION
 # @DESCRIPTION:
 # The location where ghcup will create symlinks for GHC binaries.
+# This is expected to be a subdirectory of INSTALL_BASE.
 BIN_LOCATION="$INSTALL_BASE/bin"
 
 # @VARIABLE: DOWNLOADER
@@ -265,15 +267,16 @@ USAGE:
 
 FLAGS:
     -h, --help       Prints help information
-    -f, --force      Overwrite already existing installation
 
 ARGS:
     <VERSION>        E.g. \"2.4.0.0\"
 
 DISCUSSION:
     Installs the specified cabal-install version (or the default ${KNOWN_GOOD_CABAL})
-    into the global \"~/.cabal/bin\" directory, so it can be overwritten
-    by later \"cabal new-install cabal-install\".
+    into \"${BIN_LOCATION}\", so it can be overwritten
+    by later \"cabal new-install cabal-install\", which installs into
+    \"~/.cabal/bin\". Make sure to set up your PATH appropriately, so
+    the cabal installation takes precedence.
 ")
     exit 1
 }
@@ -812,27 +815,29 @@ install_cabal() {
 
     mycabalver=$1
     myarch=$(get_arch)
-    inst_location=$HOME/.cabal/bin
-
-    if [ -e "${inst_location}"/cabal ] && ! ${FORCE} ; then
-        die "\"${inst_location}/cabal\" already exist, use --force to overwrite"
-    fi
+    inst_location=$BIN_LOCATION
 
     [ -e "${inst_location}" ] || {
-        edo mkdir "$HOME"/.cabal
-        edo mkdir "$HOME"/.cabal/bin
+        # TODO: this is a bit shaky because we don't use -p
+        edo mkdir "${INSTALL_BASE}"
+        edo mkdir "${BIN_LOCATION}"
     }
 
     (
         edo cd "$(mktemp -d)"
         edo download "https://downloads.haskell.org/~cabal/cabal-install-${mycabalver}/cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
         edo tar -xzf "cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
-        edo mv cabal "${inst_location}"/cabal
+        edo mv -f cabal "${inst_location}"/cabal
     ) || die "Failed to install cabal-install"
 
-    status_message "Successfully installed cabal-install, you may want to run the following"
-    status_message "to get the really latest version:"
+    status_message "Successfully installed cabal-install into"
+    status_message "  ${BIN_LOCATION}"
+    status_message ""
+    status_message "You may want to run the following to get the really latest version:"
     status_message "    cabal new-install cabal-install"
+    status_message ""
+    status_message "And make sure that \"~/.cabal/bin\" comes *before* \"${BIN_LOCATION}\""
+    status_message "in your PATH!"
 
     unset mycabalver myarch inst_location
 }
