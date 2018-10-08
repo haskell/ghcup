@@ -696,10 +696,11 @@ self_update() {
     status_message "Updating ${SCRIPT}"
 
     (
-        edo cd "${target_location}"
-
+        edo cd "$(mktemp -d)"
         edo download "${SCRIPT_UPDATE_URL}"
-        edo chmod +x "${target_location}"/ghcup
+        edo chmod +x ghcup
+        edo mv -f ghcup "${target_location}"/ghcup
+
     ) || die "failed to install"
 
     status_message "Done, make sure \"${target_location}\" is in your PATH!"
