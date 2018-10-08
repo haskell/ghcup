@@ -1,3 +1,4 @@
+[![GitHub release](https://img.shields.io/github/release/hasufell/ghcup.svg)](https://github.com/hasufell/ghcup/releases)
 [![Build Status](https://travis-ci.org/hasufell/ghcup.svg?branch=master)](https://travis-ci.org/hasufell/ghcup)
 [![license](https://img.shields.io/github/license/hasufell/ghcup.svg)](COPYING)
 
