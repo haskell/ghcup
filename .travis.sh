@@ -23,29 +23,28 @@ edo ./ghcup -v rm 8.4.3
 edo ./ghcup -v set 8.2.2
 
 export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$HOME/.local/bin:$PATH"
+edo mkdir -p "$HOME"/.local/bin
+
+edo cp ./ghcup "$HOME"/.local/bin/ghcup
 
 # TODO: exceeds maximum time limit of travis
 # compile GHC from source
 #./ghcup -v compile 8.4.3 ghc-8.2.2
 
 # install cabal-install
-edo ./ghcup -v install-cabal
-
-edo cabal update
-edo cabal install cabal-install
-
-# https://github.com/haskell/cabal/issues/5516
-edo mkdir -p ~/.cabal/store/ghc-8.2.2/package.db
-edo cabal new-update
+edo ghcup -v install-cabal
 
 # install shellcheck
-edo cabal new-install ShellCheck
+edo wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
+edo tar -xJf shellcheck-latest.linux.x86_64.tar.xz
+edo mv shellcheck-latest/shellcheck "$HOME"/.local/bin/shellcheck
 
 # check our script for errors
 edo shellcheck ghcup
 
 # self update
-edo mkdir -p "$HOME"/.local/bin
-edo ./ghcup self-update
+edo ghcup self-update
 
 edo ghcup show
+
+edo ghc --version

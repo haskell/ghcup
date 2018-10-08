@@ -23,6 +23,7 @@ addons:
     - make
     - ncurses-dev
     - python3
+    - realpath
     - xz-utils
 
 # TODO: also run checkbashisms.pl (currently two instances of non-compliance)
