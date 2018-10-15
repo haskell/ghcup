@@ -37,8 +37,14 @@ Inspired by [rustup](https://github.com/rust-lang-nursery/rustup.rs).
 
 ## Installation
 
-Just place the `ghcup` shell script into your PATH anywhere
+Just place the `ghcup` shell script into your `PATH` anywhere
 (preferably `~/.local/bin`).
+
+```
+mkdir -p ~/.local/bin/ghcup
+curl https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup > ~/.local/bin/ghcup
+chmod +x ~/.local/bin/ghcup
+```
 
 ## Usage
 

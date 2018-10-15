@@ -105,7 +105,11 @@ KNOWN_GOOD_CABAL="2.2.0.0"
 # How many jobs to use for compiling GHC.
 JOBS="1"
 
-
+# @VARIABLE: SOURCE
+# @DESCRIPTION:
+# The $0 argument, which contains
+# the script name.
+SOURCE="$0"
 
     ####################
     #--[ Print Help ]--#
@@ -682,6 +686,24 @@ set_ghc() {
     #--[ Subcommand self-update ]--#
     ################################
 
+# @FUNCTION: script_dir
+# @DESCRIPTION:
+# Portably gets the full directory of where
+# this script resides in and prints it to stdout.
+# @STDOUT: script directory
+script_dir() {
+    mysource=${SOURCE}
+
+    while [ -h "${mysource}" ]; do
+        mydir="$( cd -P "$( dirname "${mysource}" )" > /dev/null && pwd )"
+        mysource="$(readlink "${mysource}")"
+        [ "${mysource%${mysource#?}}"x != '/x' ] && mysource="${mydir}/${mysource}"
+    done
+    mydir="$( cd -P "$( dirname "${mysource}" )" > /dev/null && pwd )"
+    echo "${mydir}"
+
+    unset mysource mydir
+}
 
 # @FUNCTION: self_update
 # @USAGE: <install-location>
@@ -994,7 +1016,7 @@ while [ $# -gt 0 ] ; do
            if [ "${TARGET_LOCATION}" ] ; then
                self_update "${TARGET_LOCATION}"
            else
-               self_update "${HOME}/.local/bin"
+               self_update "$(script_dir)"
            fi
            break;;
        show)
