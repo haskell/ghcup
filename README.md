@@ -41,11 +41,18 @@ Just place the `ghcup` shell script into your `PATH` anywhere.
 
 E.g.:
 
-```
+```sh
 mkdir -p ~/.local/bin
 curl https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup > ~/.local/bin/ghcup
 chmod +x ~/.local/bin/ghcup
 ```
+
+Then adjust your `PATH` in `~/.bashrc` (or similar, depending on your shell) like so, for example:
+
+```sh
+export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$HOME/.local/bin:$PATH"
+```
+
 
 ## Usage
 
