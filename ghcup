@@ -494,25 +494,25 @@ get_download_url() {
 
     # TODO: awkward, restructure
     case "${mydistro},${mydistrover},${myarch},${myghcver}" in
-    Debian,7,i386,8.2.2)
+    Debian*,7,i386,8.2.2)
         printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb${mydistrover}-linux.tar.xz"
         ;;
     *,*,i386,*)
         printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
         ;;
-    Debian,*,*,8.2.2)
+    Debian*,*,*,8.2.2)
         printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
         ;;
-    Debian,8,*,*)
+    Debian*,8,*,*)
         printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
         ;;
-    Debian,*,*,*)
+    Debian*,*,*,*)
         printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
         ;;
-    Ubuntu,*,*,8.2.2)
+    Ubuntu*,*,*,8.2.2)
         printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb8-linux.tar.xz"
         ;;
-    Ubuntu,*,*,*)
+    Ubuntu*,*,*,*)
         printf "%s" "${GHC_DOWNLOAD_BASEURL}/${myghcver}/ghc-${myghcver}-${myarch}-deb9-linux.tar.xz"
         ;;
     *,*,*,8.2.2)
