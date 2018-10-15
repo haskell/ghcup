@@ -215,7 +215,7 @@ FLAGS:
     -h, --help         Prints help information
 
 ARGS:
-    [TARGET-LOCATION]  Where to place the updated script (defaults to ~/.local/bin).
+    [TARGET-LOCATION]  Where to place the updated script (defaults to directory of the script).
 ")
     exit 1
 }
