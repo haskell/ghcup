@@ -71,11 +71,12 @@ See `ghcup --help`.
 ### Precompiled binaries
 
 Since this uses precompiled binaries you may run into
-problems with ncurses and missing libtinfo, in case
+problems with *ncurses* and **missing libtinfo**, in case
 your distribution doesn't use the legacy way of building
 ncurses and has no compatibility symlinks in place.
 
-Ask your distributor on how to solve this.
+Ask your distributor on how to solve this or
+try to compile from source via `ghcup compile <version>`.
 
 ### Unreliable download location
 
