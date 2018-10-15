@@ -42,7 +42,7 @@ Just place the `ghcup` shell script into your `PATH` anywhere.
 E.g.:
 
 ```
-mkdir -p ~/.local/bin/ghcup
+mkdir -p ~/.local/bin
 curl https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup > ~/.local/bin/ghcup
 chmod +x ~/.local/bin/ghcup
 ```
