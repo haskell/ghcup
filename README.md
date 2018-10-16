@@ -29,9 +29,11 @@ In addition this script can also install `cabal-install`.
 
 ## Why
 
-I don't use stack, but `cabal new-*` and system GHC versions
+`cabal new-*` manages your haskell packages, but not GHC versions, since
+it follows the unix philosophy. Unfortunately system GHC versions
 are often either outdated or cannot be installed in parallel
-with proper symlink management.
+with proper symlink management on many distros. This tool
+tries to fill that gap and be fairly distro-agnostic.
 
 Inspired by [rustup](https://github.com/rust-lang-nursery/rustup.rs).
 
