@@ -1,6 +1,6 @@
-[![GitHub release](https://img.shields.io/github/release/hasufell/ghcup.svg)](https://github.com/hasufell/ghcup/releases)
-[![Build Status](https://travis-ci.org/hasufell/ghcup.svg?branch=master)](https://travis-ci.org/hasufell/ghcup)
-[![license](https://img.shields.io/github/license/hasufell/ghcup.svg)](COPYING)
+[![GitHub release](https://img.shields.io/github/release/haskell/ghcup.svg)](https://github.com/haskell/ghcup/releases)
+[![Build Status](https://travis-ci.org/haskell/ghcup.svg?branch=master)](https://travis-ci.org/haskell/ghcup)
+[![license](https://img.shields.io/github/license/haskell/ghcup.svg)](COPYING)
 
 # GHC up
 
@@ -43,7 +43,7 @@ E.g.:
 
 ```sh
 mkdir -p ~/.local/bin
-curl https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup > ~/.local/bin/ghcup
+curl https://raw.githubusercontent.com/haskell/ghcup/master/ghcup > ~/.local/bin/ghcup
 chmod +x ~/.local/bin/ghcup
 ```
 
@@ -67,11 +67,11 @@ See `ghcup --help`.
 
 ## TODO
 
-- [ ] FreeBSD support ([#4](https://github.com/hasufell/ghcup/issues/4))
-- [ ] Make fetching tarballs more robust ([#5](https://github.com/hasufell/ghcup/issues/5))
+- [ ] FreeBSD support ([#4](https://github.com/haskell/ghcup/issues/4))
+- [ ] Make fetching tarballs more robust ([#5](https://github.com/haskell/ghcup/issues/5))
 - [x] More code documentation
-- [x] Allow to compile from source ([#2](https://github.com/hasufell/ghcup/issues/2))
-- [x] Allow to install cabal-install as well ([#3](https://github.com/hasufell/ghcup/issues/3))
+- [x] Allow to compile from source ([#2](https://github.com/haskell/ghcup/issues/2))
+- [x] Allow to install cabal-install as well ([#3](https://github.com/haskell/ghcup/issues/3))
 
 ## Known problems
 
