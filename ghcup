@@ -297,9 +297,11 @@ USAGE:
     ${SCRIPT} compile [FLAGS] <VERSION> <BOOTSTRAP-GHC>
 
 FLAGS:
-    -h, --help       Prints help information
-    -f, --force      Overwrite already existing installation
-    -j, --jobs <n>   How many jobs for compilation
+    -h, --help                     Prints help information
+    -f, --force                    Overwrite already existing installation
+    -j, --jobs <n>                 How many jobs for compilation
+    -c, --build-config <filepath>  Use the given config file as build config
+                                   (mk/build.mk)
 
 ARGS:
     <VERSION>        E.g. \"8.4.3\" or \"8.6.1\"
@@ -866,10 +868,12 @@ install_cabal() {
 }
 
 # @FUNCTION: compile_ghc
-# @USAGE: <ghcversion> <bootstrap-ghc>
+# @USAGE: <ghcversion> <bootstrap-ghc> [build.mk]
 # @DESCRIPTION:
 # Compile and installs the given GHC version with the
 # specified GHC bootstrap version.
+# Can additionally take a custom file that will be used
+# as build configuration (mk/build.mk).
 compile_ghc() {
     { [ -z "$1" ] || [ -z "$2" ] ;} && die "Internal error: not enough arguments given to compile_ghc"
 
@@ -878,6 +882,14 @@ compile_ghc() {
     inst_location=$(get_ghc_location "$1")
     download_url="https://downloads.haskell.org/~ghc/${myghcver}/ghc-${myghcver}-src.tar.xz"
     download_tarball_name=$(basename "${download_url}")
+
+    if [ -n "$3" ] ; then
+        case "$3" in
+            /*) build_config=$3 ;;
+            *) build_config="$(pwd)/$3" ;;
+        esac
+        [ -e "${build_config}" ] || die "specified build config \"${build_config}\" file does not exist!"
+    fi
 
     if ghc_already_installed "${myghcver}" ; then
         if ${FORCE} ; then
@@ -898,15 +910,20 @@ compile_ghc() {
         edo tar -xf ghc-*-src.tar.xz
         edo cd "ghc-${myghcver}"
 
-        cat <<-EOF > mk/build.mk || die
-			BuildFlavour = quick
-			V=0
-			BUILD_MAN = NO
-			BUILD_SPHINX_HTML = NO
-			BUILD_SPHINX_PDF = NO
-			HADDOCK_DOCS = YES
-			GhcWithLlvmCodeGen = YES
-			EOF
+        if [ -n "${build_config}" ] ; then
+            edo cat "${build_config}" > mk/build.mk
+        else
+			cat <<-EOF > mk/build.mk || die
+				BuildFlavour = quick
+				V=0
+				BUILD_MAN = NO
+				BUILD_SPHINX_HTML = NO
+				BUILD_SPHINX_PDF = NO
+				HADDOCK_DOCS = YES
+				GhcWithLlvmCodeGen = YES
+				EOF
+        fi
+
 
         edo ./boot
         edo ./configure --prefix="${inst_location}" --with-ghc="${bootstrap_ghc}"
@@ -1074,6 +1091,8 @@ while [ $# -gt 0 ] ; do
                        shift 1;;
                    -j|--jobs) JOBS=$2
                        shift 2;;
+                   -c|--build-config) BUILD_CONFIG=$2
+                       shift 2;;
                    *) GHC_VER=$1
                       BOOTSTRAP_GHC=$2
                       break;;
@@ -1081,7 +1100,7 @@ while [ $# -gt 0 ] ; do
            done
            [ "${GHC_VER}" ] || compile_usage
            [ "${BOOTSTRAP_GHC}" ] || compile_usage
-           compile_ghc "${GHC_VER}" "${BOOTSTRAP_GHC}"
+           compile_ghc "${GHC_VER}" "${BOOTSTRAP_GHC}" "${BUILD_CONFIG}"
            break;;
        *) usage;;
        esac
