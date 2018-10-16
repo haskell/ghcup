@@ -1,6 +1,6 @@
-[![GitHub release](https://img.shields.io/github/release/hasufell/ghcup.svg)](https://github.com/hasufell/ghcup/releases)
-[![Build Status](https://travis-ci.org/hasufell/ghcup.svg?branch=master)](https://travis-ci.org/hasufell/ghcup)
-[![license](https://img.shields.io/github/license/hasufell/ghcup.svg)](COPYING)
+[![GitHub release](https://img.shields.io/github/release/haskell/ghcup.svg)](https://github.com/haskell/ghcup/releases)
+[![Build Status](https://travis-ci.org/haskell/ghcup.svg?branch=master)](https://travis-ci.org/haskell/ghcup)
+[![license](https://img.shields.io/github/license/haskell/ghcup.svg)](COPYING)
 
 # GHC up
 
@@ -29,9 +29,11 @@ In addition this script can also install `cabal-install`.
 
 ## Why
 
-I don't use stack, but `cabal new-*` and system GHC versions
+`cabal new-*` manages your haskell packages, but not GHC versions, since
+it follows the unix philosophy. Unfortunately system GHC versions
 are often either outdated or cannot be installed in parallel
-with proper symlink management.
+with proper symlink management on many distros. This tool
+tries to fill that gap and be fairly distro-agnostic.
 
 Inspired by [rustup](https://github.com/rust-lang-nursery/rustup.rs).
 
@@ -43,7 +45,7 @@ E.g.:
 
 ```sh
 mkdir -p ~/.local/bin
-curl https://raw.githubusercontent.com/hasufell/ghcup/master/ghcup > ~/.local/bin/ghcup
+curl https://raw.githubusercontent.com/haskell/ghcup/master/ghcup > ~/.local/bin/ghcup
 chmod +x ~/.local/bin/ghcup
 ```
 
@@ -67,11 +69,11 @@ See `ghcup --help`.
 
 ## TODO
 
-- [ ] FreeBSD support ([#4](https://github.com/hasufell/ghcup/issues/4))
-- [ ] Make fetching tarballs more robust ([#5](https://github.com/hasufell/ghcup/issues/5))
+- [ ] FreeBSD support ([#4](https://github.com/haskell/ghcup/issues/4))
+- [ ] Make fetching tarballs more robust ([#5](https://github.com/haskell/ghcup/issues/5))
 - [x] More code documentation
-- [x] Allow to compile from source ([#2](https://github.com/hasufell/ghcup/issues/2))
-- [x] Allow to install cabal-install as well ([#3](https://github.com/hasufell/ghcup/issues/3))
+- [x] Allow to compile from source ([#2](https://github.com/haskell/ghcup/issues/2))
+- [x] Allow to install cabal-install as well ([#3](https://github.com/haskell/ghcup/issues/3))
 
 ## Known problems
 
