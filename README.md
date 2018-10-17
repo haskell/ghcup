@@ -18,6 +18,8 @@ fail due to missing requirements).
 
 In addition this script can also install `cabal-install`.
 
+**Note: this project is in early stage and may not work on all distributions yet!**
+
 ## Table of Contents
 
    * [Why](#why)
