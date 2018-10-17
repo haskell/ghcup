@@ -565,12 +565,10 @@ get_ghc_location() {
 # @USAGE: <url>
 # @DESCRIPTION:
 # Downloads the given url as a file into the current directory.
-# @RETURN: status code from the downloader
 download() {
     [ -z "$1" ] && die "Internal error: no argument given to download"
     # shellcheck disable=SC2086
-    ${DOWNLOADER} ${DOWNLOADER_OPTS} "$1"
-    return $?
+    edo ${DOWNLOADER} ${DOWNLOADER_OPTS} "$1"
 }
 
 # @FUNCTION: unpack
@@ -641,7 +639,7 @@ install_ghc() {
     (
         edo cd "${tmp_dir}"
 
-        edo download "${download_url}"
+        download "${download_url}"
 
         unpack "${download_tarball_name}"
         edo cd "ghc-${myghcver}"
@@ -755,7 +753,7 @@ self_update() {
 
     (
         edo cd "$(mktemp -d)"
-        edo download "${SCRIPT_UPDATE_URL}"
+        download "${SCRIPT_UPDATE_URL}"
         edo chmod +x ghcup
         edo mv -f ghcup "${target_location}"/ghcup
 
@@ -884,7 +882,7 @@ install_cabal() {
 
     (
         edo cd "$(mktemp -d)"
-        edo download "https://downloads.haskell.org/~cabal/cabal-install-${mycabalver}/cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
+        download "https://downloads.haskell.org/~cabal/cabal-install-${mycabalver}/cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
         unpack "cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
         edo mv -f cabal "${inst_location}"/cabal
         rm "cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
@@ -940,7 +938,7 @@ compile_ghc() {
     (
         edo cd "${tmp_dir}"
 
-        edo download "${download_url}"
+        download "${download_url}"
 
         edo tar -xf ghc-*-src.tar.xz
         edo cd "ghc-${myghcver}"
