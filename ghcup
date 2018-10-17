@@ -591,6 +591,7 @@ install_ghc() {
     inst_location=$(get_ghc_location "$1")
     download_url=$(get_download_url "${myghcver}")
     download_tarball_name=$(basename "${download_url}")
+    first_install=true
 
     if ghc_already_installed "${myghcver}" ; then
         if ${FORCE} ; then
@@ -598,6 +599,7 @@ install_ghc() {
         else
             die "GHC already installed in ${inst_location}, use --force to overwrite"
         fi
+        first_install=false
     fi
 
     status_message "Installing GHC for $(get_distro_name) on architecture $(get_arch)"
@@ -623,6 +625,14 @@ install_ghc() {
     ) || {
         [ -e "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
         [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
+
+        if ${first_install} ; then
+            [ -e "${inst_location}" ] && rm -r "${inst_location}"
+        else
+            warning_message "GHC force installation failed. The install might be broken."
+            warning_message "Consider running: ghcup rm ${myghcver}"
+        fi
+
         die "Failed to install, consider updating this script via: ${SCRIPT} self-update"
     }
 
@@ -640,7 +650,7 @@ install_ghc() {
 
     status_message "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set ${myghcver}"
 
-    unset myghcver inst_location f download_url download_tarball_name
+    unset myghcver inst_location f download_url download_tarball_name first_install
 }
 
 
