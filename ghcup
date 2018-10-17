@@ -98,7 +98,7 @@ GHC_DOWNLOAD_BASEURL="https://downloads.haskell.org/~ghc"
 # @DESCRIPTION:
 # The latests known good cabal-install version for
 # which a pre-built binary exists.
-KNOWN_GOOD_CABAL="2.2.0.0"
+KNOWN_GOOD_CABAL="2.4.0.0"
 
 # @VARIABLE: JOBS
 # @DESCRIPTION:
