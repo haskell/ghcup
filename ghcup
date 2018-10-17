@@ -573,6 +573,41 @@ download() {
     return $?
 }
 
+# @FUNCTION: unpack
+# @USAGE: <tarball>
+# @DESCRIPTION:
+# Uncompresses and unpacks the given tarball if needed by discovering the
+# file extension.
+unpack() {
+    [ -z "$1" ] && die "Internal error: no argument given to unpack"
+
+    filename=$1
+    file_ext=${filename##*.}
+
+    # this is for portability, since not all
+    # distros have tar with compression detection
+    # capability
+    case "${file_ext}" in
+        xz)
+            debug_message "xz -cd \"${filename}\" | tar -xf -"
+            ( xz -cd "${filename}" | tar -xf - ; ) || die "unpacking failed!"
+            ;;
+        gz)
+            debug_message "gzip -cd \"${filename}\" | tar -xf -"
+            ( gzip -cd "${filename}" | tar -xf - ; ) || die "unpacking failed!"
+            ;;
+        tar)
+            edo tar -xf "${filename}"
+            ;;
+        *)
+            die "Unknown file extension: \"${file_ext}\""
+    esac
+
+    unset filename file_ext
+}
+
+
+
 
 
     ############################
@@ -608,7 +643,7 @@ install_ghc() {
 
         edo download "${download_url}"
 
-        edo tar -xf ghc-*-linux.tar.xz
+        unpack "${download_tarball_name}"
         edo cd "ghc-${myghcver}"
 
         debug_message "Installing GHC into ${inst_location}"
@@ -850,8 +885,9 @@ install_cabal() {
     (
         edo cd "$(mktemp -d)"
         edo download "https://downloads.haskell.org/~cabal/cabal-install-${mycabalver}/cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
-        edo tar -xzf "cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
+        unpack "cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
         edo mv -f cabal "${inst_location}"/cabal
+        rm "cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
     ) || die "Failed to install cabal-install"
 
     status_message "Successfully installed cabal-install into"
