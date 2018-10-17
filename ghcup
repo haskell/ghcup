@@ -140,6 +140,7 @@ SUBCOMMANDS:
     self-update      Update this script in-place
     rm               Remove an already installed GHC
     install-cabal    Install cabal-install
+    debug-info       Print debug info (e.g. detected system/distro)
 
 DISCUSSION:
     ghcup installs the Glasgow Haskell Compiler from the official
@@ -313,6 +314,28 @@ DISCUSSION:
 
 EXAMPLE:
     ghcup -v compile -f -j 4 8.4.2 ghc-8.2.2
+")
+    exit 1
+}
+
+# @FUNCTION: debug_info_usage
+# @DESCRIPTION:
+# Print the help message for 'ghcup debug-info' to STDERR
+# and exit the script with status code 1.
+debug_info_usage() {
+    (>&2 echo "ghcup-debug-info
+Print debug info (e.g. detected system/distro)
+
+USAGE:
+    ${SCRIPT} debug-info
+
+FLAGS:
+    -h, --help                     Prints help information
+
+DISCUSSION:
+    Prints debug information, e.g. detected system architecture,
+    distribution, version, as well as script variables. This
+    is mainly useful for debugging purposes.
 ")
     exit 1
 }
@@ -958,6 +981,30 @@ Also check https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux for 
 }
 
 
+    ###############################
+    #--[ Subcommand debug-info ]--#
+    ###############################
+
+
+# @FUNCTION: print_debug_info
+# @DESCRIPTION:
+# Print debug info (e.g. detected system/distro).
+print_debug_info() {
+    echo "Script version: ${VERSION}"
+    echo
+    echo "Script variables:"
+    echo "  GHC install location:     ${GHC_LOCATION}"
+    echo "  Binary install location:  ${BIN_LOCATION}"
+    echo "  Downloader:               ${DOWNLOADER} ${DOWNLOADER_OPTS} <url>"
+    echo "  Script update url:        ${SCRIPT_UPDATE_URL}"
+    echo "  GHC download baseurl:     ${GHC_DOWNLOAD_BASEURL}"
+    echo "  Known good cabal version: ${KNOWN_GOOD_CABAL}"
+    echo
+    echo "Detected system information:"
+    echo "  Architecture:   $(get_arch)"
+    echo "  Distribution:   $(get_distro_name)"
+    echo "  Distro version: $(get_distro_ver)"
+}
 
 
     #######################
@@ -1099,6 +1146,16 @@ while [ $# -gt 0 ] ; do
            [ "${GHC_VER}" ] || compile_usage
            [ "${BOOTSTRAP_GHC}" ] || compile_usage
            compile_ghc "${GHC_VER}" "${BOOTSTRAP_GHC}" "${BUILD_CONFIG}"
+           break;;
+       debug-info)
+           shift 1
+           while [ $# -gt 0 ] ; do
+               case $1 in
+                   -h|--help) debug_info_usage;;
+                   *) debug_info_usage;;
+               esac
+           done
+           print_debug_info
            break;;
        *) usage;;
        esac

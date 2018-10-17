@@ -47,4 +47,6 @@ edo ghcup self-update
 
 edo ghcup show
 
+edo ghcup debug-info
+
 edo ghc --version
