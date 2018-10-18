@@ -489,6 +489,18 @@ red_message() {
     printf "\\033[0;31m%s\\033[0m\\n" "$1"
 }
 
+# @FUNCTION: command_exists
+# @USAGE: <command>
+# @DESCRIPTION:
+# Check if a command exists (no arguments).
+# @RETURNS: 0 if the command exists, non-zero otherwise
+command_exists() {
+    [ -z "$1" ] && die "Internal error: no argument given to command_exists"
+
+    command -V "$1" >/dev/null 2>&1
+    return $?
+}
+
 # @FUNCTION: get_distro_name
 # @DESCRIPTION:
 # Gets the current distro identifier following
@@ -500,7 +512,7 @@ get_distro_name() {
         # shellcheck disable=SC1091
         . /etc/os-release
         printf "%s" "$NAME"
-    elif command -V lsb_release >/dev/null 2>&1; then
+    elif command_exists lsb_release ; then
         # linuxbase.org
         printf "%s" "$(lsb_release -si)"
     elif [ -f /etc/lsb-release ]; then
@@ -528,7 +540,7 @@ get_distro_ver() {
         # shellcheck disable=SC1091
         . /etc/os-release
         printf "%s" "$VERSION_ID"
-    elif command -V lsb_release >/dev/null 2>&1; then
+    elif command_exists lsb_release ; then
         # linuxbase.org
         printf "%s" "$(lsb_release -sr)"
     elif [ -f /etc/lsb-release ]; then
@@ -1420,6 +1432,7 @@ fi
 
 
 
+
     ##############################################
     #--[ Command line parsing and entry point ]--#
     ##############################################
@@ -1456,7 +1469,13 @@ while [ $# -gt 0 ] ; do
             usage
         fi
         ;;
-    *) # TODO: here comes command availability checking
+    *)
+       # check for available commands
+       for com in ${DOWNLOADER} realpath awk uname basename tar xz gzip mktemp dirname ; do
+           command_exists "${com}" || die "Command \"${com}\" is required, but does not exist! Please install."
+       done
+       unset com
+
        case $1 in
        install)
            shift 1
