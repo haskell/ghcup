@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/haskell/ghcup.svg?branch=master)](https://travis-ci.org/haskell/ghcup)
 [![license](https://img.shields.io/github/license/haskell/ghcup.svg)](COPYING)
 
-Although [`cabal-install`](https://hackage.haskell.org/package/cabal-install) manages Haskell library dependencies and can select a specific version of `ghc` (see [`with-compiler`](https://cabal.readthedocs.io/en/latest/nix-local-build.html#cfg-flag---with-compiler)), it will fail if the required version of `ghc` is not available. Unfortunately, many operating systems do not offer a way to install specific versions of `ghc`.
+Although [`cabal-install`](https://hackage.haskell.org/package/cabal-install) automatically installs Haskell library dependencies, and selects a specific version of `ghc` (see [`with-compiler`](https://cabal.readthedocs.io/en/latest/nix-local-build.html#cfg-flag---with-compiler)). However, `cabal-install` will fail if the required version of `ghc` is not available. Unfortunately, many operating systems do not offer a way to install specific versions of `ghc`.
 
 `ghcup` makes it easy to install specific versions of `ghc` on GNU/Linux, and can also bootstrap a fresh Haskell developer environment from scratch.
 
