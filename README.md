@@ -50,7 +50,7 @@ See `ghcup --help`.
 
 ### Limited distributions supported
 
-Currently only GNU/Linux distributions compatible with the [upstream GHC](https://www.haskell.org/ghc/download_ghc_8_6_1.html#binaries) binaries (built on Fedora) are supported.
+Currently only GNU/Linux distributions compatible with the [upstream GHC](https://www.haskell.org/ghc/download_ghc_8_6_1.html#binaries) binaries are supported.
 
 ### Precompiled binaries
 
