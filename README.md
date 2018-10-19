@@ -14,6 +14,7 @@ Inspired by [rustup](https://github.com/rust-lang-nursery/rustup.rs), [pyenv](ht
 
    * [Installation](#installation)
    * [Usage](#usage)
+   * [How](#how)
    * [Contributing](#contributing)
    * [Known problems](#known-problems)
 
@@ -38,6 +39,18 @@ export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$HOME/.local/bin:$PATH"
 ## Usage
 
 See `ghcup --help`.
+
+## How
+
+Installs a specified GHC version into `~/.ghcup/ghc/<ver>`, and places `ghc-<ver>` symlinks in `~/.ghcup/bin/`.
+
+Optionally, an unversioned `ghc` link can point to a default version of your choice.
+
+This uses precompiled GHC binaries that have been compiled on fedora/debian by [upstream GHC](https://www.haskell.org/ghc/download_ghc_8_6_1.html#binaries).
+
+Alternatively, you can also tell it to compile from source (note that this might fail due to missing requirements).
+
+In addition this script can also install `cabal-install`.
 
 ## Contributing
 
