@@ -10,8 +10,6 @@ Inspired by [rustup](https://github.com/rust-lang-nursery/rustup.rs), [pyenv](ht
 
 *OS X users may prefer [futurice](https://haskell.futurice.com/) and Ubuntu users may prefer [hvr's ppa](https://launchpad.net/~hvr/+archive/ubuntu/ghc).*
 
-**Note: this project is in early stage and may not work on all distributions yet!**
-
 ## Table of Contents
 
    * [Installation](#installation)
