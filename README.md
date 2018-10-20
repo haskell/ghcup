@@ -2,42 +2,21 @@
 [![Build Status](https://travis-ci.org/haskell/ghcup.svg?branch=master)](https://travis-ci.org/haskell/ghcup)
 [![license](https://img.shields.io/github/license/haskell/ghcup.svg)](COPYING)
 
-# GHC up
+[`cabal-install`](https://hackage.haskell.org/package/cabal-install) follows the UNIX philosophy of [do one thing and do it well](https://en.wikipedia.org/wiki/Unix_philosophy#Do_One_Thing_and_Do_It_Well): it builds your project by managing your dependencies. However, `cabal-install` does not download `ghc` if one is needed, although it can demand that [a specific version](https://cabal.readthedocs.io/en/latest/nix-local-build.html#cfg-flag---with-compiler)  of `ghc` is available. Unfortunately, many operating systems do not offer a way to install multiple versions of `ghc`.
 
-Installs a specified GHC version into `~/.ghcup/ghc/<ver>`,
-and places `ghc-<ver>` etc. symlinks in `~/.ghcup/bin/`.
-Additionally allows to manage currently selected ghc
-via unversioned symlinks.
+`ghcup` makes it easy to install specific versions of `ghc` on GNU/Linux, and can also bootstrap a fresh Haskell developer environment from scratch.
 
-This uses precompiled GHC binaries that have been
-compiled on fedora/debian by
-[upstream GHC](https://www.haskell.org/ghc/download_ghc_8_6_1.html#binaries).
+Similar in scope to [rustup](https://github.com/rust-lang-nursery/rustup.rs), [pyenv](https://github.com/pyenv/pyenv) and [jenv](http://www.jenv.be).
 
-Alternatively, you can also tell it to compile from source (note that this might
-fail due to missing requirements).
-
-In addition this script can also install `cabal-install`.
-
-**Note: this project is in early stage and may not work on all distributions yet!**
+*OS X users may prefer [futurice](https://haskell.futurice.com/) and Ubuntu users may prefer [hvr's ppa](https://launchpad.net/~hvr/+archive/ubuntu/ghc).*
 
 ## Table of Contents
 
-   * [Why](#why)
    * [Installation](#installation)
    * [Usage](#usage)
+   * [How](#how)
    * [Contributing](#contributing)
-   * [TODO](#todo)
    * [Known problems](#known-problems)
-
-## Why
-
-`cabal new-*` manages your haskell packages, but not GHC versions, since
-it follows the unix philosophy. Unfortunately system GHC versions
-are often either outdated or cannot be installed in parallel
-with proper symlink management on many distros. This tool
-tries to fill that gap and be fairly distro-agnostic.
-
-Inspired by [rustup](https://github.com/rust-lang-nursery/rustup.rs).
 
 ## Installation
 
@@ -57,10 +36,21 @@ Then adjust your `PATH` in `~/.bashrc` (or similar, depending on your shell) lik
 export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$HOME/.local/bin:$PATH"
 ```
 
-
 ## Usage
 
 See `ghcup --help`.
+
+## How
+
+Installs a specified GHC version into `~/.ghcup/ghc/<ver>`, and places `ghc-<ver>` symlinks in `~/.ghcup/bin/`.
+
+Optionally, an unversioned `ghc` link can point to a default version of your choice.
+
+This uses precompiled GHC binaries that have been compiled on fedora/debian by [upstream GHC](https://www.haskell.org/ghc/download_ghc_8_6_1.html#binaries).
+
+Alternatively, you can also tell it to compile from source (note that this might fail due to missing requirements).
+
+In addition this script can also install `cabal-install`.
 
 ## Contributing
 
@@ -69,15 +59,11 @@ See `ghcup --help`.
 * use [shellcheck](https://github.com/koalaman/shellcheck) and `checkbashisms.pl` from [debian devscripts](http://http.debian.net/debian/pool/main/d/devscripts/devscripts_2.18.4.tar.xz)
 * whitespaces, no tabs
 
-## TODO
-
-- [ ] FreeBSD support ([#4](https://github.com/haskell/ghcup/issues/4))
-- [ ] Make fetching tarballs more robust ([#5](https://github.com/haskell/ghcup/issues/5))
-- [x] More code documentation
-- [x] Allow to compile from source ([#2](https://github.com/haskell/ghcup/issues/2))
-- [x] Allow to install cabal-install as well ([#3](https://github.com/haskell/ghcup/issues/3))
-
 ## Known problems
+
+### Limited distributions supported
+
+Currently only GNU/Linux distributions compatible with the [upstream GHC](https://www.haskell.org/ghc/download_ghc_8_6_1.html#binaries) binaries are supported.
 
 ### Precompiled binaries
 
