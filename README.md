@@ -24,15 +24,13 @@ Just place the `ghcup` shell script into your `PATH` anywhere.
 E.g.:
 
 ```sh
-mkdir -p ~/.local/bin
-curl https://raw.githubusercontent.com/haskell/ghcup/master/ghcup > ~/.local/bin/ghcup
-chmod +x ~/.local/bin/ghcup
+( mkdir -p ~/.ghcup/bin && curl https://raw.githubusercontent.com/haskell/ghcup/master/ghcup > ~/.ghcup/bin/ghcup && chmod +x ~/.ghcup/bin/ghcup) && echo "Success"
 ```
 
 Then adjust your `PATH` in `~/.bashrc` (or similar, depending on your shell) like so, for example:
 
 ```sh
-export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$HOME/.local/bin:$PATH"
+export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
 ```
 
 ## Usage
