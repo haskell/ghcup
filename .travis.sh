@@ -15,7 +15,7 @@ edo ./ghcup -v install 8.6.1
 edo ./ghcup -v set 8.6.1
 edo ./ghcup -v set 8.4.3
 
-# rm G HC
+# rm GHC
 edo ./ghcup -v rm 8.6.1
 edo ./ghcup -v rm 8.4.3
 
@@ -33,6 +33,8 @@ edo cp ./ghcup "$HOME"/.local/bin/ghcup
 
 # install cabal-install
 edo ghcup -v install-cabal
+
+edo cabal --version
 
 # install shellcheck
 edo wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
