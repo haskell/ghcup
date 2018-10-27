@@ -885,7 +885,21 @@ rm_ghc() {
         status_message "Successfully removed GHC ${myghcver}."
 
         if [ ! -e "${BIN_LOCATION}"/ghc ] ; then
-            warning_message "Currently active GHC is a dangling symlink, run:"
+            warning_message "Currently active GHC is a dangling symlink, removing..."
+
+            # TODO: known_tools is not very robust, but we want to avoid accidentially deleting
+            # unrelated things (even if those are dangling symlinks)
+            known_tools="ghc ghci ghc-pkg haddock-ghc runghc runhaskell"
+            # remove dangling symlinks for ghc, ghci, ...
+            for t in ${known_tools} ; do
+                if [ -h "${BIN_LOCATION}/${t}" ] && [ ! -e "${BIN_LOCATION}/${t}" ] ; then
+                    edo rm "${BIN_LOCATION}/${t}"
+                fi
+            done
+            unset t known_tools
+
+            warning_message "Done."
+            warning_message "You may now want to set currently active GHC to a different version via:"
             warning_message "    ghcup set <ghcver>"
         fi
     else
