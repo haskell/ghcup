@@ -872,9 +872,13 @@ rm_ghc() {
     if ghc_already_installed "${myghcver}" ; then
         for f in "${BIN_LOCATION}"/*-"${myghcver}" ; do
             # https://tanguy.ortolo.eu/blog/article113/test-symlink
-            [ ! -e "${f}" ] && [ ! -h "${f}" ] && die "Something went wrong, ${f} does not exist!"
+            [ ! -e "${f}" ] && [ ! -h "${f}" ] && {
+                warning_message "No existing symlinks for ${myghcver} in ${BIN_LOCATION}, skipping"
+                break
+            }
             edo rm "${f}"
         done
+
         [ -z "${inst_location}" ] && die "internal error: inst_location empty!"
         edo rm -r "${inst_location}"
 
