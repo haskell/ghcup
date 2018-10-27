@@ -917,7 +917,7 @@ rm_ghc() {
 
         status_message "Successfully removed GHC ${myghcver}."
 
-        if [ ! -e "${BIN_LOCATION}"/ghc ] ; then
+        if [ -h "${BIN_LOCATION}/ghc" ] && [ ! -e "${BIN_LOCATION}/ghc" ] ; then
             warning_message "Currently active GHC is a dangling symlink, removing..."
 
             # TODO: known_tools is not very robust, but we want to avoid accidentially deleting
