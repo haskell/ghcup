@@ -16,8 +16,8 @@ edo ./ghcup -v set 8.6.1
 edo ./ghcup -v set 8.4.3
 
 # rm GHC
-edo ./ghcup -v rm 8.6.1
-edo ./ghcup -v rm 8.4.3
+edo ./ghcup -v rm -f 8.6.1
+edo ./ghcup -v rm -f 8.4.3
 
 # set GHC
 edo ./ghcup -v set 8.2.2

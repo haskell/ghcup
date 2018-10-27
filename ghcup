@@ -252,6 +252,7 @@ USAGE:
 
 FLAGS:
     -h, --help       Prints help information
+    -f, --force      Don't prompt user
 
 ARGS:
     <VERSION>        E.g. \"8.4.3\" or \"8.6.1\"
@@ -627,6 +628,30 @@ unpack() {
     unset filename file_ext
 }
 
+# @FUNCTION: ask_for_confirmation
+# @USAGE: [confirmation-msg]
+# @DESCRIPTION:
+# Asks the user for confirmation and returns 0 for yes, 1 for no.
+# @RETURN: 0 if user confirmed, 1 otherwise
+ask_for_confirmation() {
+    confirmation_msg=$1
+
+    if [ -n "${confirmation_msg}" ] ; then
+        printf "%s\\n(y/n and press Enter)\\n" "${confirmation_msg}"
+    else
+        printf "Confirm action: (y/n and press Enter)\\n"
+    fi
+    read -r answer
+
+    if [ "${answer}" != "${answer#[Yy]}" ] ;then
+        return 0
+    else
+        return 1
+    fi
+
+    unset confirmation_msg answer
+}
+
 
 
 
@@ -870,6 +895,15 @@ rm_ghc() {
     [ -z "${myghcver}" ] && die "We are paranoid, ghcver not set"
 
     if ghc_already_installed "${myghcver}" ; then
+        [ -z "${inst_location}" ] && die "internal error: inst_location empty!"
+
+        if ! ${FORCE} ; then
+            if ! ask_for_confirmation "Really removing ${myghcver}? This will also recursively remove the following directory (please double-check): \"${inst_location}\"" ; then
+                warning_message "Not removing GHC..."
+                return 0
+            fi
+        fi
+
         for f in "${BIN_LOCATION}"/*-"${myghcver}" ; do
             # https://tanguy.ortolo.eu/blog/article113/test-symlink
             [ ! -e "${f}" ] && [ ! -h "${f}" ] && {
@@ -879,7 +913,6 @@ rm_ghc() {
             edo rm "${f}"
         done
 
-        [ -z "${inst_location}" ] && die "internal error: inst_location empty!"
         edo rm -r "${inst_location}"
 
         status_message "Successfully removed GHC ${myghcver}."
@@ -1165,6 +1198,8 @@ while [ $# -gt 0 ] ; do
            while [ $# -gt 0 ] ; do
                case $1 in
                    -h|--help) rm_usage;;
+                   -f|--force) FORCE=true
+                       shift 1;;
                    *) GHC_VER=$1
                       break;;
                esac
