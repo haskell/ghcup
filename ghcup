@@ -131,6 +131,7 @@ FLAGS:
     -v, --verbose    Enable verbose output
     -h, --help       Prints help information
     -V, --version    Prints version information
+    -w, --wget       Use wget instead of curl
 
 SUBCOMMANDS:
     install          Install GHC
@@ -1134,7 +1135,16 @@ while [ $# -gt 0 ] ; do
         exit 0;;
     -h|--help)
         usage;;
-    *) case $1 in
+    -w|--wget)
+        DOWNLOADER="wget"
+        DOWNLOADER_OPTS=""
+        shift 1
+        if [ $# -lt 1 ] ; then
+            usage
+        fi
+        ;;
+    *) # TODO: here comes command availability checking
+       case $1 in
        install)
            shift 1
            while [ $# -gt 0 ] ; do
