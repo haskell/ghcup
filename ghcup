@@ -1150,6 +1150,7 @@ print_debug_info() {
     echo "Script variables:"
     echo "  GHC install location:     ${GHC_LOCATION}"
     echo "  Binary install location:  ${BIN_LOCATION}"
+    echo "  Tarball cache location:   ${CACHE_LOCATION}"
     echo "  Downloader:               ${DOWNLOADER} ${DOWNLOADER_OPTS} <url>"
     echo "  Script update url:        ${SCRIPT_UPDATE_URL}"
     echo "  GHC download baseurl:     ${GHC_DOWNLOAD_BASEURL}"
