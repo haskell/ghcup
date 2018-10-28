@@ -74,6 +74,12 @@ GHC_LOCATION="$INSTALL_BASE/ghc"
 # This is expected to be a subdirectory of INSTALL_BASE.
 BIN_LOCATION="$INSTALL_BASE/bin"
 
+# @VARIABLE: CACHE_LOCATION
+# @DESCRIPTION:
+# The location where ghcup will put tarballs for caching.
+# This is expected to be a subdirectory of INSTALL_BASE.
+CACHE_LOCATION="$INSTALL_BASE/cache"
+
 # @VARIABLE: DOWNLOADER
 # @DESCRIPTION:
 # What program to use for downloading files.
@@ -111,6 +117,13 @@ JOBS="1"
 # the script name.
 SOURCE="$0"
 
+# @VARIABLE: CACHING
+# @DESCRIPTION:
+# Whether to cache tarballs in $CACHE_LOCATION.
+CACHING=false
+
+
+
     ####################
     #--[ Print Help ]--#
     ####################
@@ -132,6 +145,8 @@ FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
     -w, --wget       Use wget instead of curl
+    -c, --cache      Use \"${CACHE_LOCATION}\" for caching tarballs
+                     (these will not be removed by ghcup)
 
 SUBCOMMANDS:
     install          Install GHC
@@ -688,11 +703,23 @@ install_ghc() {
     tmp_dir=$(mktemp -d)
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
-        edo cd "${tmp_dir}"
+        if ${CACHING} ; then
+            [ -e "${CACHE_LOCATION}" ] || {
+                [ -e "${INSTALL_BASE}" ] || edo mkdir "${INSTALL_BASE}"
+                edo mkdir "${CACHE_LOCATION}"
+            }
+            if [ ! -e "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
+                edo cd "${CACHE_LOCATION}"
+                download "${download_url}"
+            fi
+            edo cd "${tmp_dir}"
+            unpack "${CACHE_LOCATION}/${download_tarball_name}"
+        else
+            edo cd "${tmp_dir}"
+            download "${download_url}"
+            unpack "${download_tarball_name}"
+        fi
 
-        download "${download_url}"
-
-        unpack "${download_tarball_name}"
         edo cd "ghc-${myghcver}"
 
         debug_message "Installing GHC into ${inst_location}"
@@ -732,7 +759,7 @@ install_ghc() {
 
     status_message "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set ${myghcver}"
 
-    unset myghcver inst_location f download_url download_tarball_name first_install
+    unset myghcver inst_location f download_url download_tarball_name first_install tmp_dir
 }
 
 
@@ -958,6 +985,8 @@ install_cabal() {
     mycabalver=$1
     myarch=$(get_arch)
     inst_location=$BIN_LOCATION
+    download_url="https://downloads.haskell.org/~cabal/cabal-install-${mycabalver}/cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
+    download_tarball_name=$(basename "${download_url}")
 
     [ -e "${inst_location}" ] || {
         # TODO: this is a bit shaky because we don't use -p
@@ -965,12 +994,30 @@ install_cabal() {
         edo mkdir "${BIN_LOCATION}"
     }
 
+    tmp_dir=$(mktemp -d)
+    [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
-        edo cd "$(mktemp -d)"
-        download "https://downloads.haskell.org/~cabal/cabal-install-${mycabalver}/cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
-        unpack "cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
+        if ${CACHING} ; then
+            [ -e "${CACHE_LOCATION}" ] || {
+                [ -e "${INSTALL_BASE}" ] || edo mkdir "${INSTALL_BASE}"
+                edo mkdir "${CACHE_LOCATION}"
+            }
+            if [ ! -e "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
+                edo cd "${CACHE_LOCATION}"
+                download "${download_url}"
+            fi
+            edo cd "${tmp_dir}"
+            unpack "${CACHE_LOCATION}/${download_tarball_name}"
+        else
+            edo cd "${tmp_dir}"
+            download "${download_url}"
+            unpack "${download_tarball_name}"
+        fi
+
         edo mv -f cabal "${inst_location}"/cabal
-        rm "cabal-install-${mycabalver}-${myarch}-unknown-linux.tar.gz"
+        if [ -e "${tmp_dir}/${download_tarball_name}" ] ; then
+            rm "${tmp_dir}/${download_tarball_name}"
+        fi
     ) || die "Failed to install cabal-install"
 
     status_message "Successfully installed cabal-install into"
@@ -982,7 +1029,7 @@ install_cabal() {
     status_message "And make sure that \"~/.cabal/bin\" comes *before* \"${BIN_LOCATION}\""
     status_message "in your PATH!"
 
-    unset mycabalver myarch inst_location
+    unset mycabalver myarch inst_location download_url download_tarball_name tmp_dir
 }
 
 # @FUNCTION: compile_ghc
@@ -1021,11 +1068,23 @@ compile_ghc() {
     tmp_dir=$(mktemp -d)
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
-        edo cd "${tmp_dir}"
+        if ${CACHING} ; then
+            [ -e "${CACHE_LOCATION}" ] || {
+                [ -e "${INSTALL_BASE}" ] || edo mkdir "${INSTALL_BASE}"
+                edo mkdir "${CACHE_LOCATION}"
+            }
+            if [ ! -e "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
+                edo cd "${CACHE_LOCATION}"
+                download "${download_url}"
+            fi
+            edo cd "${tmp_dir}"
+            unpack "${CACHE_LOCATION}/${download_tarball_name}"
+        else
+            edo cd "${tmp_dir}"
+            download "${download_url}"
+            unpack "${download_tarball_name}"
+        fi
 
-        download "${download_url}"
-
-        edo tar -xf ghc-*-src.tar.xz
         edo cd "ghc-${myghcver}"
 
         if [ -n "${build_config}" ] ; then
@@ -1073,7 +1132,7 @@ Also check https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux for 
 
     status_message "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set ${myghcver}"
 
-    unset myghcver bootstrap_ghc inst_location f download_url download_tarball_name
+    unset myghcver bootstrap_ghc inst_location f download_url download_tarball_name tmp_dir
 }
 
 
@@ -1138,6 +1197,13 @@ while [ $# -gt 0 ] ; do
     -w|--wget)
         DOWNLOADER="wget"
         DOWNLOADER_OPTS=""
+        shift 1
+        if [ $# -lt 1 ] ; then
+            usage
+        fi
+        ;;
+    -c|--cache)
+        CACHING=true
         shift 1
         if [ $# -lt 1 ] ; then
             usage
