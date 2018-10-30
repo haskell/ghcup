@@ -52,24 +52,6 @@ Alternatively, you can also tell it to compile from source (note that this might
 
 In addition this script can also install `cabal-install`.
 
-## Contributing
-
-* PR or email
-* this script is POSIX shell
-* use [shellcheck](https://github.com/koalaman/shellcheck) and `checkbashisms.pl` from [debian devscripts](http://http.debian.net/debian/pool/main/d/devscripts/devscripts_2.18.4.tar.xz)
-* whitespaces, no tabs
-
-### Download locations
-
-Download locations are maintained in the file [.download-urls](https://raw.githubusercontent.com/haskell/ghcup/master/.download-urls)
-and may slightly be behind a very recent release or not tested
-on all distro combinations.
-
-In such a case, consider providing a PR to fix it.
-
-Similarly, available versions are maintained in
-[.available-versions](https://raw.githubusercontent.com/haskell/ghcup/master/.available-versions).
-
 ## Known problems
 
 ### Limited distributions supported
