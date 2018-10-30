@@ -1,0 +1,11 @@
+# fmt-version=1
+# tab separated columns
+# tool          | version | tag |
+ghc              8.0.2
+ghc              8.2.2
+ghc              8.4.3
+ghc              8.4.4    recommended
+ghc              8.6.1    latest,bad
+cabal-install    2.2.0.0
+cabal-install    2.4.0.0  latest,recommended
+

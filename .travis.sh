@@ -26,6 +26,9 @@ edo ./ghcup -v rm -f 8.6.1
 # set GHC
 edo ./ghcup -v set 8.2.2
 
+# install default GHC
+edo ./ghcup -v install
+
 export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$HOME/.local/bin:$PATH"
 edo mkdir -p "$HOME"/.local/bin
 
@@ -48,11 +51,15 @@ edo mv shellcheck-latest/shellcheck "$HOME"/.local/bin/shellcheck
 # check our script for errors
 edo shellcheck ghcup
 
-# self update
-edo ghcup self-update
+edo ghcup -v show
 
-edo ghcup show
+edo ghcup -v debug-info
 
-edo ghcup debug-info
+edo ghcup -v list
+edo ghcup -v list -t ghc
+edo ghcup -v list -t cabal-install
 
 edo ghc --version
+
+# self update destructively
+edo ghcup -v self-update

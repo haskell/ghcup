@@ -37,6 +37,21 @@ export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
 
 See `ghcup --help`.
 
+Common use cases are:
+
+```sh
+# install the last known "best" GHC version
+ghcup install
+# install a specific GHC version
+ghcup install 8.2.2
+# set the currently "active" GHC version
+ghcup set 8.4.4
+# install cabal-install
+ghcup install-cabal
+# update cabal-install
+cabal new-install cabal-install
+```
+
 Generally this is meant to be used with [`cabal-install`](https://hackage.haskell.org/package/cabal-install), which
 handles your haskell packages and can demand that [a specific version](https://cabal.readthedocs.io/en/latest/nix-local-build.html#cfg-flag---with-compiler)  of `ghc` is available, which `ghcup` can do.
 
@@ -51,13 +66,6 @@ This uses precompiled GHC binaries that have been compiled on fedora/debian by [
 Alternatively, you can also tell it to compile from source (note that this might fail due to missing requirements).
 
 In addition this script can also install `cabal-install`.
-
-## Contributing
-
-* PR or email
-* this script is POSIX shell
-* use [shellcheck](https://github.com/koalaman/shellcheck) and `checkbashisms.pl` from [debian devscripts](http://http.debian.net/debian/pool/main/d/devscripts/devscripts_2.18.4.tar.xz)
-* whitespaces, no tabs
 
 ## Known problems
 
@@ -74,16 +82,6 @@ ncurses and has no compatibility symlinks in place.
 
 Ask your distributor on how to solve this or
 try to compile from source via `ghcup compile <version>`.
-
-### Unreliable download location
-
-There is no single reliable URL where to download future
-GHC binary releases from, since the tarball names contain
-the distro name and version they were built on. As such,
-we cannot foresee what will be the next tarball name.
-
-In such a case, consider to update this script via
-`ghcup self-update`.
 
 ### Compilation
 
