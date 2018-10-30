@@ -872,6 +872,39 @@ get_distro_alias() {
     unset distro_name distro_alias
 }
 
+# @FUNCTION: posix_realpath
+# @USAGE: <file>
+# @DESCRIPTION:
+# Portably gets the realpath and prints it to stdout.
+# This was initially inspired by
+#   https://gist.github.com/tvlooy/cbfbdb111a4ebad8b93e
+#   and
+#   https://stackoverflow.com/a/246128
+#
+# If the file does not exist, just prints the argument unchanged.
+# @STDOUT: realpath of the given file
+posix_realpath() {
+    [ -z "$1" ] && die "Internal error: no argument given to posix_realpath"
+    mysource=$1
+
+    while [ -h "${mysource}" ]; do
+        mydir="$( cd -P "$( dirname "${mysource}" )" > /dev/null 2>&1 && pwd )"
+        mysource="$(readlink "${mysource}")"
+        [ "${mysource%${mysource#?}}"x != '/x' ] && mysource="${mydir}/${mysource}"
+    done
+    mydir="$( cd -P "$( dirname "${mysource}" )" > /dev/null 2>&1 && pwd )"
+
+    if [ -z "${mydir}" ] ; then
+        (>&2 echo "${1}: Permission denied")
+    elif [ ! -e "$1" ] ; then
+        echo "${mysource}"
+    else
+        echo "${mydir%/}/$(basename "${mysource}")"
+    fi
+
+    unset mysource mydir posix_realpath_error
+}
+
 
 
 
@@ -1010,24 +1043,6 @@ set_ghc() {
     #--[ Subcommand self-update ]--#
     ################################
 
-# @FUNCTION: script_dir
-# @DESCRIPTION:
-# Portably gets the full directory of where
-# this script resides in and prints it to stdout.
-# @STDOUT: script directory
-script_dir() {
-    mysource=${SOURCE}
-
-    while [ -h "${mysource}" ]; do
-        mydir="$( cd -P "$( dirname "${mysource}" )" > /dev/null && pwd )"
-        mysource="$(readlink "${mysource}")"
-        [ "${mysource%${mysource#?}}"x != '/x' ] && mysource="${mydir}/${mysource}"
-    done
-    mydir="$( cd -P "$( dirname "${mysource}" )" > /dev/null && pwd )"
-    echo "${mydir}"
-
-    unset mysource mydir
-}
 
 # @FUNCTION: self_update
 # @USAGE: <install-location>
@@ -1093,10 +1108,10 @@ show_ghc() {
 # @STDOUT: current GHC version
 show_ghc_installed() {
     current_ghc="${BIN_LOCATION}/ghc"
-    real_ghc=$(realpath "${current_ghc}" 2>/dev/null)
+    real_ghc=$(posix_realpath "${current_ghc}")
 
     if [ -L "${current_ghc}" ] ; then # is symlink
-        if [ -e "${real_ghc}" ] ; then # exists (realpath was called)
+        if [ -e "${real_ghc}" ] ; then # exists (posix_realpath was called)
             real_ghc="$(basename "${real_ghc}" | sed 's#ghc-##')"
             printf "%s" "${real_ghc}"
         else # is a broken symlink
@@ -1471,7 +1486,7 @@ while [ $# -gt 0 ] ; do
         ;;
     *)
        # check for available commands
-       for com in ${DOWNLOADER} realpath awk uname basename tar xz gzip mktemp dirname ; do
+       for com in ${DOWNLOADER} awk uname basename tar xz gzip mktemp dirname ; do
            command_exists "${com}" || die "Command \"${com}\" is required, but does not exist! Please install."
        done
        unset com
@@ -1522,7 +1537,7 @@ while [ $# -gt 0 ] ; do
            if [ "${TARGET_LOCATION}" ] ; then
                self_update "${TARGET_LOCATION}"
            else
-               self_update "$(script_dir)"
+               self_update "$(dirname "$(posix_realpath "${SOURCE}")")"
            fi
            break;;
        show)
