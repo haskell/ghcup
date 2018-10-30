@@ -59,6 +59,17 @@ In addition this script can also install `cabal-install`.
 * use [shellcheck](https://github.com/koalaman/shellcheck) and `checkbashisms.pl` from [debian devscripts](http://http.debian.net/debian/pool/main/d/devscripts/devscripts_2.18.4.tar.xz)
 * whitespaces, no tabs
 
+### Download locations
+
+Download locations are maintained in the file [.download-urls](https://raw.githubusercontent.com/haskell/ghcup/master/.download-urls)
+and may slightly be behind a very recent release or not tested
+on all distro combinations.
+
+In such a case, consider providing a PR to fix it.
+
+Similarly, available versions are maintained in
+[.available-versions](https://raw.githubusercontent.com/haskell/ghcup/master/.available-versions).
+
 ## Known problems
 
 ### Limited distributions supported
@@ -74,16 +85,6 @@ ncurses and has no compatibility symlinks in place.
 
 Ask your distributor on how to solve this or
 try to compile from source via `ghcup compile <version>`.
-
-### Unreliable download location
-
-There is no single reliable URL where to download future
-GHC binary releases from, since the tarball names contain
-the distro name and version they were built on. As such,
-we cannot foresee what will be the next tarball name.
-
-In such a case, consider to update this script via
-`ghcup self-update`.
 
 ### Compilation
 
