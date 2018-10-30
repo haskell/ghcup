@@ -1213,9 +1213,7 @@ install_cabal() {
     status_message "Installing cabal-install-${mycabalver} into \"${inst_location}\""
 
     [ -e "${inst_location}" ] || {
-        # TODO: this is a bit shaky because we don't use -p
-        edo mkdir "${INSTALL_BASE}"
-        edo mkdir "${BIN_LOCATION}"
+        edo mkdir "${inst_location}"
     }
 
     tmp_dir=$(mktemp -d)
