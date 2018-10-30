@@ -893,6 +893,7 @@ posix_realpath() {
     done
     mydir="$( cd -P "$( dirname "${mysource}" )" > /dev/null 2>&1 && pwd )"
 
+    # TODO: better distinguish between "does not exist" and "permission denied"
     if [ -z "${mydir}" ] ; then
         (>&2 echo "${1}: Permission denied")
     elif [ ! -e "$1" ] ; then
