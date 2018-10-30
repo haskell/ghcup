@@ -37,6 +37,21 @@ export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
 
 See `ghcup --help`.
 
+Common use cases are:
+
+```sh
+# install the last known "best" GHC version
+ghcup install
+# install a specific GHC version
+ghcup install 8.2.2
+# set the currently "active" GHC version
+ghcup set 8.4.4
+# install cabal-install
+ghcup install-cabal
+# update cabal-install
+cabal new-install cabal-install
+```
+
 Generally this is meant to be used with [`cabal-install`](https://hackage.haskell.org/package/cabal-install), which
 handles your haskell packages and can demand that [a specific version](https://cabal.readthedocs.io/en/latest/nix-local-build.html#cfg-flag---with-compiler)  of `ghc` is available, which `ghcup` can do.
 
