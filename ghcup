@@ -982,8 +982,6 @@ install_ghc() {
         die "Failed to install, consider updating this script via: ${SCRIPT} self-update"
     }
 
-    [ -e "${BIN_LOCATION}" ] || mkdir "${BIN_LOCATION}"
-
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
         fn=$(basename "${f}")
@@ -1017,7 +1015,6 @@ set_ghc() {
     inst_location=$(get_ghc_location "$1")
 
     [ -e "${inst_location}" ] || die "GHC ${myghcver} not installed yet, use: ${SCRIPT} install ${myghcver}"
-    [ -e "${BIN_LOCATION}" ] || edo mkdir "${BIN_LOCATION}"
 
     status_message "Setting GHC to ${myghcver}"
 
@@ -1213,9 +1210,7 @@ install_cabal() {
 
     status_message "Installing cabal-install-${mycabalver} into \"${inst_location}\""
 
-    [ -e "${inst_location}" ] || {
-        edo mkdir "${inst_location}"
-    }
+    edo mkdir -p "${inst_location}"
 
     tmp_dir=$(mktemp -d)
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
@@ -1333,8 +1328,6 @@ compile_ghc() {
 Also check https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux for build requirements and follow the instructions."
     }
 
-    [ -e "${BIN_LOCATION}" ] || mkdir "${BIN_LOCATION}"
-
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
         fn=$(basename "${f}")
@@ -1435,13 +1428,9 @@ if [ -z "$HOME" ] ; then
     die "HOME env not set, cannot operate"
 fi
 
-if [ ! -e "${INSTALL_BASE}" ] ; then
-    edo mkdir "${INSTALL_BASE}"
-fi
-
-if [ ! -e "${CACHE_LOCATION}" ] ; then
-    edo mkdir "${CACHE_LOCATION}"
-fi
+edo mkdir -p "${INSTALL_BASE}"
+edo mkdir -p "${BIN_LOCATION}"
+edo mkdir -p "${CACHE_LOCATION}"
 
 
 
