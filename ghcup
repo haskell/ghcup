@@ -178,7 +178,7 @@ SUBCOMMANDS:
     show             Show current/installed GHC
     set              Set currently active GHC version
     list             Show available GHCs and other tools (upstream)
-    self-update      Update this script in-place
+    upgrade          Upgrade this script in-place
     rm               Remove an already installed GHC
     install-cabal    Install cabal-install
     debug-info       Print debug info (e.g. detected system/distro)
@@ -243,16 +243,16 @@ DISCUSSION:
     exit 1
 }
 
-# @FUNCTION: self_update_usage
+# @FUNCTION: upgrade_usage
 # @DESCRIPTION:
-# Print the help message for 'ghcup self-update' to STDERR
+# Print the help message for 'ghcup upgrade' to STDERR
 # and exit the script with status code 1.
-self_update_usage() {
-    (>&2 echo "ghcup-self-update
+upgrade_usage() {
+    (>&2 echo "ghcup-upgrade
 Update the ghcup script in-place
 
 USAGE:
-    ${SCRIPT} self-update [FLAGS] [TARGET-LOCATION]
+    ${SCRIPT} upgrade [FLAGS] [TARGET-LOCATION]
 
 FLAGS:
     -h, --help         Prints help information
@@ -629,7 +629,7 @@ check_meta_file_version() {
     }" "$1")
 
     if [ "${mymetavar}" != "$2" ] ; then
-        die "Unsupported meta file format, run: ghcup self-update"
+        die "Unsupported meta file format, run: ${SCRIPT} upgrade"
     fi
 
     unset mymetavar
@@ -979,7 +979,7 @@ install_ghc() {
             warning_message "Consider running: ghcup rm ${myghcver}"
         fi
 
-        die "Failed to install, consider updating this script via: ${SCRIPT} self-update"
+        die "Failed to install, consider updating this script via: ${SCRIPT} upgrade"
     }
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
@@ -1036,17 +1036,17 @@ set_ghc() {
 
 
 
-    ################################
-    #--[ Subcommand self-update ]--#
-    ################################
+    ############################
+    #--[ Subcommand upgrade ]--#
+    ############################
 
 
-# @FUNCTION: self_update
+# @FUNCTION: upgrade
 # @USAGE: <install-location>
 # @DESCRIPTION:
 # Downloads the latest version of this script and places it into
 # the given directory.
-self_update() {
+upgrade() {
     target_location=$1
 
     [ -e "${target_location}" ] || die "Destination \"${target_location}\" does not exist, cannot update script"
@@ -1324,7 +1324,7 @@ compile_ghc() {
         [ -e "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
         [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
         die "Failed to install, consider updating this script via:
-    ${SCRIPT} self-update
+    ${SCRIPT} upgrade
 Also check https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux for build requirements and follow the instructions."
     }
 
@@ -1512,19 +1512,19 @@ while [ $# -gt 0 ] ; do
            [ "${GHC_VER}" ] || set_usage
            set_ghc "${GHC_VER}"
            break;;
-       self-update)
+       upgrade)
            shift 1
            while [ $# -gt 0 ] ; do
                case $1 in
-                   -h|--help) self_update_usage;;
+                   -h|--help) upgrade_usage;;
                    *) TARGET_LOCATION=$1
                        break;;
                esac
            done
            if [ "${TARGET_LOCATION}" ] ; then
-               self_update "${TARGET_LOCATION}"
+               upgrade "${TARGET_LOCATION}"
            else
-               self_update "$(dirname "$(posix_realpath "${SOURCE}")")"
+               upgrade "$(dirname "$(posix_realpath "${SOURCE}")")"
            fi
            break;;
        show)

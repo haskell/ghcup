@@ -62,4 +62,4 @@ edo ghcup -v list -t cabal-install
 edo ghc --version
 
 # self update destructively
-edo ghcup -v self-update
+edo ghcup -v upgrade
