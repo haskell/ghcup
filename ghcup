@@ -43,7 +43,9 @@ VERSION=0.0.6
 
 # @VARIABLE: SCRIPT
 # @DESCRIPTION:
-# Name of this script.
+# Name of this script. This will be the
+# shell name if this script is sourced, so
+# only rely on this for echos and trivial things.
 SCRIPT="$(basename "$0")"
 
 # @VARIABLE: VERBOSE
@@ -905,6 +907,34 @@ posix_realpath() {
     unset mysource mydir posix_realpath_error
 }
 
+# @FUNCTION: is_sourced
+# @DESCRIPTION:
+# Tries to figure out if we are being sourced. Based on
+#   https://stackoverflow.com/a/28776166
+# @RETURNS: 0 if we are being sourced, 1 otherwise
+is_sourced() {
+    if [ -n "$ZSH_EVAL_CONTEXT" ]; then
+        case $ZSH_EVAL_CONTEXT in
+           *:file)
+               return 0 ;;
+       esac
+    elif [ -n "$KSH_VERSION" ]; then
+        # shellcheck disable=SC2154
+        [ "$(cd "$(dirname -- "$0")" && pwd -P)/$(basename -- "$0")" != "$(cd "$(dirname -- "${.sh.file}")" && pwd -P)/$(basename -- "${.sh.file}")" ] && return 0
+    elif [ -n "$BASH_VERSION" ]; then
+        # shellcheck disable=SC2128
+        [ "$0" != "$BASH_SOURCE" ] && return 0
+    else # All other shells: examine $0 for known shell binary filenames
+        # Detects `sh` and `dash`; add additional shell filenames as needed.
+        case ${0##*/} in
+            sh|dash)
+               return 0 ;;
+       esac
+   fi
+
+   # assume we are not sourced, if our above checks didn't find it
+   return 1
+}
 
 
 
@@ -1428,9 +1458,11 @@ if [ -z "$HOME" ] ; then
     die "HOME env not set, cannot operate"
 fi
 
-edo mkdir -p "${INSTALL_BASE}"
-edo mkdir -p "${BIN_LOCATION}"
-edo mkdir -p "${CACHE_LOCATION}"
+if ! is_sourced ; then
+    edo mkdir -p "${INSTALL_BASE}"
+    edo mkdir -p "${BIN_LOCATION}"
+    edo mkdir -p "${CACHE_LOCATION}"
+fi
 
 
 
@@ -1439,192 +1471,193 @@ edo mkdir -p "${CACHE_LOCATION}"
     #--[ Command line parsing and entry point ]--#
     ##############################################
 
+if ! is_sourced ; then
 
-[ $# -lt 1 ] && usage
+    [ $# -lt 1 ] && usage
 
-while [ $# -gt 0 ] ; do
-    case $1 in
-    -v|--verbose)
-        VERBOSE=true
-        shift 1
-        if [ $# -lt 1 ] ; then
-            usage
-        fi
-        ;;
-    -V|--version)
-        printf "%s" "${VERSION}"
-        exit 0;;
-    -h|--help)
-        usage;;
-    -w|--wget)
-        DOWNLOADER="wget"
-        DOWNLOADER_OPTS=""
-        shift 1
-        if [ $# -lt 1 ] ; then
-            usage
-        fi
-        ;;
-    -c|--cache)
-        CACHING=true
-        shift 1
-        if [ $# -lt 1 ] ; then
-            usage
-        fi
-        ;;
-    *)
-       # check for available commands
-       for com in ${DOWNLOADER} awk uname basename tar xz gzip mktemp dirname ; do
-           command_exists "${com}" || die "Command \"${com}\" is required, but does not exist! Please install."
-       done
-       unset com
-
-       case $1 in
-       install)
-           shift 1
-           while [ $# -gt 0 ] ; do
-               case $1 in
-                   -h|--help) install_usage;;
-                   -f|--force) FORCE=true
-                       shift 1;;
-                   *) GHC_VER=$1
-                      break;;
-               esac
+    while [ $# -gt 0 ] ; do
+        case $1 in
+        -v|--verbose)
+            VERBOSE=true
+            shift 1
+            if [ $# -lt 1 ] ; then
+                usage
+            fi
+            ;;
+        -V|--version)
+            printf "%s" "${VERSION}"
+            exit 0;;
+        -h|--help)
+            usage;;
+        -w|--wget)
+            DOWNLOADER="wget"
+            DOWNLOADER_OPTS=""
+            shift 1
+            if [ $# -lt 1 ] ; then
+                usage
+            fi
+            ;;
+        -c|--cache)
+            CACHING=true
+            shift 1
+            if [ $# -lt 1 ] ; then
+                usage
+            fi
+            ;;
+        *)
+           # check for available commands
+           for com in ${DOWNLOADER} awk uname basename tar xz gzip mktemp dirname ; do
+               command_exists "${com}" || die "Command \"${com}\" is required, but does not exist! Please install."
            done
-           if [ -z "${GHC_VER}" ] ; then
-               _tool_ver="$(get_tool_ver_from_tag "ghc" "recommended")"
-               if [ -z "${_tool_ver}" ] ; then
-                   die "Could not find a recommended GHC version, please report a bug at ${BUG_URL}!"
+           unset com
+           case $1 in
+           install)
+               shift 1
+               while [ $# -gt 0 ] ; do
+                   case $1 in
+                       -h|--help) install_usage;;
+                       -f|--force) FORCE=true
+                           shift 1;;
+                       *) GHC_VER=$1
+                          break;;
+                   esac
+               done
+               if [ -z "${GHC_VER}" ] ; then
+                   _tool_ver="$(get_tool_ver_from_tag "ghc" "recommended")"
+                   if [ -z "${_tool_ver}" ] ; then
+                       die "Could not find a recommended GHC version, please report a bug at ${BUG_URL}!"
+                   fi
+                   install_ghc "${_tool_ver}"
+               else
+                   install_ghc "${GHC_VER}"
                fi
-               install_ghc "${_tool_ver}"
-           else
-               install_ghc "${GHC_VER}"
-           fi
-           break;;
-       set)
-           shift 1
-           while [ $# -gt 0 ] ; do
-               case $1 in
-                   -h|--help) set_usage;;
-                   *) GHC_VER=$1
-                      break;;
-               esac
-           done
-           [ "${GHC_VER}" ] || set_usage
-           set_ghc "${GHC_VER}"
-           break;;
-       self-update)
-           shift 1
-           while [ $# -gt 0 ] ; do
-               case $1 in
-                   -h|--help) self_update_usage;;
-                   *) TARGET_LOCATION=$1
-                       break;;
-               esac
-           done
-           if [ "${TARGET_LOCATION}" ] ; then
-               self_update "${TARGET_LOCATION}"
-           else
-               self_update "$(dirname "$(posix_realpath "${SOURCE}")")"
-           fi
-           break;;
-       show)
-           SHOW_INSTALLED=false
-           shift 1
-           while [ $# -gt 0 ] ; do
-               case $1 in
-                   -h|--help) show_usage;;
-                   -i|--installed) SHOW_INSTALLED=true
-                       break;;
-                   *) show_usage;;
-               esac
-           done
-           if ${SHOW_INSTALLED} ; then
-               show_ghc_installed
-           else
-               show_ghc
-           fi
-           break;;
-       rm)
-           shift 1
-           while [ $# -gt 0 ] ; do
-               case $1 in
-                   -h|--help) rm_usage;;
-                   -f|--force) FORCE=true
-                       shift 1;;
-                   *) GHC_VER=$1
-                      break;;
-               esac
-           done
-           [ "${GHC_VER}" ] || rm_usage
-           rm_ghc "${GHC_VER}"
-           break;;
-       install-cabal)
-           shift 1
-           while [ $# -gt 0 ] ; do
-               case $1 in
-                   -h|--help) install_cabal_usage;;
-                   -f|--force) FORCE=true
-                       shift 1;;
-                   *) CABAL_VER=$1
-                      break;;
-               esac
-           done
-           if [ -n "${CABAL_VER}" ] ; then
-               install_cabal "${CABAL_VER}"
-           else
-               _cabal_ver="$(get_tool_ver_from_tag "cabal-install" "recommended")"
-               if [ -z "${_cabal_ver}" ] ; then
-                   die "Could not find a recommended cabal-install version, please report a bug at ${BUG_URL}!"
+               break;;
+           set)
+               shift 1
+               while [ $# -gt 0 ] ; do
+                   case $1 in
+                       -h|--help) set_usage;;
+                       *) GHC_VER=$1
+                          break;;
+                   esac
+               done
+               [ "${GHC_VER}" ] || set_usage
+               set_ghc "${GHC_VER}"
+               break;;
+           self-update)
+               shift 1
+               while [ $# -gt 0 ] ; do
+                   case $1 in
+                       -h|--help) self_update_usage;;
+                       *) TARGET_LOCATION=$1
+                           break;;
+                   esac
+               done
+               if [ "${TARGET_LOCATION}" ] ; then
+                   self_update "${TARGET_LOCATION}"
+               else
+                   self_update "$(dirname "$(posix_realpath "${SOURCE}")")"
                fi
-               install_cabal "${_cabal_ver}"
-           fi
+               break;;
+           show)
+               SHOW_INSTALLED=false
+               shift 1
+               while [ $# -gt 0 ] ; do
+                   case $1 in
+                       -h|--help) show_usage;;
+                       -i|--installed) SHOW_INSTALLED=true
+                           break;;
+                       *) show_usage;;
+                   esac
+               done
+               if ${SHOW_INSTALLED} ; then
+                   show_ghc_installed
+               else
+                   show_ghc
+               fi
+               break;;
+           rm)
+               shift 1
+               while [ $# -gt 0 ] ; do
+                   case $1 in
+                       -h|--help) rm_usage;;
+                       -f|--force) FORCE=true
+                           shift 1;;
+                       *) GHC_VER=$1
+                          break;;
+                   esac
+               done
+               [ "${GHC_VER}" ] || rm_usage
+               rm_ghc "${GHC_VER}"
+               break;;
+           install-cabal)
+               shift 1
+               while [ $# -gt 0 ] ; do
+                   case $1 in
+                       -h|--help) install_cabal_usage;;
+                       -f|--force) FORCE=true
+                           shift 1;;
+                       *) CABAL_VER=$1
+                          break;;
+                   esac
+               done
+               if [ -n "${CABAL_VER}" ] ; then
+                   install_cabal "${CABAL_VER}"
+               else
+                   _cabal_ver="$(get_tool_ver_from_tag "cabal-install" "recommended")"
+                   if [ -z "${_cabal_ver}" ] ; then
+                       die "Could not find a recommended cabal-install version, please report a bug at ${BUG_URL}!"
+                   fi
+                   install_cabal "${_cabal_ver}"
+               fi
+               break;;
+           compile)
+               shift 1
+               while [ $# -gt 0 ] ; do
+                   case $1 in
+                       -h|--help) compile_usage;;
+                       -f|--force) FORCE=true
+                           shift 1;;
+                       -j|--jobs) JOBS=$2
+                           shift 2;;
+                       -c|--build-config) BUILD_CONFIG=$2
+                           shift 2;;
+                       *) GHC_VER=$1
+                          BOOTSTRAP_GHC=$2
+                          break;;
+                   esac
+               done
+               [ "${GHC_VER}" ] || compile_usage
+               [ "${BOOTSTRAP_GHC}" ] || compile_usage
+               compile_ghc "${GHC_VER}" "${BOOTSTRAP_GHC}" "${BUILD_CONFIG}"
+               break;;
+           debug-info)
+               shift 1
+               while [ $# -gt 0 ] ; do
+                   case $1 in
+                       -h|--help) debug_info_usage;;
+                       *) debug_info_usage;;
+                   esac
+               done
+               print_debug_info
+               break;;
+           list)
+               shift 1
+               while [ $# -gt 0 ] ; do
+                   case $1 in
+                       -h|--help) list_usage;;
+                       -t|--tool) TOOL=$2
+                           shift 2;;
+                       *) list_usage;;
+                   esac
+               done
+               list "${TOOL}"
+               break;;
+           *) usage;;
+           esac
            break;;
-       compile)
-           shift 1
-           while [ $# -gt 0 ] ; do
-               case $1 in
-                   -h|--help) compile_usage;;
-                   -f|--force) FORCE=true
-                       shift 1;;
-                   -j|--jobs) JOBS=$2
-                       shift 2;;
-                   -c|--build-config) BUILD_CONFIG=$2
-                       shift 2;;
-                   *) GHC_VER=$1
-                      BOOTSTRAP_GHC=$2
-                      break;;
-               esac
-           done
-           [ "${GHC_VER}" ] || compile_usage
-           [ "${BOOTSTRAP_GHC}" ] || compile_usage
-           compile_ghc "${GHC_VER}" "${BOOTSTRAP_GHC}" "${BUILD_CONFIG}"
-           break;;
-       debug-info)
-           shift 1
-           while [ $# -gt 0 ] ; do
-               case $1 in
-                   -h|--help) debug_info_usage;;
-                   *) debug_info_usage;;
-               esac
-           done
-           print_debug_info
-           break;;
-       list)
-           shift 1
-           while [ $# -gt 0 ] ; do
-               case $1 in
-                   -h|--help) list_usage;;
-                   -t|--tool) TOOL=$2
-                       shift 2;;
-                   *) list_usage;;
-               esac
-           done
-           list "${TOOL}"
-           break;;
-       *) usage;;
-       esac
-       break;;
-    esac
-done
+        esac
+    done
+fi # is_sourced
 
 # vim: tabstop=4 shiftwidth=4 expandtab
