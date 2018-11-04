@@ -502,6 +502,32 @@ command_exists() {
     return $?
 }
 
+# @FUNCTION: check_required_commands
+# @USAGE: [additional-commands]
+# @DESCRIPTION:
+# Check that all required commands for this script exist.
+# @STDOUT: The commands that do not exist
+# @RETURNS: 0 if all command exists, non-zero otherwise
+check_required_commands() {
+    _missing_commands=
+
+    for com in "$@" awk uname basename tar xz gzip mktemp dirname ; do
+        command_exists "${com}" || {
+            _missing_commands="${_missing_commands} ${com}"
+        }
+    done
+    unset com
+
+    if [ -n "${_missing_commands}" ] ; then
+        printf "%s" "${_missing_commands}"
+        unset _missing_commands
+        return 1
+    else
+        unset _missing_commands
+        return 0
+    fi
+}
+
 # @FUNCTION: get_distro_name
 # @DESCRIPTION:
 # Gets the current distro identifier following
@@ -1506,10 +1532,11 @@ if ! is_sourced ; then
             ;;
         *)
            # check for available commands
-           for com in ${DOWNLOADER} awk uname basename tar xz gzip mktemp dirname ; do
-               command_exists "${com}" || die "Command \"${com}\" is required, but does not exist! Please install."
-           done
-           unset com
+           missing_commands="$(check_required_commands ${DOWNLOADER})"
+           if [ -n "${missing_commands}" ] ; then
+               die "Following commands are required, but missing, please install: ${missing_commands}"
+           fi
+           unset missing_commands
            case $1 in
            install)
                shift 1
