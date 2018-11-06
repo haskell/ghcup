@@ -118,12 +118,12 @@ SOURCE="$0"
 # download information for ghc/cabal-install etc.
 META_DOWNLOAD_URL="https://raw.githubusercontent.com/haskell/ghcup/master/.download-urls"
 
-# @VARIABLE: META_DOWNLOAD_URL_FORMAT
+# @VARIABLE: META_DOWNLOAD_FORMAT
 # DESCRIPTION:
 # The version of the meta file format.
 # This determines whether this script can read the
 # file from "${META_DOWNLOAD_URL}".
-META_DOWNLOAD_URL_FORMAT="1"
+META_DOWNLOAD_FORMAT="1"
 
 # @VARIABLE: META_VERSION_URL
 # DESCRIPTION:
@@ -202,14 +202,15 @@ install_usage() {
 Install GHC from binary tarball
 
 USAGE:
-    ${SCRIPT} install [FLAGS] [VERSION]
+    ${SCRIPT} install [FLAGS] [VERSION|TAG]
 
 FLAGS:
     -h, --help       Prints help information
     -f, --force      Overwrite already existing installation
 
 ARGS:
-    [VERSION]        E.g. \"8.4.3\" or \"8.6.1\"
+    [VERSION|TAG]    E.g. \"8.4.3\" or \"8.6.1\" or
+                     a tag like \"recommended\" or \"latest\"
                      (default: discovers recommended version)
 
 DISCUSSION:
@@ -313,13 +314,14 @@ install_cabal_usage() {
 Install the specified or a default cabal version
 
 USAGE:
-    ${SCRIPT} install-cabal [FLAGS] [VERSION]
+    ${SCRIPT} install-cabal [FLAGS] [VERSION|TAG]
 
 FLAGS:
     -h, --help       Prints help information
 
 ARGS:
-    [VERSION]        E.g. \"2.4.0.0\"
+    [VERSION|TAG]    E.g. \"2.4.0.0\" or a tag
+                     like \"recommended\" or \"latest\"
 
 DISCUSSION:
     Installs the specified cabal-install version (or the default recommended)
@@ -678,38 +680,31 @@ get_download_url() {
     myarch=$(get_arch)
     mydistro=$(get_distro_alias "$(get_distro_name)")
     mydistrover=$(get_distro_ver)
-    meta_file_name="$(basename "${META_DOWNLOAD_URL}")"
+    meta_file="$(get_meta_download_file)"
 
-    (
-        edo cd "${CACHE_LOCATION}"
 
-        download_silent "${META_DOWNLOAD_URL}"
+    # 1st try with full distro=ver
+    url=$(try_download_url "${mytool}" "${myver}" "${myarch}" "${mydistro}=${mydistrover}" "${meta_file}")
+    if [ -n "${url}" ] ; then
+        printf "%s" "${url}"
+        exit 0
+    fi
 
-        check_meta_file_version "${meta_file_name}" "${META_DOWNLOAD_URL_FORMAT}"
+    # 2nd try with just distro
+    url=$(try_download_url "${mytool}" "${myver}" "${myarch}" "${mydistro}" "${meta_file}")
+    if [ -n "${url}" ] ; then
+        printf "%s" "${url}"
+        exit 0
+    fi
 
-        # 1st try with full distro=ver
-        url=$(try_download_url "${mytool}" "${myver}" "${myarch}" "${mydistro}=${mydistrover}" "${meta_file_name}")
-        if [ -n "${url}" ] ; then
-            printf "%s" "${url}"
-            exit 0
-        fi
+    # 3rd try with unknown
+    url=$(try_download_url "${mytool}" "${myver}" "${myarch}" "unknown" "${meta_file}")
+    if [ -n "${url}" ] ; then
+        printf "%s" "${url}"
+        exit 0
+    fi
 
-        # 2nd try with just distro
-        url=$(try_download_url "${mytool}" "${myver}" "${myarch}" "${mydistro}" "${meta_file_name}")
-        if [ -n "${url}" ] ; then
-            printf "%s" "${url}"
-            exit 0
-        fi
-
-        # 3rd try with unknown
-        url=$(try_download_url "${mytool}" "${myver}" "${myarch}" "unknown" "${meta_file_name}")
-        if [ -n "${url}" ] ; then
-            printf "%s" "${url}"
-            exit 0
-        fi
-    )
-
-    unset mytool myver myarch mydistro mydistrover meta_file_name
+    unset mytool myver myarch mydistro mydistrover meta_file
 }
 
 # @FUNCTION: get_tool_ver_from_tag
@@ -723,28 +718,21 @@ get_tool_ver_from_tag() {
 
     mytool=$1
     mytag=$2
-    meta_file_name="$(basename "${META_VERSION_URL}")"
 
-    (
-        edo cd "${CACHE_LOCATION}"
+    meta_file="$(get_meta_version_file)"
 
-        download_silent "${META_VERSION_URL}"
-
-        check_meta_file_version "${meta_file_name}" "${META_VERSION_FORMAT}"
-
-        awk "
-        NF {
-            if (\$1 == \"${mytool}\") {
-                split(\$3,a,\",\");
-                for (i in a) if (a[i] == \"${mytag}\") {
-                    print \$2
-                    exit
-                }
+    awk "
+    NF {
+        if (\$1 == \"${mytool}\") {
+            split(\$3,a,\",\");
+            for (i in a) if (a[i] == \"${mytag}\") {
+                print \$2
+                exit
             }
-        }" "${meta_file_name}" || die "awk failed!"
-    )
+        }
+    }" "${meta_file}" || die "awk failed!"
 
-    unset mytool mytag meta_file_name
+    unset mytool mytag meta_file
 }
 
 # @FUNCTION: ghc_already_installed
@@ -960,6 +948,130 @@ is_sourced() {
 
    # assume we are not sourced, if our above checks didn't find it
    return 1
+}
+
+# @FUNCTION: get_meta_version_file
+# @DESCRIPTION:
+# Downloads the META_VERSION_URL
+# in case it hasn't been downloaded
+# during the execution of this script yet
+# and checks the format version matches
+# the expected one.
+# @STDOUT: file location
+get_meta_version_file() {
+    meta_file_name="$(basename "${META_VERSION_URL}")"
+    meta_filepath="${CACHE_LOCATION}/${meta_file_name}"
+
+    if [ ! -e "${meta_filepath}" ] ; then
+        (
+            edo cd "${CACHE_LOCATION}"
+            download_silent "${META_VERSION_URL}"
+        ) || die "downloading failed"
+    fi
+
+    check_meta_file_version "${meta_file_name}" "${META_VERSION_FORMAT}"
+
+    printf "%s" "${meta_filepath}"
+
+    unset meta_file_name meta_filepath
+}
+
+
+# @FUNCTION: get_meta_download_file
+# @DESCRIPTION:
+# Downloads the META_DOWNLOAD_URL
+# in case it hasn't been downloaded
+# during the execution of this script yet
+# and checks the format version matches
+# the expected one.
+# @STDOUT: file location
+get_meta_download_file() {
+    meta_file_name="$(basename "${META_DOWNLOAD_URL}")"
+    meta_filepath="${CACHE_LOCATION}/${meta_file_name}"
+
+    if [ ! -e "${meta_filepath}" ] ; then
+        (
+            edo cd "${CACHE_LOCATION}"
+            download_silent "${META_DOWNLOAD_URL}"
+        ) || die "downloading failed!"
+    fi
+
+    check_meta_file_version "${meta_file_name}" "${META_DOWNLOAD_FORMAT}"
+
+    printf "%s" "${CACHE_LOCATION}/${meta_file_name}"
+
+    unset meta_file_name meta_filepath
+}
+
+# @FUNCTION: known_tool_versions
+# @USAGE: <tool>
+# @DESCRIPTION:
+# Prints the known tool versions from
+# META_VERSION_URL.
+# @STDOUT: known ghc versions
+known_tool_versions() {
+    [ -z "$1" ] && die "Internal error: no argument given to posix_realpath"
+
+    mytool=$1
+    meta_file="$(get_meta_version_file)"
+
+    awk "
+    NF {
+        if (\$1 == \"${mytool}\") {
+            print \$2
+        }
+    }" "${meta_file}" || die "awk failed!"
+
+    unset mytool meta_file
+}
+
+
+# @FUNCTION: known_tool_tags
+# @USAGE: <tool>
+# @DESCRIPTION:
+# Prints the known tool tags from
+# META_VERSION_URL.
+# @STDOUT: known tool tags
+known_tool_tags() {
+    [ -z "$1" ] && die "Internal error: no argument given to known_tool_tags"
+
+    mytool=$1
+    meta_file="$(get_meta_version_file)"
+
+    awk "
+    NF {
+        if (\$1 == \"${mytool}\") {
+            split(\$3,a,\",\");
+            for (i in a) {
+                print a[i]
+            }
+        }
+    }" "${meta_file}" | sort -u || die "awk failed!"
+
+    unset mytool meta_file
+}
+
+# @FUNCTION: array_contains
+# @USAGE: <element> <array>
+# @DESCRIPTION:
+# Checks whether the given elements
+# is in the array.
+# @RETURNS: returns 0 if the element is in the array, 1 otherwise
+array_contains() {
+    { [ -z "$1" ] || [ -z "$2" ] ;} && die "Internal error: not enough arguments given to array_contains"
+
+    element=$1
+    array=$2
+
+    for e in ${array} ; do
+        if [ "${e}" = "${element}" ] ; then
+            unset e element array
+            return 0
+        fi
+    done
+
+    unset e element array
+    return 1
 }
 
 
@@ -1419,7 +1531,7 @@ print_debug_info() {
     echo "  Script update url:        ${SCRIPT_UPDATE_URL}"
     echo "  GHC download baseurl:     ${GHC_DOWNLOAD_BASEURL}"
     echo "  Meta download url         ${META_DOWNLOAD_URL}"
-    echo "  Meta download format      ${META_DOWNLOAD_URL_FORMAT}"
+    echo "  Meta download format      ${META_DOWNLOAD_FORMAT}"
     echo "  Meta version url          ${META_VERSION_URL}"
     echo "  Meta version format       ${META_VERSION_FORMAT}"
     echo
@@ -1442,35 +1554,27 @@ print_debug_info() {
 list() {
     mytool=$1
 
-    meta_file_name="$(basename "${META_VERSION_URL}")"
+    meta_file="$(get_meta_version_file)"
 
-    (
-        edo cd "${CACHE_LOCATION}"
+    echo "Available upstream versions:"
+    echo
+    if [ -z "${mytool}" ] ; then
+        awk "
+        NF {
+            if (\$1 != \"#\") {
+                print \$1 \" \" \$2
+            }
+        }" "${meta_file}" || die "awk failed!"
+    else
+        awk "
+        NF {
+            if (\$1 == \"${mytool}\") {
+                print \$1 \" \" \$2
+            }
+        }" "${meta_file}" || die "awk failed!"
+    fi
 
-        download_silent "${META_VERSION_URL}"
-
-        check_meta_file_version "${meta_file_name}" "${META_VERSION_FORMAT}"
-
-        echo "Available upstream versions:"
-        echo
-        if [ -z "${mytool}" ] ; then
-            awk "
-            NF {
-                if (\$1 != \"#\") {
-                    print \$1 \" \" \$2
-                }
-            }" "${meta_file_name}" || die "awk failed!"
-        else
-            awk "
-            NF {
-                if (\$1 == \"${mytool}\") {
-                    print \$1 \" \" \$2
-                }
-            }" "${meta_file_name}" || die "awk failed!"
-        fi
-    )
-
-    unset mytool meta_file_name
+    unset mytool meta_file
 }
 
 
@@ -1484,11 +1588,6 @@ if [ -z "$HOME" ] ; then
     die "HOME env not set, cannot operate"
 fi
 
-if ! is_sourced ; then
-    edo mkdir -p "${INSTALL_BASE}"
-    edo mkdir -p "${BIN_LOCATION}"
-    edo mkdir -p "${CACHE_LOCATION}"
-fi
 
 
 
@@ -1530,7 +1629,20 @@ if ! is_sourced ; then
                 usage
             fi
             ;;
-        *)
+        *) ## startup tasks ##
+
+           edo mkdir -p "${INSTALL_BASE}"
+           edo mkdir -p "${BIN_LOCATION}"
+           edo mkdir -p "${CACHE_LOCATION}"
+
+           # clean up old meta files
+           if [ -e "${CACHE_LOCATION}/$(basename "${META_VERSION_URL}")" ] ; then
+               edo rm "${CACHE_LOCATION}/$(basename "${META_VERSION_URL}")"
+           fi
+           if [ -e "${CACHE_LOCATION}/$(basename "${META_DOWNLOAD_URL}")" ] ; then
+               edo rm "${CACHE_LOCATION}/$(basename "${META_DOWNLOAD_URL}")"
+           fi
+
            # check for available commands
            missing_commands="$(check_required_commands ${DOWNLOADER})"
            if [ -n "${missing_commands}" ] ; then
@@ -1556,7 +1668,14 @@ if ! is_sourced ; then
                    fi
                    install_ghc "${_tool_ver}"
                else
-                   install_ghc "${GHC_VER}"
+                   # could be a version or a tag, let's check
+                   if array_contains "${GHC_VER}" "$(known_tool_versions "ghc")" ; then
+                       install_ghc "${GHC_VER}"
+                   elif array_contains "${GHC_VER}" "$(known_tool_tags "ghc")" ; then
+                       install_ghc "$(get_tool_ver_from_tag "ghc" "${GHC_VER}")"
+                   else
+                       die "\"${GHC_VER}\" is not a known version or tag!"
+                   fi
                fi
                break;;
            set)
@@ -1629,7 +1748,14 @@ if ! is_sourced ; then
                    esac
                done
                if [ -n "${CABAL_VER}" ] ; then
-                   install_cabal "${CABAL_VER}"
+                   # could be a version or a tag, let's check
+                   if array_contains "${CABAL_VER}" "$(known_tool_versions "cabal-install")" ; then
+                       install_cabal "${CABAL_VER}"
+                   elif array_contains "${CABAL_VER}" "$(known_tool_tags "cabal-install")" ; then
+                       install_cabal "$(get_tool_ver_from_tag "cabal-install" "${CABAL_VER}")"
+                   else
+                       die "\"${CABAL_VER}\" is not a known version or tag!"
+                   fi
                else
                    _cabal_ver="$(get_tool_ver_from_tag "cabal-install" "recommended")"
                    if [ -z "${_cabal_ver}" ] ; then
