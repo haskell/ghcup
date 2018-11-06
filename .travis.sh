@@ -6,6 +6,9 @@ edo()
     "$@" || exit 2
 }
 
+edo rm .available-versions
+edo rm .download-urls
+
 # install GHCs
 edo ./ghcup -v install 8.2.2
 edo ./ghcup -v install 8.4.3

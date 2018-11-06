@@ -969,7 +969,7 @@ get_meta_version_file() {
         ) || die "downloading failed"
     fi
 
-    check_meta_file_version "${meta_file_name}" "${META_VERSION_FORMAT}"
+    check_meta_file_version "${meta_filepath}" "${META_VERSION_FORMAT}"
 
     printf "%s" "${meta_filepath}"
 
@@ -996,7 +996,7 @@ get_meta_download_file() {
         ) || die "downloading failed!"
     fi
 
-    check_meta_file_version "${meta_file_name}" "${META_DOWNLOAD_FORMAT}"
+    check_meta_file_version "${meta_filepath}" "${META_DOWNLOAD_FORMAT}"
 
     printf "%s" "${CACHE_LOCATION}/${meta_file_name}"
 
