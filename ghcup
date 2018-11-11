@@ -880,6 +880,9 @@ get_distro_alias() {
         "CentOS Linux"|"CentOS"|"centos")
             distro_alias=centos
             ;;
+        "Darwin")
+            distro_alias=darwin
+            ;;
     esac
 
     printf "%s" "${distro_alias}"
