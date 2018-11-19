@@ -1199,6 +1199,8 @@ set_ghc() {
     done
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf runghc "${BIN_LOCATION}"/runhaskell
+    # shellcheck disable=SC2046
+    edo ln $(optionv "-v") -sf haddock-ghc "${BIN_LOCATION}"/haddock
 
     status_message "Done, make sure \"${BIN_LOCATION}\" is in your PATH!"
 
@@ -1337,7 +1339,7 @@ rm_ghc() {
 
             # TODO: known_tools is not very robust, but we want to avoid accidentially deleting
             # unrelated things (even if those are dangling symlinks)
-            known_tools="ghc ghci ghc-pkg haddock-ghc runghc runhaskell"
+            known_tools="ghc ghci ghc-pkg haddock haddock-ghc runghc runhaskell"
             # remove dangling symlinks for ghc, ghci, ...
             for t in ${known_tools} ; do
                 if [ -h "${BIN_LOCATION}/${t}" ] && [ ! -e "${BIN_LOCATION}/${t}" ] ; then
