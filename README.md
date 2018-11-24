@@ -13,6 +13,7 @@ Similar in scope to [rustup](https://github.com/rust-lang-nursery/rustup.rs), [p
 
    * [Installation](#installation)
    * [Usage](#usage)
+   * [Design goals](#design-goals)
    * [How](#how)
    * [Known problems](#known-problems)
 
@@ -53,6 +54,20 @@ cabal new-install cabal-install
 
 Generally this is meant to be used with [`cabal-install`](https://hackage.haskell.org/package/cabal-install), which
 handles your haskell packages and can demand that [a specific version](https://cabal.readthedocs.io/en/latest/nix-local-build.html#cfg-flag---with-compiler)  of `ghc` is available, which `ghcup` can do.
+
+## Design goals
+
+1. simplicity
+2. non-interactive
+3. portable
+4. do one thing and do it well (UNIX philosophy)
+
+### Non-goals
+
+1. invoking `sudo`, `apt-get` or *any* package manager
+2. handling system packages
+3. handling cabal projects
+4. being a stack alternative
 
 ## How
 
