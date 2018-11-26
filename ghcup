@@ -534,6 +534,7 @@ check_required_commands() {
 # @DESCRIPTION:
 # Gets the current distro identifier following
 # https://unix.stackexchange.com/a/6348
+# (see also http://linuxmafia.com/faq/Admin/release-files.html)
 # @STDOUT: current distro identifier
 get_distro_name() {
     if [ -f /etc/os-release ]; then
@@ -549,6 +550,23 @@ get_distro_name() {
         # shellcheck disable=SC1091
         . /etc/lsb-release
         printf "%s" "$DISTRIB_ID"
+    elif [ -f /etc/redhat-release ]; then
+        case "$(cat /etc/redhat-release)" in
+        # Older CentOS releases didn't have a /etc/centos-release file
+        "CentOS release "*)
+            printf "CentOS"
+            ;;
+        "CentOS Linux release "*)
+            printf "CentOS Linux"
+            ;;
+        "Fedora release "*)
+            printf "Fedora"
+            ;;
+        # Fallback to uname
+        *)
+            printf "%s" "$(uname -s)"
+            ;;
+        esac
     elif [ -f /etc/debian_version ]; then
         # Older Debian/Ubuntu/etc.
         printf "Debian"
@@ -577,12 +595,37 @@ get_distro_ver() {
         # shellcheck disable=SC1091
         . /etc/lsb-release
         printf "%s" "$DISTRIB_RELEASE"
+    elif [ -f /etc/redhat-release ]; then
+        case "$(cat /etc/redhat-release)" in
+        # NB: Older CentOS releases didn't have a /etc/centos-release file
+        "CentOS release "*|"Fedora release "*)
+            printf "%s" "$(awk 'NR==1 { split($3, a, "."); print a[1] }' /etc/redhat-release)"
+            ;;
+        "CentOS Linux release "*)
+            printf "%s" "$(awk 'NR==1 { split($4, a, "."); print a[1] }' /etc/redhat-release)"
+            ;;
+        # Fallback to uname
+        *)
+            printf "%s" "$(uname -r)"
+            ;;
+        esac
     elif [ -f /etc/debian_version ]; then
         # Older Debian/Ubuntu/etc.
         printf "%s" "$(cat /etc/debian_version)"
     else
-        # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
-        printf "%s" "$(uname -r)"
+        case "$(uname -s)" in
+        AIX)
+            printf "%s" "$(uname -v)"
+            ;;
+        FreeBSD)
+            # we only care about the numeric version part left of
+            # the '-' in "11.2-RELEASE".
+            printf "%s" "$(uname -r | cut -d - -f 1)"
+            ;;
+        *)
+            # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
+            printf "%s" "$(uname -r)"
+        esac
     fi
 }
 
@@ -596,15 +639,28 @@ get_arch() {
     myarch=$(uname -m)
 
     case "${myarch}" in
-    x86_64)
+    x86_64|amd64)
         printf "x86_64"  # or AMD64 or Intel64 or whatever
         ;;
     i*86)
         printf "i386"  # or IA32 or Intel32 or whatever
         ;;
     *)
-        die "Cannot figure out architecture (was: ${myarch})"
-        ;;
+        case "$(uname -s)" in
+        AIX)
+            case "$(uname -p)" in
+            powerpc)
+                printf "powerpc"
+                ;;
+            *)
+                die "Cannot figure out architecture on AIX (was: ${myarch})"
+                ;;
+            esac
+            ;;
+        *)
+            die "Cannot figure out architecture (was: ${myarch})"
+            ;;
+        esac
     esac
 
     unset myarch
@@ -879,6 +935,15 @@ get_distro_alias() {
             ;;
         "CentOS Linux"|"CentOS"|"centos")
             distro_alias=centos
+            ;;
+        "Alpine Linux"|"Alpine")
+            distro_alias=alpine
+            ;;
+        "AIX")
+            distro_alias=aix
+            ;;
+        "FreeBSD")
+            distro_alias=freebsd
             ;;
         "Darwin")
             distro_alias=darwin
