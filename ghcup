@@ -1543,6 +1543,7 @@ print_debug_info() {
     echo "Detected system information:"
     echo "  Architecture:   $(get_arch)"
     echo "  Distribution:   $(get_distro_name)"
+    echo "  Distro alias:   $(get_distro_alias "$(get_distro_name)")"
     echo "  Distro version: $(get_distro_ver)"
 }
 
