@@ -239,13 +239,15 @@ set_usage() {
 Set the currently active GHC to the specified version
 
 USAGE:
-    ${SCRIPT} set [FLAGS] <VERSION>
+    ${SCRIPT} set [FLAGS] [VERSION|TAG]
 
 FLAGS:
     -h, --help       Prints help information
 
 ARGS:
-    <VERSION>        E.g. \"8.4.3\" or \"8.6.1\"
+    [VERSION|TAG]    E.g. \"8.4.3\" or \"8.6.1\" or
+                     a tag like \"recommended\" or \"latest\"
+                     (default: discovers recommended version)
 
 DISCUSSION:
     Sets the the current GHC version by creating non-versioned
@@ -1777,8 +1779,24 @@ if ! is_sourced ; then
                           break;;
                    esac
                done
-               [ -n "${GHC_VER}" ] || set_usage
-               set_ghc "${GHC_VER}"
+
+               if [ -z "${GHC_VER}" ] ; then
+                   _tool_ver="$(get_tool_ver_from_tag "ghc" "recommended")"
+                   if [ -z "${_tool_ver}" ] ; then
+                       die "Could not find a recommended GHC version, please report a bug at ${BUG_URL}!"
+                   fi
+                   set_ghc "${_tool_ver}"
+               else
+                   # could be a version or a tag, let's check
+                   if array_contains "${GHC_VER}" "$(known_tool_versions "ghc")" ; then
+                       set_ghc "${GHC_VER}"
+                   elif array_contains "${GHC_VER}" "$(known_tool_tags "ghc")" ; then
+                       set_ghc "$(get_tool_ver_from_tag "ghc" "${GHC_VER}")"
+                   else
+                       die "\"${GHC_VER}\" is not a known version or tag!"
+                   fi
+               fi
+
                break;;
            upgrade)
                shift 1
