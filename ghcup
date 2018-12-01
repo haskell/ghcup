@@ -245,7 +245,7 @@ FLAGS:
     -h, --help       Prints help information
 
 ARGS:
-    [VERSION|TAG]    E.g. \"8.4.3\" or \"8.6.1\" or
+    [VERSION|TAG]    E.g. \"8.4.3\" or \"8.6.3\" or
                      a tag like \"recommended\" or \"latest\"
                      (default: discovers recommended version)
 
