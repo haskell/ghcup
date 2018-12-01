@@ -1186,7 +1186,8 @@ install_ghc() {
         if ${FORCE} ; then
             echo "GHC already installed in ${inst_location}, overwriting!"
         else
-            die "GHC already installed in ${inst_location}, use --force to overwrite"
+            warning_message "GHC already installed in ${inst_location}, use --force to overwrite"
+            exit 0
         fi
         first_install=false
     fi
