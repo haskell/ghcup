@@ -857,18 +857,18 @@ verify_tarball() {
 
    signature_download_url=$1
    tarball_filename=$2
-   signature_filename=$(basename ${signature_download_url})
+   signature_filename=$(basename "${signature_download_url}")
    ghc_public_key_filename="$(get_signing_public_key)"
 
    {
 
-       download ${signature_download_url}
-       gpg --no-default-keyring --trusted-key '2DE04D4E97DB64AD' --keyring ${ghc_public_key_filename} --verify ${signature_filename} ${tarball_filename}
+       download "${signature_download_url}"
+       gpg --no-default-keyring --trusted-key '2DE04D4E97DB64AD' --keyring "${ghc_public_key_filename}" --verify "${signature_filename}" "${tarball_filename}"
 
        # cleanup
-       [ -e "${signature_filename}" ] && rm ${signature_filename}
+       [ -e "${signature_filename}" ] && rm "${signature_filename}"
     } || {
-       [ -e "${signature_filename}" ] && rm ${signature_filename}
+       [ -e "${signature_filename}" ] && rm "${signature_filename}"
        die "Could not verify tarball integrity"
     }
 
