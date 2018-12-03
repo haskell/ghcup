@@ -153,7 +153,7 @@ BUG_URL="https://github.com/haskell/ghcup/issues"
 # DESCRIPTION:
 # The url of the file containing the public key
 # of the ghc tarball signature.
-SIGNING_PUBLIC_KEY_URL="https://raw.githubusercontent.com/Franciman/ghcup/master/.ghc-public-key"
+SIGNING_PUBLIC_KEY_URL="https://raw.githubusercontent.com/haskell/ghcup/master/.ghc-public-key"
 
 # @VARIABLE: CACHING
 # @DESCRIPTION:
