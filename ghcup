@@ -153,7 +153,7 @@ BUG_URL="https://github.com/haskell/ghcup/issues"
 # DESCRIPTION:
 # The url of the file containing the public key
 # of the ghc tarball signature.
-SIGNING_PUBLIC_KEY_URL="https://raw.githubusercontent.com/haskell/Franciman/master/.ghc-public-key"
+SIGNING_PUBLIC_KEY_URL="https://raw.githubusercontent.com/Franciman/ghcup/master/.ghc-public-key"
 
 # @VARIABLE: CACHING
 # @DESCRIPTION:
@@ -863,7 +863,7 @@ verify_tarball() {
    {
 
        download ${signature_download_url}
-       gpg --no-default-keyring --keyring ${ghc_public_key_filename} --verify ${signature_filename} ${tarball_filename}
+       gpg --no-default-keyring --trusted-key '2DE04D4E97DB64AD' --keyring ${ghc_public_key_filename} --verify ${signature_filename} ${tarball_filename}
 
        # cleanup
        [ -e "${signature_filename}" ] && rm ${signature_filename}
