@@ -81,6 +81,12 @@ BIN_LOCATION="$INSTALL_BASE/bin"
 # This is expected to be a subdirectory of INSTALL_BASE.
 CACHE_LOCATION="$INSTALL_BASE/cache"
 
+# @VARIABLE: SIGNING_PUBLIC_KEY_LOCATION
+# @DESCRIPTION:
+# The location where the public key of the signer
+# of tarballs is stored
+SIGNING_PUBLIC_KEY_LOCATION="$INSTALL_BASE/pub_key"
+
 # @VARIABLE: DOWNLOADER
 # @DESCRIPTION:
 # What program to use for downloading files.
@@ -142,6 +148,12 @@ META_VERSION_FORMAT="1"
 # DESCRIPTION:
 # The url to report bugs to.
 BUG_URL="https://github.com/haskell/ghcup/issues"
+
+# @VARIABLE: SIGNING_PUBLIC_KEY_URL
+# DESCRIPTION:
+# The url of the file containing the public key
+# of the ghc tarball signature.
+SIGNING_PUBLIC_KEY_URL="https://raw.githubusercontent.com/haskell/Franciman/master/.ghc-public-key"
 
 # @VARIABLE: CACHING
 # @DESCRIPTION:
@@ -513,7 +525,7 @@ command_exists() {
 check_required_commands() {
     _missing_commands=
 
-    for com in "$@" awk uname basename tar xz gzip mktemp dirname ; do
+    for com in "$@" awk uname basename tar xz gzip mktemp dirname gpg ; do
         command_exists "${com}" || {
             _missing_commands="${_missing_commands} ${com}"
         }
@@ -835,6 +847,34 @@ download() {
     edo ${DOWNLOADER} ${DOWNLOADER_OPTS} "$1"
 }
 
+# @FUNCTION: verify_tarball
+# @USAGE: <download_url> <tarball_filename>
+# @DESCRIPTION:
+# Downloads the detached signature file for the tarball
+# and use it to verify the integrity of the tarball
+verify_tarball() {
+   { [ -z "$1" ] || [ -z "$2" ] ;} && die "Internal error: not enough arguments given to verify_tarball"
+
+   signature_download_url=$1
+   tarball_filename=$2
+   signature_filename=$(basename ${signature_download_url})
+   ghc_public_key_filename="$(get_signing_public_key)"
+
+   {
+
+       download ${signature_download_url}
+       gpg --no-default-keyring --keyring ${ghc_public_key_filename} --verify ${signature_filename} ${tarball_filename}
+
+       # cleanup
+       [ -e "${signature_filename}" ] && rm ${signature_filename}
+    } || {
+       [ -e "${signature_filename}" ] && rm ${signature_filename}
+       die "Could not verify tarball integrity"
+    }
+
+    unset signature_download_url tarball_filename signature_filename ghc_public_key_filename
+}
+
 # @FUNCTION: download_silent
 # @USAGE: <url>
 # @DESCRIPTION:
@@ -1071,6 +1111,27 @@ get_meta_download_file() {
     unset meta_file_name meta_filepath
 }
 
+# @FUNCTION: get_signing_public_key
+# @DESCRIPTION:
+# Downloads the SIGNING_PUBLIC_KEY_URL
+# in case it hasn't been downloaded
+# during the execution of this script yet
+# @STDOUT: file location
+get_signing_public_key() {
+    signing_public_key_name="$(basename "${SIGNING_PUBLIC_KEY_URL}")"
+    signing_public_key_filepath="${SIGNING_PUBLIC_KEY_LOCATION}/${signing_public_key_name}"
+    if [ ! -e "${signing_public_key_filepath}" ] ; then
+        (
+            edo cd "${SIGNING_PUBLIC_KEY_LOCATION}"
+            download_silent "${SIGNING_PUBLIC_KEY_URL}"
+        ) || die "downloading failed!"
+    fi
+
+    printf "%s" "${signing_public_key_filepath}"
+    
+    unset signing_public_key_name signing_public_key_filepath
+}
+
 # @FUNCTION: known_tool_versions
 # @USAGE: <tool>
 # @DESCRIPTION:
@@ -1181,17 +1242,25 @@ install_ghc() {
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
         if ${CACHING} ; then
+            must_verify_tarball="false"
             if [ ! -e "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
                 edo cd "${CACHE_LOCATION}"
                 download "${download_url}"
+                must_verify_tarball="true"
+            fi
+            if "${must_verify_tarball}" ; then
+                verify_tarball "${download_url}.sig" "${CACHE_LOCATION}/${download_tarball_name}"
             fi
             edo cd "${tmp_dir}"
             unpack "${CACHE_LOCATION}/${download_tarball_name}"
         else
             edo cd "${tmp_dir}"
             download "${download_url}"
+            verify_tarball "${download_url}.sig" "${download_tarball_name}"
             unpack "${download_tarball_name}"
         fi
+
+
 
         edo cd "ghc-${myghcver}"
 
@@ -1521,15 +1590,22 @@ compile_ghc() {
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
         if ${CACHING} ; then
+            must_verify_tarball="false"
             if [ ! -e "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
                 edo cd "${CACHE_LOCATION}"
                 download "${download_url}"
+                must_verify_tarball="true"
+            fi
+            if "${must_verify_tarball}" ; then
+                unset must_verify_tarball
+                verify_tarball "${download_url}.sig" "${CACHE_LOCATION}/${download_tarball_name}"
             fi
             edo cd "${tmp_dir}"
             unpack "${CACHE_LOCATION}/${download_tarball_name}"
         else
             edo cd "${tmp_dir}"
             download "${download_url}"
+            verify_tarball "${download_url}.sig" "${download_tarball_name}"
             unpack "${download_tarball_name}"
         fi
 
@@ -1709,6 +1785,7 @@ if ! is_sourced ; then
            edo mkdir -p "${INSTALL_BASE}"
            edo mkdir -p "${BIN_LOCATION}"
            edo mkdir -p "${CACHE_LOCATION}"
+           edo mkdir -p "${SIGNING_PUBLIC_KEY_LOCATION}"
 
            # clean up old meta files
            if [ -e "${CACHE_LOCATION}/$(basename "${META_VERSION_URL}")" ] ; then
@@ -1716,6 +1793,9 @@ if ! is_sourced ; then
            fi
            if [ -e "${CACHE_LOCATION}/$(basename "${META_DOWNLOAD_URL}")" ] ; then
                edo rm "${CACHE_LOCATION}/$(basename "${META_DOWNLOAD_URL}")"
+           fi
+           if [ -e "${SIGNING_PUBLIC_KEY_LOCATION}/$(basename "${SIGNING_PUBLIC_KEY_URL}")" ] ; then
+               edo rm "${SIGNING_PUBLIC_KEY_LOCATION}/$(basename "${SIGNING_PUBLIC_KEY_URL}")"
            fi
 
            # check for available commands
