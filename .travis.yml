@@ -29,6 +29,3 @@ addons:
 # TODO: also run checkbashisms.pl (currently two instances of non-compliance)
 script:
  - ./.travis.sh
-
-matrix:
-  fast_finish: true
