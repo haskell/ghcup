@@ -58,10 +58,19 @@ VERBOSE=false
 # Whether to force installation and overwrite files.
 FORCE=false
 
+# @VARIABLE: GHCUP_INSTALL_BASE_PREFIX
+# @DESCRIPTION:
+# The main install directory prefix, under which .ghcup
+# directory will be created. This directory is user
+# configurable via the environment variable of the
+# same name. It must be non-empty and the path
+# it points to must exist.
+: "${GHCUP_INSTALL_BASE_PREFIX:=$HOME}"
+
 # @VARIABLE: INSTALL_BASE
 # @DESCRIPTION:
 # The main install directory where all ghcup stuff happens.
-INSTALL_BASE="$HOME/.ghcup"
+INSTALL_BASE="$GHCUP_INSTALL_BASE_PREFIX/.ghcup"
 
 # @VARIABLE: GHC_LOCATION
 # @DESCRIPTION:
@@ -1659,10 +1668,13 @@ list() {
     #######################
 
 
-if [ -z "$HOME" ] ; then
-    die "HOME env not set, cannot operate"
+if [ -z "${GHCUP_INSTALL_BASE_PREFIX}" ] ; then
+    die "GHCUP_INSTALL_BASE_PREFIX empty, cannot operate"
 fi
 
+if [ ! -d "${GHCUP_INSTALL_BASE_PREFIX}" ] ; then
+    die "${GHCUP_INSTALL_BASE_PREFIX} does not exist"
+fi
 
 
 
