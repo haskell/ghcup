@@ -23,7 +23,7 @@ ghc 8.4.3   x86_64  darwin                          https://downloads.haskell.or
 ghc 8.4.4   i386    debian=8,debian,ubuntu,unknown  https://downloads.haskell.org/~ghc/8.4.4/ghc-8.4.4-i386-deb8-linux.tar.xz
 ghc 8.4.4   x86_64  debian=8                        https://downloads.haskell.org/~ghc/8.4.4/ghc-8.4.4-x86_64-deb8-linux.tar.xz
 ghc 8.4.4   x86_64  debian=9,debian,ubuntu          https://downloads.haskell.org/~ghc/8.4.4/ghc-8.4.4-x86_64-deb9-linux.tar.xz
-ghc 8.4.4   x86_64  centos=7,centos                 https://downloads.haskell.org/~ghc/8.4.4/ghc-8.4.4-x86_64-centos70-linux.tar.xz
+ghc 8.4.4   x86_64  centos=7,centos,amazonlinux     https://downloads.haskell.org/~ghc/8.4.4/ghc-8.4.4-x86_64-centos70-linux.tar.xz
 ghc 8.4.4   x86_64  fedora=27,fedora,unknown        https://downloads.haskell.org/~ghc/8.4.4/ghc-8.4.4-x86_64-fedora27-linux.tar.xz
 ghc 8.4.4   x86_64  darwin                          https://downloads.haskell.org/~ghc/8.4.4/ghc-8.4.4-x86_64-apple-darwin.tar.xz
 
@@ -42,7 +42,7 @@ ghc 8.6.3   i386    debian=8,debian,ubuntu,unknown  https://downloads.haskell.or
 ghc 8.6.3   x86_64  debian=8                        https://downloads.haskell.org/~ghc/8.6.3/ghc-8.6.3-x86_64-deb8-linux.tar.xz
 ghc 8.6.3   x86_64  debian=9,debian,ubuntu          https://downloads.haskell.org/~ghc/8.6.3/ghc-8.6.3-x86_64-deb9-linux.tar.xz
 ghc 8.6.3   x86_64  fedora=27,fedora,unknown        https://downloads.haskell.org/~ghc/8.6.3/ghc-8.6.3-x86_64-fedora27-linux.tar.xz
-ghc 8.6.3   x86_64  centos=7,centos                 https://downloads.haskell.org/~ghc/8.6.3/ghc-8.6.3-x86_64-centos7-linux.tar.xz
+ghc 8.6.3   x86_64  centos=7,centos,amazonlinux     https://downloads.haskell.org/~ghc/8.6.3/ghc-8.6.3-x86_64-centos7-linux.tar.xz
 ghc 8.6.3   x86_64  darwin                          https://downloads.haskell.org/~ghc/8.6.3/ghc-8.6.3-x86_64-apple-darwin.tar.xz
 
 
