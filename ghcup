@@ -743,9 +743,11 @@ get_download_url() {
     mytool=$1
     myver=$2
     myarch=$(get_arch)
+    [ -z "${myarch}" ] && die "failed to get architecture"
     mydistro=$(get_distro_alias "$(get_distro_name)")
     mydistrover=$(get_distro_ver)
     meta_file="$(get_meta_download_file)"
+    [ -z "${meta_file}" ] && die "failed to get meta file"
 
 
     # 1st try with full distro=ver
@@ -785,6 +787,7 @@ get_tool_ver_from_tag() {
     mytag=$2
 
     meta_file="$(get_meta_version_file)"
+    [ -z "${meta_file}" ] && die "failed to get meta file"
 
     awk "
     NF {
@@ -1170,13 +1173,14 @@ install_ghc() {
 
     myghcver=$1
     inst_location=$(get_ghc_location "$1")
+    [ -z "${inst_location}" ] && die "failed to get install location"
     download_url=$(get_download_url "ghc" "${myghcver}")
-    download_tarball_name=$(basename "${download_url}")
-    first_install=true
-
     if [ -z "${download_url}" ] ; then
         die "Could not find an appropriate download for the requested GHC-${myghcver} on your system! Please report a bug at ${BUG_URL}"
     fi
+    download_tarball_name=$(basename "${download_url}")
+    first_install=true
+
 
     status_message "Installing GHC-${myghcver} for $(get_distro_name) on architecture $(get_arch)"
 
@@ -1261,6 +1265,7 @@ set_ghc() {
 
     myghcver=$1
     inst_location=$(get_ghc_location "$1")
+    [ -z "${inst_location}" ] && die "failed to get install location"
 
     [ -e "${inst_location}" ] || die "GHC ${myghcver} not installed yet, use: ${SCRIPT} install ${myghcver}"
 
@@ -1450,6 +1455,7 @@ install_cabal() {
 
     mycabalver=$1
     myarch=$(get_arch)
+    [ -z "${myarch}" ] && die "failed to get architecture"
     inst_location=$BIN_LOCATION
     download_url=$(get_download_url "cabal-install" "${mycabalver}")
     download_tarball_name=$(basename "${download_url}")
@@ -1509,6 +1515,7 @@ compile_ghc() {
     myghcver=$1
     bootstrap_ghc=$2
     inst_location=$(get_ghc_location "$1")
+    [ -z "${inst_location}" ] && die "failed to get install location"
     download_url="https://downloads.haskell.org/~ghc/${myghcver}/ghc-${myghcver}-src.tar.xz"
     download_tarball_name=$(basename "${download_url}")
 
@@ -1902,5 +1909,6 @@ if ! is_sourced ; then
         esac
     done
 fi # is_sourced
+
 
 # vim: tabstop=4 shiftwidth=4 expandtab
