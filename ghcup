@@ -1777,7 +1777,7 @@ if ! is_sourced ; then
                           break;;
                    esac
                done
-               [ "${GHC_VER}" ] || set_usage
+               [ -n "${GHC_VER}" ] || set_usage
                set_ghc "${GHC_VER}"
                break;;
            upgrade)
@@ -1789,7 +1789,7 @@ if ! is_sourced ; then
                            break;;
                    esac
                done
-               if [ "${TARGET_LOCATION}" ] ; then
+               if [ -n "${TARGET_LOCATION}" ] ; then
                    upgrade "${TARGET_LOCATION}"
                else
                    upgrade "$(dirname "$(posix_realpath "${SOURCE}")")"
@@ -1823,7 +1823,7 @@ if ! is_sourced ; then
                           break;;
                    esac
                done
-               [ "${GHC_VER}" ] || rm_usage
+               [ -n "${GHC_VER}" ] || rm_usage
                rm_ghc "${GHC_VER}"
                break;;
            install-cabal)
@@ -1870,8 +1870,8 @@ if ! is_sourced ; then
                           break;;
                    esac
                done
-               [ "${GHC_VER}" ] || compile_usage
-               [ "${BOOTSTRAP_GHC}" ] || compile_usage
+               [ -n "${GHC_VER}" ] || compile_usage
+               [ -n "${BOOTSTRAP_GHC}" ] || compile_usage
                compile_ghc "${GHC_VER}" "${BOOTSTRAP_GHC}" "${BUILD_CONFIG}"
                break;;
            debug-info)
