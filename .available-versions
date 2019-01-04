@@ -1,6 +1,14 @@
 # fmt-version=1
-# tab separated columns
+#
+# 'recommended' follows the "most widely used" GHC version.
+# Indicators for that are:
+#   1. the current hackage ecosystem and common tools and libraries work
+#      well with that GHC version
+#   2. stackage has an LTS with that GHC version
+#   3. people on #haskell IRC or reddit recommend it
+#
 # tool          | version | tag |
+
 ghc              8.0.2
 ghc              8.2.2
 ghc              8.4.3
