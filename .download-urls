@@ -1,4 +1,16 @@
 # fmt-version=1
+#
+# Only url is unique. tool, version and arch are explicit, because we cannot rely
+# on the url to have it (we want to be agnostic of urls).
+#
+# Order of trying distros is:
+#   1. distro=ver if exists
+#   2. distro if applicable
+#   3. otherwise 'unknown'
+#
+# As such, every triple of (tool, version, arch) should have EXACTLY ONE 'unknown' in supported-distros
+# list.
+#
 # tool | version | arch | supported-distros for given url | url |
 
 ghc 8.0.2   x86_64  debian=7                        https://downloads.haskell.org/~ghc/8.0.2/ghc-8.0.2-x86_64-deb7-linux.tar.xz
