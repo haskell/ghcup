@@ -19,6 +19,24 @@ Similar in scope to [rustup](https://github.com/rust-lang-nursery/rustup.rs), [p
 
 ## Installation
 
+### Simple bootstrap of ghcup, GHC and cabal-install
+
+```sh
+# complete bootstrap
+curl https://raw.githubusercontent.com/haskell/ghcup/master/bootstrap-haskell -sSf | sh
+
+# prepare your environment
+. "$HOME/.ghcup/env"
+echo '. $HOME/.ghcup/env' >> "$HOME/.bashrc" # or similar
+
+# now create a project, such as:
+mkdir myproject && cd myproject
+cabal init -n --is-executable
+cabal v2-run
+```
+
+### Manual install
+
 Just place the `ghcup` shell script into your `PATH` anywhere.
 
 E.g.:
