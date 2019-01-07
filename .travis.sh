@@ -32,12 +32,10 @@ edo ./ghcup -v rm -f 8.2.2
 
 # install default GHC
 edo ./ghcup -v install
+edo ./ghcup -v set
 
 # install latest GHC
 edo ./ghcup -v install latest
-
-# FIXME: this might break from time to time depending on recommended GHC
-edo ./ghcup -v set 8.4.4
 
 export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$HOME/.local/bin:$PATH"
 edo mkdir -p "$HOME"/.local/bin
