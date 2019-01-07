@@ -15,9 +15,12 @@ Similar in scope to [rustup](https://github.com/rust-lang-nursery/rustup.rs), [p
    * [Usage](#usage)
    * [Design goals](#design-goals)
    * [How](#how)
+   * [Known users](#known-users)
    * [Known problems](#known-problems)
 
 ## Installation
+
+Choose one of the following installation methods.
 
 ### Simple bootstrap of ghcup, GHC and cabal-install
 
@@ -50,6 +53,9 @@ Then adjust your `PATH` in `~/.bashrc` (or similar, depending on your shell) lik
 ```sh
 export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
 ```
+
+Security aware users may want to use the files from the [release page](https://github.com/haskell/ghcup/releases)
+and verify the gpg signatures.
 
 ## Usage
 
@@ -98,6 +104,10 @@ This uses precompiled GHC binaries that have been compiled on fedora/debian by [
 Alternatively, you can also tell it to compile from source (note that this might fail due to missing requirements).
 
 In addition this script can also install `cabal-install`.
+
+## Known users
+
+* [vabal](https://github.com/Franciman/vabal)
 
 ## Known problems
 
