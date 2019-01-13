@@ -9,6 +9,8 @@ Similar in scope to [rustup](https://github.com/rust-lang-nursery/rustup.rs), [p
 
 *OS X users may prefer [futurice](https://haskell.futurice.com/) and Ubuntu users may prefer [hvr's ppa](https://launchpad.net/~hvr/+archive/ubuntu/ghc).*
 
+*This project was started when [CM](https://github.com/capital-match) was switching from stack to [cabal nix-style builds](https://www.haskell.org/cabal/users-guide/nix-local-build-overview.html).*
+
 ## Table of Contents
 
    * [Installation](#installation)
