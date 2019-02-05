@@ -120,12 +120,22 @@ Currently only GNU/Linux distributions compatible with the [upstream GHC](https:
 ### Precompiled binaries
 
 Since this uses precompiled binaries you may run into
-problems with *ncurses* and **missing libtinfo**, in case
+several problems.
+
+#### Missing libtinfo (ncurses)
+
+You may run into problems with *ncurses* and **missing libtinfo**, in case
 your distribution doesn't use the legacy way of building
 ncurses and has no compatibility symlinks in place.
 
 Ask your distributor on how to solve this or
 try to compile from source via `ghcup compile <version>`.
+
+#### Libnuma required
+
+This was a [bug](https://ghc.haskell.org/trac/ghc/ticket/15688) in the build system of some GHC versions that lead to
+unconditionally enabled libnuma support. To mitigate this you might have to install the libnuma
+package of your distribution. See [here](https://github.com/haskell/ghcup/issues/58) for a discussion.
 
 ### Compilation
 
