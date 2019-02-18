@@ -649,9 +649,9 @@ get_distro_ver() {
             printf "%s" "$(uname -v)"
             ;;
         FreeBSD)
-            # we only care about the numeric version part left of
-            # the '-' in "11.2-RELEASE".
-            printf "%s" "$(uname -r | cut -d - -f 1)"
+            # we only care about the major numeric version part left of
+            # the '.' in "11.2-RELEASE".
+            printf "%s" "$(uname -r | cut -d . -f 1)"
             ;;
         *)
             # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
