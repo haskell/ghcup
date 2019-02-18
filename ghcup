@@ -184,8 +184,7 @@ FLAGS:
                      (these will not be removed by ghcup)
 
 SUBCOMMANDS:
-    install          Install GHC
-    compile          Compile and install GHC from source
+    install          Install GHC$(${VERBOSE} && printf "\n    compile          Compile and install GHC from source (UNSTABLE!!!)")
     show             Show current/installed GHC
     set              Set currently active GHC version
     list             Show available GHCs and other tools (upstream)
