@@ -452,6 +452,27 @@ edo()
     "$@" || exit 2
 }
 
+# @FUNCTION: emake
+# @USAGE: [arguments]
+# @DESCRIPTION:
+# Wrapper around 'make', may call 'gmake' if it exists.
+emake() { # avoid re-checking for gmake
+    if [ -n "${MAKE}" ] ; then
+        # shellcheck disable=SC2086
+        edo ${MAKE} "$@"
+    else
+        if command_exists gmake ; then
+            MAKE="gmake"
+            # shellcheck disable=SC2086
+            edo ${MAKE} "$@"
+        else
+            MAKE="make"
+            # shellcheck disable=SC2086
+            edo ${MAKE} "$@"
+        fi
+    fi
+}
+
 # @FUNCTION: debug_message
 # @USAGE: <msg>
 # @DESCRIPTION:
@@ -628,9 +649,9 @@ get_distro_ver() {
             printf "%s" "$(uname -v)"
             ;;
         FreeBSD)
-            # we only care about the numeric version part left of
-            # the '-' in "11.2-RELEASE".
-            printf "%s" "$(uname -r | cut -d - -f 1)"
+            # we only care about the major numeric version part left of
+            # the '.' in "11.2-RELEASE".
+            printf "%s" "$(uname -r | cut -d . -f 1)"
             ;;
         *)
             # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
@@ -1188,7 +1209,7 @@ install_ghc() {
         debug_message "Installing GHC into ${inst_location}"
 
         edo ./configure --prefix="${inst_location}"
-        edo make install
+        emake install
 
         # clean up
         edo cd ..
@@ -1544,8 +1565,8 @@ compile_ghc() {
 
         edo ./boot
         edo ./configure --prefix="${inst_location}" --with-ghc="${bootstrap_ghc}"
-        edo make -j${JOBS}
-        edo make install
+        emake -j${JOBS}
+        emake install
 
         # clean up
         edo cd ..

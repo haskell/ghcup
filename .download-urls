@@ -18,6 +18,7 @@ ghc 8.0.2   i386    debian=7                        https://downloads.haskell.or
 ghc 8.0.2   x86_64  debian=8,debian,ubuntu,unknown  https://downloads.haskell.org/~ghc/8.0.2/ghc-8.0.2-x86_64-deb8-linux.tar.xz
 ghc 8.0.2   i386    debian=8,debian,ubuntu,unknown  https://downloads.haskell.org/~ghc/8.0.2/ghc-8.0.2-i386-deb8-linux.tar.xz
 ghc 8.0.2   x86_64  darwin                          https://downloads.haskell.org/~ghc/8.0.2/ghc-8.0.2-x86_64-apple-darwin.tar.xz
+ghc 8.0.2   x86_64  freebsd=9,freebsd=10,freebsd=11 https://downloads.haskell.org/~ghc/8.0.2/ghc-8.0.2-x86_64-portbld-freebsd.tar.xz
 
 ghc 8.2.2   x86_64  debian=7                        https://downloads.haskell.org/~ghc/8.2.2/ghc-8.2.2-x86_64-deb7-linux.tar.xz
 ghc 8.2.2   i386    debian=7                        https://downloads.haskell.org/~ghc/8.2.2/ghc-8.2.2-i386-deb7-linux.tar.xz
@@ -25,6 +26,8 @@ ghc 8.2.2   x86_64  debian=8,debian,ubuntu          https://downloads.haskell.or
 ghc 8.2.2   i386    debian=8,debian,ubuntu,unknown  https://downloads.haskell.org/~ghc/8.2.2/ghc-8.2.2-i386-deb8-linux.tar.xz
 ghc 8.2.2   x86_64  unknown                         https://downloads.haskell.org/~ghc/8.2.2/ghc-8.2.2-x86_64-unknown-linux.tar.xz
 ghc 8.2.2   x86_64  darwin                          https://downloads.haskell.org/~ghc/8.2.2/ghc-8.2.2-x86_64-apple-darwin.tar.xz
+ghc 8.2.2   x86_64  freebsd=10                      https://downloads.haskell.org/~ghc/8.2.2/ghc-8.2.2-x86_64-portbld10_3-freebsd.tar.xz
+ghc 8.2.2   x86_64  freebsd=11                      https://downloads.haskell.org/~ghc/8.2.2/ghc-8.2.2-x86_64-portbld11-freebsd.tar.xz
 
 ghc 8.4.3   i386    debian=8,debian,ubuntu,unknown  https://downloads.haskell.org/~ghc/8.4.3/ghc-8.4.3-i386-deb8-linux.tar.xz
 ghc 8.4.3   x86_64  debian=8                        https://downloads.haskell.org/~ghc/8.4.3/ghc-8.4.3-x86_64-deb8-linux.tar.xz
@@ -38,12 +41,14 @@ ghc 8.4.4   x86_64  debian=9,debian,ubuntu          https://downloads.haskell.or
 ghc 8.4.4   x86_64  centos=7,centos,amazonlinux     https://downloads.haskell.org/~ghc/8.4.4/ghc-8.4.4-x86_64-centos70-linux.tar.xz
 ghc 8.4.4   x86_64  fedora=27,fedora,unknown        https://downloads.haskell.org/~ghc/8.4.4/ghc-8.4.4-x86_64-fedora27-linux.tar.xz
 ghc 8.4.4   x86_64  darwin                          https://downloads.haskell.org/~ghc/8.4.4/ghc-8.4.4-x86_64-apple-darwin.tar.xz
+ghc 8.4.4   x86_64  freebsd=11                      https://downloads.haskell.org/~ghc/8.4.4/ghc-8.4.4-x86_64-portbld-freebsd11.tar.xz
 
 ghc 8.6.1   i386    debian=8,debian,ubuntu,unknown  https://downloads.haskell.org/~ghc/8.6.1/ghc-8.6.1-i386-deb8-linux.tar.xz
 ghc 8.6.1   x86_64  debian=8                        https://downloads.haskell.org/~ghc/8.6.1/ghc-8.6.1-x86_64-deb8-linux.tar.xz
 ghc 8.6.1   x86_64  debian=9,debian,ubuntu          https://downloads.haskell.org/~ghc/8.6.1/ghc-8.6.1-x86_64-deb9-linux.tar.xz
 ghc 8.6.1   x86_64  fedora=27,fedora,unknown        https://downloads.haskell.org/~ghc/8.6.1/ghc-8.6.1-x86_64-fedora27-linux.tar.xz
 ghc 8.6.1   x86_64  darwin                          https://downloads.haskell.org/~ghc/8.6.1/ghc-8.6.1-x86_64-apple-darwin.tar.xz
+ghc 8.6.1   x86_64  freebsd                         https://downloads.haskell.org/~ghc/8.6.1/ghc-8.6.1-x86_64-portbld-freebsd.tar.xz
 
 ghc 8.6.2   i386    debian=8,debian,ubuntu,unknown  https://downloads.haskell.org/~ghc/8.6.2/ghc-8.6.2-i386-deb8-linux.tar.xz
 ghc 8.6.2   x86_64  debian=8,debian,ubuntu          https://downloads.haskell.org/~ghc/8.6.2/ghc-8.6.2-x86_64-deb8-linux.tar.xz
@@ -56,6 +61,8 @@ ghc 8.6.3   x86_64  debian=9,debian,ubuntu          https://downloads.haskell.or
 ghc 8.6.3   x86_64  fedora=27,fedora,unknown        https://downloads.haskell.org/~ghc/8.6.3/ghc-8.6.3-x86_64-fedora27-linux.tar.xz
 ghc 8.6.3   x86_64  centos=7,centos,amazonlinux     https://downloads.haskell.org/~ghc/8.6.3/ghc-8.6.3-x86_64-centos7-linux.tar.xz
 ghc 8.6.3   x86_64  darwin                          https://downloads.haskell.org/~ghc/8.6.3/ghc-8.6.3-x86_64-apple-darwin.tar.xz
+ghc 8.6.3   x86_64  freebsd=11                      https://downloads.haskell.org/~ghc/8.6.3/ghc-8.6.3-x86_64-portbld-freebsd.tar.xz
+
 
 
 cabal-install   2.2.0.0     i386    unknown         https://downloads.haskell.org/~cabal/cabal-install-2.2.0.0/cabal-install-2.2.0.0-i386-unknown-linux.tar.gz
@@ -66,7 +73,7 @@ cabal-install   2.4.0.0     x86_64  darwin          https://downloads.haskell.or
 cabal-install   2.4.0.0     x86_64  unknown         https://downloads.haskell.org/~cabal/cabal-install-2.4.0.0/cabal-install-2.4.0.0-x86_64-unknown-linux.tar.gz
 
 cabal-install   2.4.1.0     powerpc aix=7           https://downloads.haskell.org/cabal/cabal-install-2.4.1.0/cabal-install-2.4.1.0-powerpc-ibm-aix7.1.0.0.tar.xz
-cabal-install   2.4.1.0     x86_64  freebsd         https://downloads.haskell.org/cabal/cabal-install-2.4.1.0/cabal-install-2.4.1.0-x86_64-portbld-freebsd.tar.xz
+cabal-install   2.4.1.0     x86_64  freebsd=11      https://downloads.haskell.org/cabal/cabal-install-2.4.1.0/cabal-install-2.4.1.0-x86_64-portbld-freebsd.tar.xz
 cabal-install   2.4.1.0     x86_64  darwin          https://downloads.haskell.org/cabal/cabal-install-2.4.1.0/cabal-install-2.4.1.0-x86_64-apple-darwin-sierra.tar.xz
 cabal-install   2.4.1.0     x86_64  alpine          https://downloads.haskell.org/cabal/cabal-install-2.4.1.0/cabal-install-2.4.1.0-x86_64-alpine-linux-musl.tar.xz
 cabal-install   2.4.1.0     i386    unknown         https://downloads.haskell.org/cabal/cabal-install-2.4.1.0/cabal-install-2.4.1.0-i386-unknown-linux.tar.xz
