@@ -459,16 +459,17 @@ edo()
 # Wrapper around 'make', may call 'gmake' if it exists.
 emake() { # avoid re-checking for gmake
     if [ -n "${MAKE}" ] ; then
-        edo "${MAKE}" "$@"
+        # shellcheck disable=SC2086
+        edo ${MAKE} "$@"
     else
         if command_exists gmake ; then
-            # shellcheck disable=SC2209
-            MAKE=gmake
-            edo "${MAKE}" "$@"
+            MAKE="gmake"
+            # shellcheck disable=SC2086
+            edo ${MAKE} "$@"
         else
-            # shellcheck disable=SC2209
-            MAKE=make
-            edo "${MAKE}" "$@"
+            MAKE="make"
+            # shellcheck disable=SC2086
+            edo ${MAKE} "$@"
         fi
     fi
 }
