@@ -869,6 +869,37 @@ download() {
     edo ${DOWNLOADER} ${DOWNLOADER_OPTS} "$1"
 }
 
+# @FUNCTION: download_to_cache
+# @USAGE: <url>
+# @DESCRIPTION:
+# Downloads the given url as a file into the cache directory
+# and makes sure the file is deleted on failed/interrupted download.
+download_to_cache() {
+    [ -z "$1" ] && die "Internal error: no argument given to download_to_cache"
+
+    _dtc_download_url="$1"
+    _dtc_download_tarball_name=$(basename "${_dtc_download_url}")
+
+    rm_tarball() {
+        if [ -e "${CACHE_LOCATION}/${_dtc_download_tarball_name}" ] ; then
+            rm "${CACHE_LOCATION}/${_dtc_download_tarball_name}"
+        fi
+    }
+
+    (
+        trap 'rm_tarball' 2
+        edo cd "${CACHE_LOCATION}"
+        # shellcheck disable=SC2086
+        edo ${DOWNLOADER} ${DOWNLOADER_OPTS} "${_dtc_download_url}"
+        trap - 2
+    ) || {
+        rm_tarball
+        die "Failed to download"
+    }
+
+    unset _dtc_download_tarball_name _dtc_download_url
+}
+
 # @FUNCTION: download_silent
 # @USAGE: <url>
 # @DESCRIPTION:
@@ -1193,8 +1224,7 @@ install_ghc() {
     (
         if ${CACHING} ; then
             if [ ! -e "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
-                edo cd "${CACHE_LOCATION}"
-                download "${download_url}"
+                download_to_cache "${download_url}"
             fi
             edo cd "${tmp_dir}"
             unpack "${CACHE_LOCATION}/${download_tarball_name}"
@@ -1468,8 +1498,7 @@ install_cabal() {
     (
         if ${CACHING} ; then
             if [ ! -e "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
-                edo cd "${CACHE_LOCATION}"
-                download "${download_url}"
+                download_to_cache "${download_url}"
             fi
             edo cd "${tmp_dir}"
             unpack "${CACHE_LOCATION}/${download_tarball_name}"
@@ -1536,8 +1565,7 @@ compile_ghc() {
     (
         if ${CACHING} ; then
             if [ ! -e "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
-                edo cd "${CACHE_LOCATION}"
-                download "${download_url}"
+                download_to_cache "${download_url}"
             fi
             edo cd "${tmp_dir}"
             unpack "${CACHE_LOCATION}/${download_tarball_name}"
