@@ -192,6 +192,7 @@ SUBCOMMANDS:
     rm               Remove an already installed GHC
     install-cabal    Install cabal-install
     debug-info       Print debug info (e.g. detected system/distro)
+    changelog        Show the changelog of a GHC release (online)
 
 DISCUSSION:
     ghcup installs the Glasgow Haskell Compiler from the official
@@ -416,6 +417,32 @@ FLAGS:
 DISCUSSION:
     Prints tools (e.g. GHC and cabal-install) and their
     available upstream versions.
+")
+    exit 1
+}
+
+# @FUNCTION: changelog_usage
+# @DESCRIPTION:
+# Print the help message for 'ghcup set' to STDERR
+# and exit the script with status code 1.
+changelog_usage() {
+    (>&2 echo "ghcup-changelog
+View the online changelog for the given GHC version
+
+USAGE:
+    ${SCRIPT} changelog [FLAGS] [VERSION|TAG]
+
+FLAGS:
+    -h, --help       Prints help information
+
+ARGS:
+    [VERSION|TAG]    E.g. \"8.4.3\" or \"8.6.3\" or
+                     a tag like \"recommended\" or \"latest\"
+                     (default: discovers latest version)
+
+DISCUSSION:
+    Opens the online changelog for the given GHC version via
+    xdg-open.
 ")
     exit 1
 }
@@ -1695,6 +1722,39 @@ list() {
 }
 
 
+    ##############################
+    #--[ Subcommand changelog ]--#
+    ##############################
+
+
+# @FUNCTION: changelog_url
+# @USAGE: <ghcversion>
+# @DESCRIPTION:
+# Print the changelog url for the given GHC version to stdout.
+# @STDOUT: the changelog url
+changelog_url() {
+    [ -z "$1" ] && die "Internal error: no argument given to changelog"
+
+    printf "https://downloads.haskell.org/~ghc/%s/docs/html/users_guide/%s-notes.html" "$1" "$1"
+}
+
+
+# @FUNCTION: changelog
+# @USAGE: <ghcversion>
+# @DESCRIPTION:
+# Opens the changelog for the given ghc version via xdg-open.
+changelog() {
+    [ -z "$1" ] && die "Internal error: no argument given to changelog"
+
+    url=$(changelog_url "$1")
+
+    xdg-open "${url}" || die "failed to xdg-open the following url: ${url}"
+
+    unset url
+}
+
+
+
 
     #######################
     #--[ Sanity checks ]--#
@@ -1939,6 +1999,34 @@ while [ $# -gt 0 ] ; do
                esac
            done
            list "${TOOL}"
+           break;;
+       changelog)
+           shift 1
+           while [ $# -gt 0 ] ; do
+               case $1 in
+                   -h|--help) changelog_usage;;
+                   -f|--force) FORCE=true
+                       shift 1;;
+                   *) GHC_VER=$1
+                      break;;
+               esac
+           done
+           if [ -z "${GHC_VER}" ] ; then
+               _tool_ver="$(get_tool_ver_from_tag "ghc" "latest")"
+               if [ -z "${_tool_ver}" ] ; then
+                   die "Could not find a latest GHC version, please report a bug at ${BUG_URL}!"
+               fi
+               changelog "${_tool_ver}"
+           else
+               # could be a version or a tag, let's check
+               if array_contains "${GHC_VER}" "$(known_tool_versions "ghc")" ; then
+                   changelog "${GHC_VER}"
+               elif array_contains "${GHC_VER}" "$(known_tool_tags "ghc")" ; then
+                   changelog "$(get_tool_ver_from_tag "ghc" "${GHC_VER}")"
+               else
+                   die "\"${GHC_VER}\" is not a known version or tag!"
+               fi
+           fi
            break;;
        *) usage;;
        esac
