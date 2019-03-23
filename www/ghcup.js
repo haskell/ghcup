@@ -1,4 +1,4 @@
-var platforms = ["default", "unknown", "win32", "win64", "unix"];
+var platforms = ["default", "unknown", "win32", "win64", "linux", "freebsd", "mac"];
 var platform_override = null;
 
 function detect_platform() {
@@ -10,41 +10,41 @@ function detect_platform() {
 
     var os = "unknown";
 
-    if (navigator.platform == "Linux x86_64") {os = "unix";}
-    if (navigator.platform == "Linux i686") {os = "unix";}
-    if (navigator.platform == "Linux i686 on x86_64") {os = "unix";}
-    if (navigator.platform == "Linux aarch64") {os = "unix";}
-    if (navigator.platform == "Linux armv6l") {os = "unix";}
-    if (navigator.platform == "Linux armv7l") {os = "unix";}
-    if (navigator.platform == "Linux armv8l") {os = "unix";}
-    if (navigator.platform == "Linux ppc64") {os = "unix";}
-    if (navigator.platform == "Linux mips") {os = "unix";}
-    if (navigator.platform == "Linux mips64") {os = "unix";}
-    if (navigator.platform == "Mac") {os = "unix";}
+    if (navigator.platform == "Linux x86_64") {os = "linux";}
+    if (navigator.platform == "Linux i686") {os = "linux";}
+    if (navigator.platform == "Linux i686 on x86_64") {os = "linux";}
+    if (navigator.platform == "Linux aarch64") {os = "linux";}
+    if (navigator.platform == "Linux armv6l") {os = "linux";}
+    if (navigator.platform == "Linux armv7l") {os = "linux";}
+    if (navigator.platform == "Linux armv8l") {os = "linux";}
+    if (navigator.platform == "Linux ppc64") {os = "linux";}
+    if (navigator.platform == "Linux mips") {os = "linux";}
+    if (navigator.platform == "Linux mips64") {os = "linux";}
+    if (navigator.platform == "Mac") {os = "mac";}
     if (navigator.platform == "Win32") {os = "win32";}
     if (navigator.platform == "Win64" ||
         navigator.userAgent.indexOf("WOW64") != -1 ||
         navigator.userAgent.indexOf("Win64") != -1) { os = "win64"; }
-    if (navigator.platform == "FreeBSD x86_64") {os = "unix";}
-    if (navigator.platform == "FreeBSD amd64") {os = "unix";}
-    if (navigator.platform == "NetBSD x86_64") {os = "unix";}
-    if (navigator.platform == "NetBSD amd64") {os = "unix";}
+    if (navigator.platform == "FreeBSD x86_64") {os = "freebsd";}
+    if (navigator.platform == "FreeBSD amd64") {os = "freebsd";}
+    // if (navigator.platform == "NetBSD x86_64") {os = "unix";}
+    // if (navigator.platform == "NetBSD amd64") {os = "unix";}
 
     // I wish I knew by now, but I don't. Try harder.
     if (os == "unknown") {
         if (navigator.appVersion.indexOf("Win")!=-1) {os = "win32";}
-        if (navigator.appVersion.indexOf("Mac")!=-1) {os = "unix";}
-        if (navigator.appVersion.indexOf("FreeBSD")!=-1) {os = "unix";}
+        if (navigator.appVersion.indexOf("Mac")!=-1) {os = "mac";}
+        if (navigator.appVersion.indexOf("FreeBSD")!=-1) {os = "freebsd";}
     }
 
     // Firefox Quantum likes to hide platform and appVersion but oscpu works
     if (navigator.oscpu) {
         if (navigator.oscpu.indexOf("Win32")!=-1) {os = "win32";}
         if (navigator.oscpu.indexOf("Win64")!=-1) {os = "win64";}
-        if (navigator.oscpu.indexOf("Mac")!=-1) {os = "unix";}
-        if (navigator.oscpu.indexOf("Linux")!=-1) {os = "unix";}
-        if (navigator.oscpu.indexOf("FreeBSD")!=-1) {os = "unix";}
-        if (navigator.oscpu.indexOf("NetBSD")!=-1) {os = "unix";}
+        if (navigator.oscpu.indexOf("Mac")!=-1) {os = "mac";}
+        if (navigator.oscpu.indexOf("Linux")!=-1) {os = "linux";}
+        if (navigator.oscpu.indexOf("FreeBSD")!=-1) {os = "freebsd";}
+        // if (navigator.oscpu.indexOf("NetBSD")!=-1) {os = "unix";}
     }
 
     return os;
