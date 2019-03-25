@@ -2,12 +2,12 @@
 [![Build Status](https://travis-ci.org/haskell/ghcup.svg?branch=master)](https://travis-ci.org/haskell/ghcup)
 [![license](https://img.shields.io/github/license/haskell/ghcup.svg)](COPYING)
 
-`ghcup` makes it easy to install specific versions of `ghc` on GNU/Linux as well as MacOS (aka Darwin), and can also bootstrap a fresh Haskell developer environment from scratch.
+`ghcup` makes it easy to install specific versions of `ghc` on GNU/Linux as well as macOS (aka Darwin), and can also bootstrap a fresh Haskell developer environment from scratch.
 It follows the unix UNIX philosophy of [do one thing and do it well](https://en.wikipedia.org/wiki/Unix_philosophy#Do_One_Thing_and_Do_It_Well).
 
 Similar in scope to [rustup](https://github.com/rust-lang-nursery/rustup.rs), [pyenv](https://github.com/pyenv/pyenv) and [jenv](http://www.jenv.be).
 
-*OS X users may prefer [futurice](https://haskell.futurice.com/) and Ubuntu users may prefer [hvr's ppa](https://launchpad.net/~hvr/+archive/ubuntu/ghc).*
+*Ubuntu users may prefer [hvr's ppa](https://launchpad.net/~hvr/+archive/ubuntu/ghc).*
 
 *This project was started when [CM](https://github.com/capital-match) was switching from stack to [cabal nix-style builds](https://www.haskell.org/cabal/users-guide/nix-local-build-overview.html).*
 
