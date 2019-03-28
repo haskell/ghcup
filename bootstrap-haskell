@@ -65,8 +65,6 @@ edo ghcup set
 edo ghcup install-cabal
 
 edo cabal new-update
-# 1 job until https://github.com/haskell/cabal/issues/5776 is fixed
-edo cabal new-install --symlink-bindir="$HOME/.cabal/bin" --jobs=1 cabal-install
 
 printf "\\033[0;35m%s\\033[0m\\n" ""
 printf "\\033[0;35m%s\\033[0m\\n" "Installation done!"
