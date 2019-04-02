@@ -100,10 +100,10 @@ DOWNLOADER="curl"
 # Options passed to the download program.
 DOWNLOADER_OPTS="--fail -O"
 
-# @VARIABLE: SCRIPT_UPDATE_URL
+# @VARIABLE: DOWNLOADER_STDOUT_OPTS
 # @DESCRIPTION:
-# Location to update this script from.
-SCRIPT_UPDATE_URL="https://raw.githubusercontent.com/haskell/ghcup/master/ghcup"
+# Options passed to the download program when printing the content to stdout.
+DOWNLOADER_STDOUT_OPTS="--fail"
 
 # @VARIABLE: GHC_DOWNLOAD_BASEURL
 # @DESCRIPTION:
@@ -121,11 +121,21 @@ JOBS="1"
 # the script name.
 SOURCE="$0"
 
+# @VARIABLE: BASE_DOWNLOAD_URL
+# DESCRIPTION:
+# The base url for downloading stuff like meta files, requirements files etc.
+BASE_DOWNLOAD_URL="https://raw.githubusercontent.com/haskell/ghcup/master/"
+
+# @VARIABLE: SCRIPT_UPDATE_URL
+# @DESCRIPTION:
+# Location to update this script from.
+SCRIPT_UPDATE_URL="${BASE_DOWNLOAD_URL}/ghcup"
+
 # @VARIABLE: META_DOWNLOAD_URL
 # DESCRIPTION:
 # The url of the meta file for getting
 # download information for ghc/cabal-install etc.
-META_DOWNLOAD_URL="https://raw.githubusercontent.com/haskell/ghcup/master/.download-urls"
+META_DOWNLOAD_URL="${BASE_DOWNLOAD_URL}/.download-urls"
 
 # @VARIABLE: META_DOWNLOAD_FORMAT
 # DESCRIPTION:
@@ -138,7 +148,7 @@ META_DOWNLOAD_FORMAT="1"
 # DESCRIPTION:
 # The url of the meta file for getting
 # available versions for ghc/cabal-install etc.
-META_VERSION_URL="https://raw.githubusercontent.com/haskell/ghcup/master/.available-versions"
+META_VERSION_URL="${BASE_DOWNLOAD_URL}/.available-versions"
 
 # @VARIABLE: META_VERSION_FORMAT
 # DESCRIPTION:
@@ -184,14 +194,15 @@ FLAGS:
                      (these will not be removed by ghcup)
 
 SUBCOMMANDS:
-    install          Install GHC$(${VERBOSE} && printf "\n    compile          Compile and install GHC from source (UNSTABLE!!!)")
-    set              Set currently active GHC version
-    list             Show available GHCs and other tools
-    upgrade          Upgrade this script in-place
-    rm               Remove an already installed GHC
-    install-cabal    Install cabal-install
-    debug-info       Print debug info (e.g. detected system/distro)
-    changelog        Show the changelog of a GHC release (online)
+    install            Install GHC$(${VERBOSE} && printf "\n    compile          Compile and install GHC from source (UNSTABLE!!!)")
+    set                Set currently active GHC version
+    list               Show available GHCs and other tools
+    upgrade            Upgrade this script in-place
+    rm                 Remove an already installed GHC
+    install-cabal      Install cabal-install
+    debug-info         Print debug info (e.g. detected system/distro)
+    changelog          Show the changelog of a GHC release (online)
+    print-system-reqs  Print an approximation of system requirements
 
 DISCUSSION:
     ghcup installs the Glasgow Haskell Compiler from the official
@@ -405,7 +416,7 @@ DISCUSSION:
 
 # @FUNCTION: changelog_usage
 # @DESCRIPTION:
-# Print the help message for 'ghcup set' to STDERR
+# Print the help message for 'ghcup changelog' to STDERR
 # and exit the script with status code 1.
 changelog_usage() {
     (>&2 echo "ghcup-changelog
@@ -425,6 +436,30 @@ ARGS:
 DISCUSSION:
     Opens the online changelog for the given GHC version via
     xdg-open.
+")
+    exit 1
+}
+
+# @FUNCTION: print_system_reqs_usage
+# @DESCRIPTION:
+# Print the help message for 'ghcup print-system-reqs' to STDERR
+# and exit the script with status code 1.
+print_system_reqs_usage() {
+    (>&2 echo "ghcup-print-system-reqs
+Print an approximation of system requirements
+
+USAGE:
+    ${SCRIPT} print-system-reqs
+
+FLAGS:
+    -h, --help       Prints help information
+
+DISCUSSION:
+    Just prints an approximation of the system requirements
+    for the 'recommended' GHC version and the 'latest' distro version
+    you are on.
+
+    Review this output carefully!
 ")
     exit 1
 }
@@ -963,6 +998,16 @@ download_silent() {
         # shellcheck disable=SC2086
         edo ${DOWNLOADER} ${DOWNLOADER_OPTS} "$1" 1> /dev/null 2> /dev/null
     fi
+}
+
+# @FUNCTION: download_to_stdout
+# @USAGE: <url>
+# @DESCRIPTION:
+# Downloads the given url to stdout.
+download_to_stdout() {
+    [ -z "$1" ] && die "Internal error: no argument given to download"
+    # shellcheck disable=SC2086
+    edo ${DOWNLOADER} ${DOWNLOADER_STDOUT_OPTS} "$1"
 }
 
 # @FUNCTION: unpack
@@ -1805,6 +1850,42 @@ changelog() {
 }
 
 
+    ######################################
+    #--[ Subcommand print-system-reqs ]--#
+    ######################################
+
+
+# @FUNCTION: system_reqs_url
+# @USAGE: <distro-alias>
+# @DESCRIPTION:
+# Mapping of distro-alias to system requirements URL.
+system_reqs_url() {
+    [ -z "$1" ] && die "Internal error: no argument given to system_reqs_url"
+
+    case "$1" in
+    "debian"|"ubuntu")
+        printf "%s/.requirements/ghc/ubuntu" "${BASE_DOWNLOAD_URL}"
+        ;;
+    *)
+        printf "%s/.requirements/ghc/default" "${BASE_DOWNLOAD_URL}"
+        ;;
+    esac
+}
+
+
+# @FUNCTION: print_system_reqs
+# @DESCRIPTION:
+# Print the system requirements (approximation).
+print_system_reqs() {
+    mydistro=$(get_distro_alias "$(get_distro_name)")
+    reqs_url=$(system_reqs_url "${mydistro}")
+
+    download_to_stdout "${reqs_url}"
+
+    unset mydistro reqs_url
+}
+
+
 
 
     #######################
@@ -1846,6 +1927,7 @@ while [ $# -gt 0 ] ; do
     -w|--wget)
         DOWNLOADER="wget"
         DOWNLOADER_OPTS=""
+        DOWNLOADER_STDOUT_OPTS="-qO-"
         shift 1
         if [ $# -lt 1 ] ; then
             usage
@@ -2067,6 +2149,16 @@ while [ $# -gt 0 ] ; do
                    die "\"${GHC_VER}\" is not a known version or tag!"
                fi
            fi
+           break;;
+       print-system-reqs)
+           shift 1
+           while [ $# -gt 0 ] ; do
+               case $1 in
+                   -h|--help) print_system_reqs_usage;;
+                   *) print_system_reqs_usage;;
+               esac
+           done
+           print_system_reqs
            break;;
        *) usage;;
        esac
