@@ -243,6 +243,7 @@ USAGE:
 
 FLAGS:
     -h, --help       Prints help information
+    -l, --local      Set the GHC version for the current project/directory only
 
 ARGS:
     [VERSION|TAG]    E.g. \"8.4.3\" or \"8.6.3\" or
@@ -250,9 +251,16 @@ ARGS:
                      (default: discovers recommended version)
 
 DISCUSSION:
-    Sets the the current GHC version by creating non-versioned
-    symlinks for all ghc binaries of the specified version in
-    \"~/.ghcup/bin/<binary>\".
+    Sets the current GHC version by creating a file
+    .ghcup.ghcver either in the current directory (if -l is supplied)
+    or globally in ~/.ghcup directory and then creating shims
+    for ghc/ghci and friends that read these files. The decision
+    as to which GHC version to use is as follows:
+
+    1. if GHCUP_GHCVER env variable is set, use that as ghc version
+    2. if .ghcup.ghcver exists in current directory, read the contents of
+       that file as ghc version
+    3. else use ~/.ghcup/.ghcup.ghcver
 ")
     exit 1
 }
@@ -1145,7 +1153,7 @@ get_meta_download_file() {
 # META_VERSION_URL.
 # @STDOUT: known ghc versions
 known_tool_versions() {
-    [ -z "$1" ] && die "Internal error: no argument given to posix_realpath"
+    [ -z "$1" ] && die "Internal error: no argument given to known_tool_versions"
 
     mytool=$1
     meta_file="$(get_meta_version_file)"
@@ -1214,6 +1222,8 @@ array_contains() {
     ############################
     #--[ Subcommand install ]--#
     ############################
+
+
 
 
 # @FUNCTION: install_ghc
@@ -1308,33 +1318,98 @@ install_ghc() {
     ########################
 
 
-# @FUNCTION: set_ghc
-# @USAGE: <ghcversion>
+# @FUNCTION: create_shim
+# @USAGE: <target>
 # @DESCRIPTION:
-# Sets the current ghc version by creating symlinks.
+# Creates a shim for the given target (like 'ghc'),
+# which can dynamically choose a specific requested version.
+create_shim() {
+    [ -z "$1" ] && die "Internal error: no argument given to create_shim"
+
+    shim_target=$1
+
+    debug_message "creating target shim for ${shim_target}"
+
+	cat <<-EOF > "${BIN_LOCATION}/${shim_target}" || die
+		#!/bin/sh
+		
+		target="${shim_target}"
+		
+		GHCUP_BASE="$INSTALL_BASE"
+		
+		if [ -n "\${GHCUP_GHCVER}" ] ; then
+		    exec "\${target}-\${GHCUP_GHCVER}" "\$@"
+		elif [ -f "\${PWD}/.ghcup.ghcver" ] ; then
+		    ghcver="\$(cat "\${PWD}/.ghcup.ghcver")"
+		
+		    exec "\${target}-\${ghcver}" "\$@"
+		else
+		    [ -f "\${GHCUP_BASE}/.ghcup.ghcver" ] || {
+		        (>&2 echo "\${GHCUP_BASE}/.ghcup.ghcver missing! Don't know what version to run. You may need to issue: 'ghcup set <ghcver>'")
+		        exit 1
+		    }
+		
+		    ghcver="\$(cat "\${GHCUP_BASE}/.ghcup.ghcver")"
+		
+		    exec "\${target}-\${ghcver}" "\$@"
+		fi
+		EOF
+
+    edo chmod +x "${BIN_LOCATION}/${shim_target}"
+
+    unset shim_target
+}
+
+
+
+
+# @FUNCTION: set_ghc
+# @USAGE: <ghcversion> <local-or-not>
+# @DESCRIPTION:
+# Sets the current ghc version by creating shims and ghc version config file.
 set_ghc() {
-    [ -z "$1" ] && die "Internal error: no argument given to set_ghc"
+    { [ -z "$1" ] || [ -z "$2" ] ;} && die "Internal error: not enough arguments given to set_ghc"
 
     myghcver=$1
+    is_local=$2
     inst_location=$(get_ghc_location "$1")
     [ -z "${inst_location}" ] && die "failed to get install location"
 
     [ -e "${inst_location}" ] || die "GHC ${myghcver} not installed yet, use: ${SCRIPT} install ${myghcver}"
 
-    status_message "Setting GHC to ${myghcver}"
+    if ${is_local} ; then
+        status_message "Setting local GHC to ${myghcver}"
+    else
+        status_message "Setting global GHC to ${myghcver}"
+    fi
 
+    # create shims
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
         source_fn=$(basename "${f}")
         target_fn=$(echo "${source_fn}" | sed "s#-${myghcver}##")
-        # shellcheck disable=SC2046
-        edo ln $(optionv "-v") -sf ../ghc/"${myghcver}/bin/${source_fn}" "${BIN_LOCATION}/${target_fn}"
+
+        # for backwards compat with old-style ghcup symlink we need to clean these up
+        if [ -L "${BIN_LOCATION}/${target_fn}" ] ; then
+            edo rm "${BIN_LOCATION}/${target_fn}"
+        fi
+
+        create_shim "${target_fn}"
         unset source_fn target_fn
     done
+
+    # create alias symlinks
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf runghc "${BIN_LOCATION}"/runhaskell
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf haddock-ghc "${BIN_LOCATION}"/haddock
+
+    # set ghc version
+    if ${is_local} ; then
+        printf "%s" "${myghcver}" > "${PWD}/.ghcup.ghcver" || die "failed to set GHC version locally! Not enough permissions?"
+    else
+        printf "%s" "${myghcver}" > "${INSTALL_BASE}/.ghcup.ghcver" || die "failed to set GHC version globally! Not enough permissions?"
+    fi
 
     status_message "Done, make sure \"${BIN_LOCATION}\" is in your PATH!"
 
@@ -1857,10 +1932,13 @@ while [ $# -gt 0 ] ; do
            fi
            break;;
        set)
+           IS_LOCAL=false
            shift 1
            while [ $# -gt 0 ] ; do
                case $1 in
                    -h|--help) set_usage;;
+                   -l|--local) IS_LOCAL=true
+                       shift 1 ;;
                    *) GHC_VER=$1
                       break;;
                esac
@@ -1871,13 +1949,13 @@ while [ $# -gt 0 ] ; do
                if [ -z "${_tool_ver}" ] ; then
                    die "Could not find a recommended GHC version, please report a bug at ${BUG_URL}!"
                fi
-               set_ghc "${_tool_ver}"
+               set_ghc "${_tool_ver}" ${IS_LOCAL}
            else
                # could be a version or a tag, let's check
                if array_contains "${GHC_VER}" "$(known_tool_versions "ghc")" ; then
-                   set_ghc "${GHC_VER}"
+                   set_ghc "${GHC_VER}" ${IS_LOCAL}
                elif array_contains "${GHC_VER}" "$(known_tool_tags "ghc")" ; then
-                   set_ghc "$(get_tool_ver_from_tag "ghc" "${GHC_VER}")"
+                   set_ghc "$(get_tool_ver_from_tag "ghc" "${GHC_VER}")" ${IS_LOCAL}
                else
                    die "\"${GHC_VER}\" is not a known version or tag!"
                fi

@@ -99,7 +99,7 @@ handles your haskell packages and can demand that [a specific version](https://c
 
 Installs a specified GHC version into `~/.ghcup/ghc/<ver>`, and places `ghc-<ver>` symlinks in `~/.ghcup/bin/`.
 
-Optionally, an unversioned `ghc` link can point to a default version of your choice.
+Optionally, unversioned `ghc` shims can be created that respect `GHCUP_GHCVER` env variable, by default read the ghc version from `~/.ghcup/.ghcup.ghcver` and can also read `.ghcup.ghcver` from the current directory.
 
 This uses precompiled GHC binaries that have been compiled on fedora/debian by [upstream GHC](https://www.haskell.org/ghc/download_ghc_8_6_1.html#binaries).
 
