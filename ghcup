@@ -185,7 +185,6 @@ FLAGS:
 
 SUBCOMMANDS:
     install          Install GHC$(${VERBOSE} && printf "\n    compile          Compile and install GHC from source (UNSTABLE!!!)")
-    show             Show current/installed GHC
     set              Set currently active GHC version
     list             Show available GHCs and other tools
     upgrade          Upgrade this script in-place
@@ -273,24 +272,6 @@ FLAGS:
 
 ARGS:
     [TARGET-LOCATION]  Where to place the updated script (defaults to directory of the script).
-")
-    exit 1
-}
-
-# @FUNCTION: show_usage
-# @DESCRIPTION:
-# Print the help message for 'ghcup show' to STDERR
-# and exit the script with status code 1.
-show_usage() {
-    (>&2 echo "ghcup-show
-Show the installed/current GHC versions
-
-USAGE:
-    ${SCRIPT} show [FLAGS]
-
-FLAGS:
-    -h, --help         Prints help information
-    -i, --installed    Show installed GHC version only
 ")
     exit 1
 }
@@ -1249,6 +1230,37 @@ array_contains() {
     return 1
 }
 
+# @FUNCTION: show_ghc_installed
+# @DESCRIPTION:
+# Prints the currently selected GHC only as version string.
+# @STDOUT: current GHC version
+show_ghc_installed() {
+    current_ghc="${BIN_LOCATION}/ghc"
+    real_ghc=$(posix_realpath "${current_ghc}")
+
+    if [ -L "${current_ghc}" ] ; then # is symlink
+        if [ -e "${real_ghc}" ] ; then # exists (posix_realpath was called)
+            real_ghc="$(basename "${real_ghc}" | sed 's#ghc-##')"
+            printf "%s" "${real_ghc}"
+        else # is a broken symlink
+            red_message "broken symlink"
+        fi
+    fi
+
+    unset real_ghc current_ghc
+}
+
+# @FUNCTION: show_cabal_installed
+# @DESCRIPTION:
+# Prints the currently selected cabal only as version string.
+# @STDOUT: current cabal version
+show_cabal_installed() {
+    if [ -x "${BIN_LOCATION}/cabal" ] ; then
+        "${BIN_LOCATION}/cabal" --numeric-version
+    fi
+}
+
+
 
 
     ############################
@@ -1413,68 +1425,6 @@ upgrade() {
     unset target_location
 }
 
-
-
-    #########################
-    #--[ Subcommand show ]--#
-    #########################
-
-
-# @FUNCTION: show_ghc
-# @DESCRIPTION:
-# Prints the currently installed and selected GHC, in human-friendly
-# format.
-show_ghc() {
-    current_ghc=$(show_ghc_installed)
-
-    echo "Installed GHCs:"
-    for i in "${GHC_LOCATION}"/* ; do
-        if [ -e "${i}" ] ; then
-            echo "    $(basename "${i}")"
-        else # directory is empty
-            echo "    None"
-            exit 0
-        fi
-    done
-
-    if [ -n "${current_ghc}" ] ; then
-        echo
-        echo "Current GHC"
-        echo "    ${current_ghc}"
-    fi
-
-    unset current_ghc i
-}
-
-# @FUNCTION: show_ghc_installed
-# @DESCRIPTION:
-# Prints the currently selected GHC only as version string.
-# @STDOUT: current GHC version
-show_ghc_installed() {
-    current_ghc="${BIN_LOCATION}/ghc"
-    real_ghc=$(posix_realpath "${current_ghc}")
-
-    if [ -L "${current_ghc}" ] ; then # is symlink
-        if [ -e "${real_ghc}" ] ; then # exists (posix_realpath was called)
-            real_ghc="$(basename "${real_ghc}" | sed 's#ghc-##')"
-            printf "%s" "${real_ghc}"
-        else # is a broken symlink
-            red_message "broken symlink"
-        fi
-    fi
-
-    unset real_ghc current_ghc
-}
-
-# @FUNCTION: show_cabal_installed
-# @DESCRIPTION:
-# Prints the currently selected cabal only as version string.
-# @STDOUT: current cabal version
-show_cabal_installed() {
-    if [ -x "${BIN_LOCATION}/cabal" ] ; then
-        "${BIN_LOCATION}/cabal" --numeric-version
-    fi
-}
 
 
 
@@ -2002,23 +1952,6 @@ while [ $# -gt 0 ] ; do
                upgrade "${TARGET_LOCATION}"
            else
                upgrade "$(dirname "$(posix_realpath "${SOURCE}")")"
-           fi
-           break;;
-       show)
-           SHOW_INSTALLED=false
-           shift 1
-           while [ $# -gt 0 ] ; do
-               case $1 in
-                   -h|--help) show_usage;;
-                   -i|--installed) SHOW_INSTALLED=true
-                       break;;
-                   *) show_usage;;
-               esac
-           done
-           if ${SHOW_INSTALLED} ; then
-               show_ghc_installed
-           else
-               show_ghc
            fi
            break;;
        rm)
