@@ -187,7 +187,7 @@ SUBCOMMANDS:
     install          Install GHC$(${VERBOSE} && printf "\n    compile          Compile and install GHC from source (UNSTABLE!!!)")
     show             Show current/installed GHC
     set              Set currently active GHC version
-    list             Show available GHCs and other tools (upstream)
+    list             Show available GHCs and other tools
     upgrade          Upgrade this script in-place
     rm               Remove an already installed GHC
     install-cabal    Install cabal-install
@@ -404,19 +404,20 @@ DISCUSSION:
 # and exit the script with status code 1.
 list_usage() {
     (>&2 echo "ghcup-list
-Show available GHCs and other tools (from upstream)
+Show available GHCs and other tools
 
 USAGE:
     ${SCRIPT} list
 
 FLAGS:
-    -h, --help                     Prints help information
-    -t, --tool                     Tool to list versions for (e.g. 'ghc' or 'cabal-install').
-                                   Default is showing all tools.
+    -h, --help                             Prints help information
+    -t, --tool <all|ghc|cabal-install>     Tool to list versions for. Default is ghc only.
+    -c, --show-criteria <installed|set>    Show only installed or set tool versions
+    -r, --raw-format                       Raw format, for machine parsing
 
 DISCUSSION:
     Prints tools (e.g. GHC and cabal-install) and their
-    available upstream versions.
+    available/installed/set versions.
 ")
     exit 1
 }
@@ -867,6 +868,45 @@ ghc_already_installed() {
         return 1
     fi
 }
+
+# @FUNCTION: cabal_already_installed
+# @USAGE: <cabalversion>
+# @DESCRIPTION:
+# Checks whether the specified cabal version
+# has been installed by ghcup already.
+# @RETURN: 0 if cabal is already installed, 1 otherwise
+cabal_already_installed() {
+    [ -z "$1" ] && die "Internal error: no argument given to cabal_already_installed"
+
+    if [ -x "${BIN_LOCATION}/cabal" ] ; then
+        if [ "$("${BIN_LOCATION}/cabal" --numeric-version)" = "$1" ] ; then
+            return 0
+        else
+            return 1
+        fi
+    else
+        return 1
+    fi
+}
+
+# @FUNCTION: tool_already_installed
+# @USAGE: <tool> <cabalversion>
+# @DESCRIPTION:
+# Checks whether the specified tool and version
+# has been installed by ghcup already.
+# @RETURN: 0 if tool is already installed, 1 otherwise
+tool_already_installed() {
+    if [ "$1" = "ghc" ] ; then
+        ghc_already_installed "$2"
+        return $?
+    elif [ "$1" = "cabal-install" ] ; then
+        cabal_already_installed "$2"
+        return $?
+    else
+        return 1
+    fi
+}
+
 
 # @FUNCTION: get_ghc_location
 # @USAGE: <ghcversion>
@@ -1426,6 +1466,16 @@ show_ghc_installed() {
     unset real_ghc current_ghc
 }
 
+# @FUNCTION: show_cabal_installed
+# @DESCRIPTION:
+# Prints the currently selected cabal only as version string.
+# @STDOUT: current cabal version
+show_cabal_installed() {
+    if [ -x "${BIN_LOCATION}/cabal" ] ; then
+        "${BIN_LOCATION}/cabal" --numeric-version
+    fi
+}
+
 
 
     #######################
@@ -1688,37 +1738,92 @@ print_debug_info() {
 
 
 # @FUNCTION: list
-# @USAGE: [tool]
+# @USAGE: <tool> <raw-format> <criteria>
 # @DESCRIPTION:
 # List available tools and their versions from upstream.
 list() {
     mytool=$1
+    raw_format=$2
+    criteria=$3
 
     meta_file="$(get_meta_version_file)"
 
-    echo "Available upstream versions:"
-    echo
-    if [ -z "${mytool}" ] ; then
-        awk "
-        NF {
-            if (\$1 != \"#\") {
-                if (\$1 == \"cabal-install\") {
-                    print \$1 \"\\t\" \$2 \"\\t\" \$3
-                } else {
-                    print \$1 \"\\t\\t\" \$2 \"\\t\" \$3
-                }
-            }
-        }" "${meta_file}" || die "awk failed!"
-    else
-        awk "
-        NF {
-            if (\$1 == \"${mytool}\") {
-                print \$1 \"\\t\" \$2 \"\\t\" \$3
-            }
-        }" "${meta_file}" || die "awk failed!"
+    if ! ${raw_format} ; then
+        printf "\\033[1;32m%s\\033[0m\\n" "Available versions:"
     fi
 
-    unset mytool meta_file
+    lines=$(
+        if [ "${mytool}" = "all" ] ; then
+            awk "
+            NF {
+                if (\$1 != \"#\") {
+                    if (\$1 == \"cabal-install\") {
+                        print \$1 \"\\t\" \$2 \"\\t\" \$3
+                    } else {
+                        print \$1 \"\\t\\t\" \$2 \"\\t\" \$3
+                    }
+                }
+            }" "${meta_file}" || die "awk failed!"
+        else
+            awk "
+            NF {
+                if (\$1 == \"${mytool}\") {
+                    print \$1 \"\\t\" \$2 \"\\t\" \$3
+                }
+            }" "${meta_file}" || die "awk failed!"
+        fi
+    )
+
+    _print_me() {
+        if ${raw_format} ; then
+            printf "%s\\n" "$1"
+        else
+            if [ "$2" = "available" ] ; then
+                printf "\\033[0;32m\342\234\224\\033[0m %s\\n" "$1"
+            elif [ "$2" = "set" ] ; then
+                printf "\\033[0;32m\342\234\224 \\033[0;34m%s\\033[0m\\n" "$1"
+            elif [ "$2" = "unavailable" ] ; then
+                printf "\\033[0;31m\342\234\227\\033[0m %s\\n" "$1"
+            fi
+        fi
+    }
+
+    if [ -z "${lines}" ] ; then
+        (>&2 echo "Nothing found for tool ${mytool}")
+        return
+    fi
+
+
+    echo "$lines" | while read -r l; do
+        tool=$(echo "${l}" | cut -f1)
+        version=$(echo "${l}" | cut -f2)
+
+        if [ "${criteria}" = "set" ] ; then
+            if [ "${tool}" = "ghc" ] && [ "${version}" = "$(show_ghc_installed)" ] ; then
+                _print_me "${l}" "set"
+            fi
+
+            if [ "${tool}" = "cabal-install" ] && [ "${version}" = "$(show_cabal_installed)" ] ; then
+                _print_me "${l}" "set"
+            fi
+        else
+            if tool_already_installed "${tool}" "${version}" ; then
+                if [ "${tool}" = "ghc" ] && [ "${version}" = "$(show_ghc_installed)" ] ; then
+                    _print_me "${l}" "set"
+                elif  [ "${tool}" = "cabal-install" ] && [ "${version}" = "$(show_cabal_installed)" ] ; then
+                    _print_me "${l}" "set"
+                else
+                    _print_me "${l}" "available"
+                fi
+            else
+                if [ "${criteria}" != "installed" ] ; then
+                    _print_me "${l}" "unavailable"
+                fi
+            fi
+        fi
+    done
+
+    unset mytool meta_file l lines tool version raw_format installed_only criteria
 }
 
 
@@ -1989,16 +2094,22 @@ while [ $# -gt 0 ] ; do
            print_debug_info
            break;;
        list)
+           RAW_FORMAT=false
+           TOOL="ghc"
            shift 1
            while [ $# -gt 0 ] ; do
                case $1 in
                    -h|--help) list_usage;;
                    -t|--tool) TOOL=$2
                        shift 2;;
+                   -r|--raw-format) RAW_FORMAT=true
+                       shift 1;;
+                   -c|--show-criteria) SHOW_CRITERIA=$2
+                       shift 2;;
                    *) list_usage;;
                esac
            done
-           list "${TOOL}"
+           list "${TOOL}" ${RAW_FORMAT} "${SHOW_CRITERIA}"
            break;;
        changelog)
            shift 1
