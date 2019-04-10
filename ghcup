@@ -268,10 +268,12 @@ USAGE:
     ${SCRIPT} upgrade [FLAGS] [TARGET-LOCATION]
 
 FLAGS:
+    -i, --inplace      Update this script in-place (wherever it's at)
     -h, --help         Prints help information
 
 ARGS:
-    [TARGET-LOCATION]  Where to place the updated script (defaults to directory of the script).
+    [TARGET-LOCATION]  Where to place the updated script (defaults to ${BIN_LOCATION}).
+                       This is ignored if --inplace is issued as well.
 ")
     exit 1
 }
@@ -1936,18 +1938,23 @@ while [ $# -gt 0 ] ; do
 
            break;;
        upgrade)
+           IN_PLACE=false
            shift 1
            while [ $# -gt 0 ] ; do
                case $1 in
                    -h|--help) upgrade_usage;;
+                   -i|--inplace) IN_PLACE=true
+                       shift 1 ;;
                    *) TARGET_LOCATION=$1
                        break;;
                esac
            done
-           if [ -n "${TARGET_LOCATION}" ] ; then
+           if ${IN_PLACE} ; then
+               upgrade "$(dirname "$(posix_realpath "${SOURCE}")")"
+           elif [ -n "${TARGET_LOCATION}" ] ; then
                upgrade "${TARGET_LOCATION}"
            else
-               upgrade "$(dirname "$(posix_realpath "${SOURCE}")")"
+               upgrade "${BIN_LOCATION}"
            fi
            break;;
        rm)
