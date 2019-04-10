@@ -59,8 +59,6 @@ edo mv shellcheck-latest/shellcheck "$HOME"/.local/bin/shellcheck
 # check our script for errors
 edo shellcheck ghcup
 
-edo ghcup -v show
-
 edo ghcup -v debug-info
 
 edo ghcup -v list
