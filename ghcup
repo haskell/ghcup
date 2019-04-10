@@ -506,7 +506,7 @@ emake() { # avoid re-checking for gmake
 # Print a blue debug message if verbosity is enabled.
 debug_message() {
     if ${VERBOSE} ; then
-        printf "\\033[0;34m%s\\033[0m\\n" "$1"
+        (>&2 printf "\\033[0;34m%s\\033[0m\\n" "$1")
     fi
 }
 
