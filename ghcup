@@ -1707,11 +1707,7 @@ list() {
             awk "
             NF {
                 if (\$1 != \"#\") {
-                    if (\$1 == \"cabal-install\") {
-                        print \$1 \"\\t\" \$2 \"\\t\" \$3
-                    } else {
-                        print \$1 \"\\t\\t\" \$2 \"\\t\" \$3
-                    }
+                    print \$1 \"\\t\" \$2 \"\\t\" \$3
                 }
             }" "${meta_file}" || die "awk failed!"
         else
