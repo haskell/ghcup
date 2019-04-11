@@ -74,10 +74,10 @@ if [ -z "${BOOTSTRAP_HASKELL_NONINTERACTIVE}" ] ; then
 	read -r answer </dev/tty
 fi
 
-edo ghcup install
+edo ghcup --cache install
 
 edo ghcup set
-edo ghcup install-cabal
+edo ghcup --cache install-cabal
 
 edo cabal new-update
 
