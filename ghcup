@@ -1009,7 +1009,7 @@ download_silent() {
 download_to_stdout() {
     [ -z "$1" ] && die "Internal error: no argument given to download"
     # shellcheck disable=SC2086
-    edo ${DOWNLOADER} ${DOWNLOADER_STDOUT_OPTS} "$1"
+    edo ${DOWNLOADER} ${DOWNLOADER_STDOUT_OPTS} "$1" 2> /dev/null
 }
 
 # @FUNCTION: unpack
