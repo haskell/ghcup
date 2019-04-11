@@ -33,10 +33,9 @@ echo "PATH components."
 echo
 
 if [ -z "${BOOTSTRAP_HASKELL_NONINTERACTIVE}" ] ; then
-	echo "To proceed with the installation press enter, to cancel press ctrl-c."
+	echo "To proceed with the ghcup installation press enter, to cancel press ctrl-c."
 	echo "Note that this script can be re-run at any given time."
 	echo
-
 	# Wait for user input to continue.
 	# shellcheck disable=SC2034
 	read -r answer </dev/tty
@@ -59,6 +58,22 @@ else
 	edo . "${GHCUP_INSTALL_BASE_PREFIX}"/.ghcup/env
 fi
 
+echo
+echo "To install and run GHC you need the following dependencies:"
+echo "  $(ghcup print-system-reqs)"
+echo
+
+if [ -z "${BOOTSTRAP_HASKELL_NONINTERACTIVE}" ] ; then
+	echo "You may want to install these now, then press enter to proceed"
+	echo "or press ctrl-c to abort."
+	echo "Installation may take a while."
+	echo
+
+	# Wait for user input to continue.
+	# shellcheck disable=SC2034
+	read -r answer </dev/tty
+fi
+
 edo ghcup install
 
 edo ghcup set
@@ -74,3 +89,6 @@ printf "\\033[0;35m%s\\033[0m\\n" ""
 
 
 )
+
+# vim: tabstop=4 shiftwidth=4 expandtab
+
