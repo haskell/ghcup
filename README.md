@@ -19,6 +19,7 @@ Similar in scope to [rustup](https://github.com/rust-lang-nursery/rustup.rs), [p
    * [How](#how)
    * [Known users](#known-users)
    * [Known problems](#known-problems)
+   * [FAQ](#faq)
 
 ## Installation
 
@@ -144,3 +145,25 @@ wrapper around the build system. It makes no effort in trying
 to figure out whether you have the correct toolchain and
 the correct dependencies. Refer to [the official docs](https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux)
 on how to prepare your environment for building GHC.
+
+## FAQ
+
+1. Why reimplement stack?
+
+ghcup is not a reimplementation of stack. The only common part is automatic installation of GHC, but even that differs in scope and design.
+
+2. Why not contribute to stack and create a library for the common part?
+
+While this might be an interesting idea, ghcup is about simplicity.
+
+3. Why write a >1000k LOC bash script?
+
+ghcup is POSIX sh.
+
+4. Why write a >1000k LOC POSIX sh script?
+
+Mainly because the implementation is fairly straight-forward and the script is highly portable. No need to bootstrap anything or set up yet another CI to build ghcup binaries for all possible arches and distros just to perform a very simple task: identify distro and platform and download a GHC bindist.
+
+5. Why not support windows?
+
+Portability between linux and windows is difficult. However ghcup doesn't have to be only POSIX based, so a separate windows-specific PowerShell script might be the way to go. Contributions are welcome.
