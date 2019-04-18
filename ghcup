@@ -1127,7 +1127,7 @@ get_distro_alias() {
 #   and
 #   https://stackoverflow.com/a/246128
 #
-# If the file does not exist, just prints the argument unchanged.
+# If the file does not exist, just prints it appended to the current directory.
 # @STDOUT: realpath of the given file
 posix_realpath() {
     [ -z "$1" ] && die "Internal error: no argument given to posix_realpath"
@@ -1151,8 +1151,6 @@ posix_realpath() {
     # TODO: better distinguish between "does not exist" and "permission denied"
     if [ -z "${mydir}" ] ; then
         (>&2 echo "${1}: Permission denied")
-    elif [ ! -e "$1" ] ; then
-        echo "${mysource}"
     else
         echo "${mydir%/}/$(basename "${mysource}")"
     fi
