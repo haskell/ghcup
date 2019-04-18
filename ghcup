@@ -1131,12 +1131,20 @@ get_distro_alias() {
 # @STDOUT: realpath of the given file
 posix_realpath() {
     [ -z "$1" ] && die "Internal error: no argument given to posix_realpath"
+    current_loop=0
+    max_loops=50
     mysource=$1
 
     while [ -h "${mysource}" ]; do
+        current_loop=$((current_loop+1))
         mydir="$( cd -P "$( dirname "${mysource}" )" > /dev/null 2>&1 && pwd )"
         mysource="$(readlink "${mysource}")"
         [ "${mysource%${mysource#?}}"x != '/x' ] && mysource="${mydir}/${mysource}"
+
+        if [ ${current_loop} -gt ${max_loops} ] ; then
+            (>&2 echo "${1}: Too many levels of symbolic links")
+            break
+        fi
     done
     mydir="$( cd -P "$( dirname "${mysource}" )" > /dev/null 2>&1 && pwd )"
 
@@ -1149,7 +1157,7 @@ posix_realpath() {
         echo "${mydir%/}/$(basename "${mysource}")"
     fi
 
-    unset mysource mydir posix_realpath_error
+    unset current_loop max_loops mysource mydir
 }
 
 
