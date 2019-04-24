@@ -1217,6 +1217,7 @@ known_tool_versions() {
 
     mytool=$1
     meta_file="$(get_meta_version_file)"
+    [ -z "${meta_file}" ] && die "failed to get meta file"
 
     awk "
     NF {
@@ -1240,6 +1241,7 @@ known_tool_tags() {
 
     mytool=$1
     meta_file="$(get_meta_version_file)"
+    [ -z "${meta_file}" ] && die "failed to get meta file"
 
     awk "
     NF {
@@ -1744,6 +1746,7 @@ list() {
     criteria=$3
 
     meta_file="$(get_meta_version_file)"
+    [ -z "${meta_file}" ] && die "failed to get meta file"
 
     if ! ${raw_format} ; then
         printf "\\033[1;32m%s\\033[0m\\n" "Available versions:"
