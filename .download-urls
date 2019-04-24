@@ -69,6 +69,12 @@ ghc 8.6.4   x86_64  debian=9,debian,ubuntu          https://downloads.haskell.or
 ghc 8.6.4   x86_64  fedora=27,fedora,unknown        https://downloads.haskell.org/~ghc/8.6.4/ghc-8.6.4-x86_64-fedora27-linux.tar.xz
 ghc 8.6.4   x86_64  darwin                          https://downloads.haskell.org/~ghc/8.6.4/ghc-8.6.4-x86_64-apple-darwin.tar.xz
 
+ghc 8.6.5   i386    debian=9,debian,ubuntu,unknown  https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-i386-deb9-linux.tar.xz
+ghc 8.6.5   x86_64  debian=8                        https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-deb8-linux.tar.xz
+ghc 8.6.5   x86_64  debian=9,debian,ubuntu          https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-deb9-linux.tar.xz
+ghc 8.6.5   x86_64  fedora=27,fedora,unknown        https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-fedora27-linux.tar.xz
+ghc 8.6.5   x86_64  centos=7,centos,amazonlinux     https://downloads.haskell.org/~ghc/8.6.5/ghc-x86_64-centos7-linux.tar.xz
+ghc 8.6.5   x86_64  darwin                          https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-apple-darwin.tar.xz
 
 
 cabal-install   2.2.0.0     i386    unknown         https://downloads.haskell.org/~cabal/cabal-install-2.2.0.0/cabal-install-2.2.0.0-i386-unknown-linux.tar.gz
