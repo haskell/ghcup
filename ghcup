@@ -1360,7 +1360,7 @@ install_ghc() {
             unpack "${download_tarball_name}"
         fi
 
-        edo cd "ghc-${myghcver}"
+        edo cd "./ghc-${myghcver}"
 
         debug_message "Installing GHC into ${inst_location}"
 
@@ -1649,7 +1649,7 @@ compile_ghc() {
             unpack "${download_tarball_name}"
         fi
 
-        edo cd "ghc-${myghcver}"
+        edo cd "./ghc-${myghcver}"
 
         if [ -n "${build_config}" ] ; then
             edo cat "${build_config}" > mk/build.mk
