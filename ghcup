@@ -1099,6 +1099,9 @@ get_distro_alias() {
         "Alpine Linux"|"Alpine")
             distro_alias=alpine
             ;;
+        "Linux Mint"|"LinuxMint")
+            distro_alias=mint
+            ;;
 	"Amazon Linux AMI")
 	    distro_alias=amazonlinux
 	    ;;
