@@ -47,7 +47,7 @@ if command -V "ghcup" >/dev/null 2>&1 ; then
 		edo ghcup upgrade
 	fi
 else
-	edo curl --silent https://raw.githubusercontent.com/haskell/ghcup/master/ghcup > "${GHCUP_INSTALL_BASE_PREFIX}"/.ghcup/bin/ghcup
+	edo curl --silent https://gitlab.haskell.org/haskell/ghcup/raw/master/ghcup > "${GHCUP_INSTALL_BASE_PREFIX}"/.ghcup/bin/ghcup
 	edo chmod +x "${GHCUP_INSTALL_BASE_PREFIX}"/.ghcup/bin/ghcup
 
 	cat <<-EOF > "${GHCUP_INSTALL_BASE_PREFIX}"/.ghcup/env || die "Failed to create env file"

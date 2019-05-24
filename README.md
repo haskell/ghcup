@@ -1,7 +1,3 @@
-[![GitHub release](https://img.shields.io/github/release/haskell/ghcup.svg)](https://github.com/haskell/ghcup/releases)
-[![Build Status](https://travis-ci.org/haskell/ghcup.svg?branch=master)](https://travis-ci.org/haskell/ghcup)
-[![license](https://img.shields.io/github/license/haskell/ghcup.svg)](COPYING)
-
 `ghcup` makes it easy to install specific versions of `ghc` on GNU/Linux as well as macOS (aka Darwin), and can also bootstrap a fresh Haskell developer environment from scratch.
 It follows the unix UNIX philosophy of [do one thing and do it well](https://en.wikipedia.org/wiki/Unix_philosophy#Do_One_Thing_and_Do_It_Well).
 
@@ -29,7 +25,7 @@ Choose one of the following installation methods.
 
 ```sh
 # complete bootstrap
-curl https://raw.githubusercontent.com/haskell/ghcup/master/bootstrap-haskell -sSf | sh
+curl https://gitlab.haskell.org/haskell/ghcup/raw/master/bootstrap-haskell -sSf | sh
 
 # prepare your environment
 . "$HOME/.ghcup/env"
@@ -48,7 +44,7 @@ Just place the `ghcup` shell script into your `PATH` anywhere.
 E.g.:
 
 ```sh
-( mkdir -p ~/.ghcup/bin && curl https://raw.githubusercontent.com/haskell/ghcup/master/ghcup > ~/.ghcup/bin/ghcup && chmod +x ~/.ghcup/bin/ghcup) && echo "Success"
+( mkdir -p ~/.ghcup/bin && curl https://gitlab.haskell.org/haskell/ghcup/raw/master/ghcup > ~/.ghcup/bin/ghcup && chmod +x ~/.ghcup/bin/ghcup) && echo "Success"
 ```
 
 Then adjust your `PATH` in `~/.bashrc` (or similar, depending on your shell) like so, for example:
@@ -57,7 +53,7 @@ Then adjust your `PATH` in `~/.bashrc` (or similar, depending on your shell) lik
 export PATH="$HOME/.cabal/bin:$HOME/.ghcup/bin:$PATH"
 ```
 
-Security aware users may want to use the files from the [release page](https://github.com/haskell/ghcup/releases)
+Security aware users may want to use the files from the [release page](https://gitlab.haskell.org/haskell/ghcup/tags/)
 and verify the gpg signatures.
 
 ## Usage
@@ -136,7 +132,7 @@ try to compile from source via `ghcup compile <version>`.
 
 This was a [bug](https://ghc.haskell.org/trac/ghc/ticket/15688) in the build system of some GHC versions that lead to
 unconditionally enabled libnuma support. To mitigate this you might have to install the libnuma
-package of your distribution. See [here](https://github.com/haskell/ghcup/issues/58) for a discussion.
+package of your distribution. See [here](https://gitlab.haskell.org/haskell/ghcup/issues/58) for a discussion.
 
 ### Compilation
 

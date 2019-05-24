@@ -124,7 +124,7 @@ SOURCE="$0"
 # @VARIABLE: BASE_DOWNLOAD_URL
 # DESCRIPTION:
 # The base url for downloading stuff like meta files, requirements files etc.
-BASE_DOWNLOAD_URL="https://raw.githubusercontent.com/haskell/ghcup/master/"
+BASE_DOWNLOAD_URL="https://gitlab.haskell.org/haskell/ghcup/raw/master/"
 
 # @VARIABLE: SCRIPT_UPDATE_URL
 # @DESCRIPTION:
@@ -160,7 +160,7 @@ META_VERSION_FORMAT="1"
 # @VARIABLE: BUG_URL
 # DESCRIPTION:
 # The url to report bugs to.
-BUG_URL="https://github.com/haskell/ghcup/issues"
+BUG_URL="https://gitlab.haskell.org/haskell/ghcup/issues"
 
 # @VARIABLE: CACHING
 # @DESCRIPTION:
