@@ -1934,7 +1934,7 @@ while [ $# -gt 0 ] ; do
         fi
         ;;
     -V|--version)
-        printf "%s" "${VERSION}"
+        printf "%s\\n" "${VERSION}"
         exit 0;;
     -h|--help)
         usage;;
