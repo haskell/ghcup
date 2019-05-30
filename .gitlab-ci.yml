@@ -1,0 +1,11 @@
+before_script:
+  - add-apt-repository "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main" -y
+  - apt-get update -qq
+  - apt-get install -y -qq autoconf automake g++ gcc git libgmp-dev libllvm5.0 libtinfo-dev libtool llvm-5.0 llvm-5.0-dev make ncurses-dev python3 realpath xz-utils
+
+
+# TODO: also run checkbashisms.pl (currently two instances of non-compliance)
+test:
+  script:
+    - ./.github-ci.sh
+
