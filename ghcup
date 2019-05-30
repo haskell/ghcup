@@ -135,7 +135,7 @@ SCRIPT_UPDATE_URL="${BASE_DOWNLOAD_URL}/ghcup"
 # DESCRIPTION:
 # The url of the meta file for getting
 # download information for ghc/cabal-install etc.
-META_DOWNLOAD_URL="${BASE_DOWNLOAD_URL}/.download-urls"
+META_DOWNLOAD_URL="${GHCUP_META_DOWNLOAD_URL:=${BASE_DOWNLOAD_URL}/.download-urls}"
 
 # @VARIABLE: META_DOWNLOAD_FORMAT
 # DESCRIPTION:
@@ -148,7 +148,7 @@ META_DOWNLOAD_FORMAT="1"
 # DESCRIPTION:
 # The url of the meta file for getting
 # available versions for ghc/cabal-install etc.
-META_VERSION_URL="${BASE_DOWNLOAD_URL}/.available-versions"
+META_VERSION_URL="${GHCUP_META_VERSION_URL:=${BASE_DOWNLOAD_URL}/.available-versions}"
 
 # @VARIABLE: META_VERSION_FORMAT
 # DESCRIPTION:
