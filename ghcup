@@ -1319,6 +1319,50 @@ show_cabal_installed() {
 }
 
 
+# @FUNCTION: get_full_ghc_ver
+# @USAGE: <ghcmajorversion>
+# @DESCRIPTION:
+# Get the latest full GHC version .
+get_full_ghc_ver() {
+    [ -z "$1" ] && die "Internal error: no argument given to get_full_ghc_ver"
+
+    mymajorghcver=$1
+    latest_ghc=0
+
+    for current_ghc in "${BIN_LOCATION}/ghc-${mymajorghcver}."* ; do
+        [ -e "${current_ghc}" ] || break
+        real_ghc=$(posix_realpath "${current_ghc}")
+        real_ghc="$(basename "${real_ghc}" | sed 's#ghc-##')"
+        if [ "$(expr "${real_ghc}" \> "${latest_ghc}")" = 1 ] ; then
+            latest_ghc=${real_ghc}
+        fi
+    done
+
+    if [ "${latest_ghc}" != 0 ] ; then
+        printf "%s" "${latest_ghc}"
+    fi
+
+    unset mymajorghcver latest_ghc real_ghc current_ghc
+}
+
+# @FUNCTION: set_ghc_major
+# @USAGE: <ghcversion>
+# @DESCRIPTION:
+# Sets a ghc-x.y major version to the latest ghc-x.y.z if any is installed.
+set_ghc_major() {
+    [ -z "$1" ] && die "Internal error: no argument given to set_ghc_major"
+
+    full_ghc_ver="$(get_full_ghc_ver "${1%.*}")"
+
+    if [ -z "${full_ghc_ver}" ] ; then
+        die "Could not set GHC major symlink"
+    fi
+    set_ghc "${full_ghc_ver}" "-${1%.*}"
+
+    unset full_ghc_ver
+}
+
+
 
 
     ############################
@@ -1406,9 +1450,14 @@ install_ghc() {
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/runhaskell "${BIN_LOCATION}/runhaskell-${myghcver}"
 
+
     status_message "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set ${myghcver}"
 
-    unset myghcver inst_location f download_url download_tarball_name first_install tmp_dir
+    unset inst_location f download_url download_tarball_name first_install tmp_dir
+
+    set_ghc_major "${myghcver}"
+
+    unset myghcver
 }
 
 
@@ -1419,13 +1468,14 @@ install_ghc() {
 
 
 # @FUNCTION: set_ghc
-# @USAGE: <ghcversion>
+# @USAGE: <ghcversion> [target-suffix]
 # @DESCRIPTION:
 # Sets the current ghc version by creating symlinks.
 set_ghc() {
     [ -z "$1" ] && die "Internal error: no argument given to set_ghc"
 
     myghcver=$1
+    target_suffix=$2
     inst_location=$(get_ghc_location "$1")
     [ -z "${inst_location}" ] && die "failed to get install location"
 
@@ -1436,20 +1486,21 @@ set_ghc() {
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
         source_fn=$(basename "${f}")
-        target_fn=$(echo "${source_fn}" | sed "s#-${myghcver}##")
+        target_fn="$(echo "${source_fn}" | sed "s#-${myghcver}##")${target_suffix}"
         # shellcheck disable=SC2046
         edo ln $(optionv "-v") -sf ../ghc/"${myghcver}/bin/${source_fn}" "${BIN_LOCATION}/${target_fn}"
         unset source_fn target_fn
     done
     # shellcheck disable=SC2046
-    edo ln $(optionv "-v") -sf runghc "${BIN_LOCATION}"/runhaskell
+    edo ln $(optionv "-v") -sf "runghc${target_suffix}" "${BIN_LOCATION}/runhaskell${target_suffix}"
     # shellcheck disable=SC2046
-    edo ln $(optionv "-v") -sf haddock-ghc "${BIN_LOCATION}"/haddock
+    edo ln $(optionv "-v") -sf "haddock-ghc${target_suffix}" "${BIN_LOCATION}/haddock${target_suffix}"
 
     status_message "Done, make sure \"${BIN_LOCATION}\" is in your PATH!"
 
-    unset myghcver inst_location f
+    unset myghcver inst_location f target_suffix
 }
+
 
 
 
@@ -1525,6 +1576,24 @@ rm_ghc() {
         edo rm -r "${inst_location}"
 
         status_message "Successfully removed GHC ${myghcver}."
+
+        # Only run set_ghc_major if there is at least one 8.6.x version left for 8.6.
+        if [ -n "$(get_full_ghc_ver "${myghcver%.*}")" ] ; then
+            set_ghc_major "${myghcver}"
+        fi
+
+        if [ -h "${BIN_LOCATION}/ghc-${myghcver%.*}" ] && [ ! -e "${BIN_LOCATION}/ghc-${myghcver%.*}" ] ; then
+            # TODO: known_tools is not very robust, but we want to avoid accidentially deleting
+            # unrelated things (even if those are dangling symlinks)
+            known_tools="ghc ghci ghc-pkg haddock haddock-ghc runghc runhaskell"
+            # remove dangling symlinks for ghc, ghci, ...
+            for t in ${known_tools} ; do
+                if [ -h "${BIN_LOCATION}/${t}-${myghcver%.*}" ] && [ ! -e "${BIN_LOCATION}/${t}-${myghcver%.*}" ] ; then
+                    edo rm "${BIN_LOCATION}/${t}-${myghcver%.*}"
+                fi
+            done
+            unset t known_tools
+        fi
 
         if [ -h "${BIN_LOCATION}/ghc" ] && [ ! -e "${BIN_LOCATION}/ghc" ] ; then
             warning_message "Currently active GHC is a dangling symlink, removing..."
@@ -1705,7 +1774,11 @@ Also check https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux for 
 
     status_message "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set ${myghcver}"
 
-    unset myghcver bootstrap_ghc inst_location f download_url download_tarball_name tmp_dir
+    unset bootstrap_ghc inst_location f download_url download_tarball_name tmp_dir
+
+    set_ghc_major "${myghcver}"
+
+    unset myghcver
 }
 
 
