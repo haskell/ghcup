@@ -98,12 +98,12 @@ DOWNLOADER="curl"
 # @VARIABLE: DOWNLOADER_OPTS
 # @DESCRIPTION:
 # Options passed to the download program.
-DOWNLOADER_OPTS="--fail -O"
+DOWNLOADER_OPTS="-L --fail -O"
 
 # @VARIABLE: DOWNLOADER_STDOUT_OPTS
 # @DESCRIPTION:
 # Options passed to the download program when printing the content to stdout.
-DOWNLOADER_STDOUT_OPTS="--fail"
+DOWNLOADER_STDOUT_OPTS="-L --fail"
 
 # @VARIABLE: GHC_DOWNLOAD_BASEURL
 # @DESCRIPTION:
@@ -1443,8 +1443,11 @@ set_ghc() {
     done
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf runghc "${BIN_LOCATION}"/runhaskell
-    # shellcheck disable=SC2046
-    edo ln $(optionv "-v") -sf haddock-ghc "${BIN_LOCATION}"/haddock
+    # not all bindists install haddock...
+    if [ -e "${inst_location}/bin/haddock" ] ; then
+        # shellcheck disable=SC2046
+        edo ln $(optionv "-v") -sf haddock-ghc "${BIN_LOCATION}"/haddock
+    fi
 
     status_message "Done, make sure \"${BIN_LOCATION}\" is in your PATH!"
 
@@ -1877,6 +1880,9 @@ system_reqs_url() {
     [ -z "$1" ] && die "Internal error: no argument given to system_reqs_url"
 
     case "$1" in
+    "alpine")
+        printf "%s/.requirements/ghc/alpine" "${BASE_DOWNLOAD_URL}"
+        ;;
     "debian"|"ubuntu")
         printf "%s/.requirements/ghc/ubuntu" "${BASE_DOWNLOAD_URL}"
         ;;
