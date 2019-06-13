@@ -6,12 +6,14 @@ edo()
     "$@" || exit 2
 }
 
+GHCUP_META_DOWNLOAD_URL="file://$(pwd)/.download-urls"
+export GHCUP_META_DOWNLOAD_URL
+GHCUP_META_VERSION_URL="file://$(pwd)/.available-versions"
+export GHCUP_META_VERSION_URL
+
 # dependencies
 edo sudo apt-get update -y
 edo sudo apt-get install -y libnuma-dev
-
-edo rm .available-versions
-edo rm .download-urls
 
 # install GHCs
 edo ./ghcup -v install 8.2.2
