@@ -6,6 +6,10 @@ edo()
     "$@" || exit 2
 }
 
+# dependencies
+edo sudo apt-get update -y
+edo sudo apt-get install -y libnuma-dev
+
 edo rm .available-versions
 edo rm .download-urls
 
