@@ -1449,7 +1449,10 @@ install_ghc() {
     done
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/runhaskell "${BIN_LOCATION}/runhaskell-${myghcver}"
-
+    if [ -e "${inst_location}/bin/haddock" ] ; then
+        # shellcheck disable=SC2046
+        edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/haddock "${BIN_LOCATION}/haddock-${myghcver}"
+    fi
 
     status_message "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set ${myghcver}"
 
@@ -1774,6 +1777,10 @@ Also check https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux for 
     done
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/runhaskell "${BIN_LOCATION}/runhaskell-${myghcver}"
+    if [ -e "${inst_location}/bin/haddock" ] ; then
+        # shellcheck disable=SC2046
+        edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/haddock "${BIN_LOCATION}/haddock-${myghcver}"
+    fi
 
     status_message "Done installing, run \"ghci-${myghcver}\" or set up your current GHC via: ${SCRIPT} set ${myghcver}"
 
