@@ -1,0 +1,1 @@
+curl gcc g++ gmp-dev ncurses-dev libffi-dev make python3 xz tar perl
