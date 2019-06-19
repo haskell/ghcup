@@ -1449,6 +1449,12 @@ install_ghc() {
     done
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/runhaskell "${BIN_LOCATION}/runhaskell-${myghcver}"
+    # shellcheck disable=SC2046
+    edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/hsc2hs "${BIN_LOCATION}/hsc2hs-${myghcver}"
+    # shellcheck disable=SC2046
+    edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/hp2ps "${BIN_LOCATION}/hp2ps-${myghcver}"
+    # shellcheck disable=SC2046
+    edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/hpc "${BIN_LOCATION}/hpc-${myghcver}"
     if [ -e "${inst_location}/bin/haddock" ] ; then
         # shellcheck disable=SC2046
         edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/haddock "${BIN_LOCATION}/haddock-${myghcver}"
@@ -1496,6 +1502,12 @@ set_ghc() {
     done
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf "runghc${target_suffix}" "${BIN_LOCATION}/runhaskell${target_suffix}"
+    # shellcheck disable=SC2046
+    edo ln $(optionv "-v") -sf "hsc2hs-${myghcver}" "${BIN_LOCATION}/hsc2hs${target_suffix}"
+    # shellcheck disable=SC2046
+    edo ln $(optionv "-v") -sf "hp2ps-${myghcver}" "${BIN_LOCATION}/hp2ps${target_suffix}"
+    # shellcheck disable=SC2046
+    edo ln $(optionv "-v") -sf "hpc-${myghcver}" "${BIN_LOCATION}/hpc${target_suffix}"
     # not all bindists install haddock...
     if [ -e "${inst_location}/bin/haddock" ] ; then
         # shellcheck disable=SC2046
@@ -1591,7 +1603,7 @@ rm_ghc() {
         if [ -h "${BIN_LOCATION}/ghc-${myghcver%.*}" ] && [ ! -e "${BIN_LOCATION}/ghc-${myghcver%.*}" ] ; then
             # TODO: known_tools is not very robust, but we want to avoid accidentially deleting
             # unrelated things (even if those are dangling symlinks)
-            known_tools="ghc ghci ghc-pkg haddock haddock-ghc runghc runhaskell"
+            known_tools="ghc ghci ghc-pkg haddock haddock-ghc runghc runhaskell hp2ps hpc hsc2hs"
             # remove dangling symlinks for ghc, ghci, ...
             for t in ${known_tools} ; do
                 if [ -h "${BIN_LOCATION}/${t}-${myghcver%.*}" ] && [ ! -e "${BIN_LOCATION}/${t}-${myghcver%.*}" ] ; then
@@ -1606,7 +1618,7 @@ rm_ghc() {
 
             # TODO: known_tools is not very robust, but we want to avoid accidentially deleting
             # unrelated things (even if those are dangling symlinks)
-            known_tools="ghc ghci ghc-pkg haddock haddock-ghc runghc runhaskell"
+            known_tools="ghc ghci ghc-pkg haddock haddock-ghc runghc runhaskell hp2ps hpc hsc2hs"
             # remove dangling symlinks for ghc, ghci, ...
             for t in ${known_tools} ; do
                 if [ -h "${BIN_LOCATION}/${t}" ] && [ ! -e "${BIN_LOCATION}/${t}" ] ; then
@@ -1777,6 +1789,12 @@ Also check https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux for 
     done
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/runhaskell "${BIN_LOCATION}/runhaskell-${myghcver}"
+    # shellcheck disable=SC2046
+    edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/hsc2hs "${BIN_LOCATION}/hsc2hs-${myghcver}"
+    # shellcheck disable=SC2046
+    edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/hp2ps "${BIN_LOCATION}/hp2ps-${myghcver}"
+    # shellcheck disable=SC2046
+    edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/hpc "${BIN_LOCATION}/hpc-${myghcver}"
     if [ -e "${inst_location}/bin/haddock" ] ; then
         # shellcheck disable=SC2046
         edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/haddock "${BIN_LOCATION}/haddock-${myghcver}"
