@@ -1102,9 +1102,9 @@ get_distro_alias() {
         "Linux Mint"|"LinuxMint")
             distro_alias=mint
             ;;
-	"Amazon Linux AMI")
-	    distro_alias=amazonlinux
-	    ;;
+        "Amazon Linux AMI")
+            distro_alias=amazonlinux
+            ;;
         "AIX")
             distro_alias=aix
             ;;
@@ -1752,7 +1752,7 @@ compile_ghc() {
         if [ -n "${build_config}" ] ; then
             edo cat "${build_config}" > mk/build.mk
         else
-			cat <<-EOF > mk/build.mk || die
+            cat <<-EOF > mk/build.mk || die
 				V=0
 				BUILD_MAN = NO
 				BUILD_SPHINX_HTML = NO
