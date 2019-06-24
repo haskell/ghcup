@@ -1093,7 +1093,7 @@ get_distro_alias() {
         "Fedora"|"fedora")
             distro_alias=fedora
             ;;
-        "CentOS Linux"|"CentOS"|"centos")
+        "CentOS Linux"|"CentOS"|"centos"|"Red Hat Enterprise Linux"*)
             distro_alias=centos
             ;;
         "Alpine Linux"|"Alpine")
