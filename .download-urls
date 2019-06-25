@@ -90,7 +90,7 @@ ghc 8.6.5   i386    debian=9,debian,ubuntu,mint,unknown https://downloads.haskel
 ghc 8.6.5   x86_64  debian=8                            https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-deb8-linux.tar.xz
 ghc 8.6.5   x86_64  debian=9,debian,ubuntu,mint         https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-deb9-linux.tar.xz
 ghc 8.6.5   x86_64  fedora=27,fedora,unknown            https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-fedora27-linux.tar.xz
-ghc 8.6.5   x86_64  centos=7,centos,amazonlinux         https://downloads.haskell.org/~ghc/8.6.5/ghc-x86_64-centos7-linux.tar.xz
+ghc 8.6.5   x86_64  centos=7,centos,amazonlinux         https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-centos7-linux.tar.xz
 ghc 8.6.5   x86_64  darwin                              https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-apple-darwin.tar.xz
 ghc 8.6.5   i386    alpine                              https://github.com/redneb/ghc-alt-libc/releases/download/ghc-8.6.5-musl/ghc-8.6.5-i386-unknown-linux-musl.tar.xz
 ghc 8.6.5   x86_64  alpine                              https://github.com/redneb/ghc-alt-libc/releases/download/ghc-8.6.5-musl/ghc-8.6.5-x86_64-unknown-linux-musl.tar.xz
