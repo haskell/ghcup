@@ -1,1 +1,1 @@
-curl g++ gcc libgmp-dev libtinfo-dev make ncurses-dev python3 realpath xz-utils
+build-essential curl libgmp-dev libffi-dev libncurses-dev
