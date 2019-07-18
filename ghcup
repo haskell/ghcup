@@ -1020,6 +1020,7 @@ download_to_stdout() {
 unpack() {
     [ -z "$1" ] && die "Internal error: no argument given to unpack"
 
+    mydistro=$(get_distro_alias "$(get_distro_name)")
     filename=$1
     file_ext=${filename##*.}
 
@@ -1028,8 +1029,14 @@ unpack() {
     # capability
     case "${file_ext}" in
         xz)
-            debug_message "xz -cd \"${filename}\" | tar -xf -"
-            ( xz -cd "${filename}" | tar -xf - ; ) || die "unpacking failed!"
+            if test "$mydistro" = "darwin";
+            then
+              debug_message "tar -xzf \"${filename}\""
+              ( tar -xzf "${filename}" ) || die "unpacking failed!"
+            else
+              debug_message "xz -cd \"${filename}\" | tar -xf -"
+              ( xz -cd "${filename}" | tar -xf - ; ) || die "unpacking failed!"
+            fi
             ;;
         gz)
             debug_message "gzip -cd \"${filename}\" | tar -xf -"
@@ -1042,7 +1049,7 @@ unpack() {
             die "Unknown file extension: \"${file_ext}\""
     esac
 
-    unset filename file_ext
+    unset mydistro filename file_ext
 }
 
 # @FUNCTION: ask_for_confirmation
@@ -1998,7 +2005,12 @@ print_system_reqs() {
     mydistro=$(get_distro_alias "$(get_distro_name)")
     reqs_url=$(system_reqs_url "${mydistro}")
 
+
     download_to_stdout "${reqs_url}"
+
+    if test "$mydistro" = "darwin"; then
+      printf "%s\n" "(Note: on OS X, in the course of running ghcup you will be given a dialog box to install the command line tools. Accept and the requirements will be installed for you. You will then need to run the command again.)"
+    fi
 
     unset mydistro reqs_url
 }
