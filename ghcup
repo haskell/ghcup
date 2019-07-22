@@ -1029,8 +1029,7 @@ unpack() {
     # capability
     case "${file_ext}" in
         xz)
-            if test "$mydistro" = "darwin";
-            then
+            if test "${mydistro}" = "darwin"; then
               debug_message "tar -xzf \"${filename}\""
               ( tar -xzf "${filename}" ) || die "unpacking failed!"
             else
@@ -1991,6 +1990,9 @@ system_reqs_url() {
     "debian"|"ubuntu")
         printf "%s/.requirements/ghc/ubuntu" "${BASE_DOWNLOAD_URL}"
         ;;
+    "darwin")
+        printf "%s/.requirements/ghc/darwin" "${BASE_DOWNLOAD_URL}"
+        ;;
     *)
         printf "%s/.requirements/ghc/default" "${BASE_DOWNLOAD_URL}"
         ;;
@@ -2005,12 +2007,7 @@ print_system_reqs() {
     mydistro=$(get_distro_alias "$(get_distro_name)")
     reqs_url=$(system_reqs_url "${mydistro}")
 
-
     download_to_stdout "${reqs_url}"
-
-    if test "$mydistro" = "darwin"; then
-      printf "%s\n" "(Note: on OS X, in the course of running ghcup you will be given a dialog box to install the command line tools. Accept and the requirements will be installed for you. You will then need to run the command again.)"
-    fi
 
     unset mydistro reqs_url
 }
