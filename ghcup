@@ -1020,6 +1020,7 @@ download_to_stdout() {
 unpack() {
     [ -z "$1" ] && die "Internal error: no argument given to unpack"
 
+    mydistro=$(get_distro_alias "$(get_distro_name)")
     filename=$1
     file_ext=${filename##*.}
 
@@ -1028,8 +1029,13 @@ unpack() {
     # capability
     case "${file_ext}" in
         xz)
-            debug_message "xz -cd \"${filename}\" | tar -xf -"
-            ( xz -cd "${filename}" | tar -xf - ; ) || die "unpacking failed!"
+            if test "${mydistro}" = "darwin"; then
+              debug_message "tar -xzf \"${filename}\""
+              ( tar -xzf "${filename}" ) || die "unpacking failed!"
+            else
+              debug_message "xz -cd \"${filename}\" | tar -xf -"
+              ( xz -cd "${filename}" | tar -xf - ; ) || die "unpacking failed!"
+            fi
             ;;
         gz)
             debug_message "gzip -cd \"${filename}\" | tar -xf -"
@@ -1042,7 +1048,7 @@ unpack() {
             die "Unknown file extension: \"${file_ext}\""
     esac
 
-    unset filename file_ext
+    unset mydistro filename file_ext
 }
 
 # @FUNCTION: ask_for_confirmation
@@ -1983,6 +1989,9 @@ system_reqs_url() {
         ;;
     "debian"|"ubuntu")
         printf "%s/.requirements/ghc/ubuntu" "${BASE_DOWNLOAD_URL}"
+        ;;
+    "darwin")
+        printf "%s/.requirements/ghc/darwin" "${BASE_DOWNLOAD_URL}"
         ;;
     *)
         printf "%s/.requirements/ghc/default" "${BASE_DOWNLOAD_URL}"
