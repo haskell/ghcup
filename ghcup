@@ -2049,6 +2049,18 @@ while [ $# -gt 0 ] ; do
     -V|--version)
         printf "%s\\n" "${VERSION}"
         exit 0;;
+    --list-commands)
+        echo "changelog
+compile
+debug-info
+install
+install-cabal
+list
+print-system-reqs
+rm
+set
+upgrade"
+        exit 0;;
     -h|--help)
         usage;;
     -w|--wget)
