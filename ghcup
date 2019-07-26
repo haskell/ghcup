@@ -590,12 +590,19 @@ command_exists() {
 check_required_commands() {
     _missing_commands=
 
-    for com in "$@" awk uname basename tar xz gzip mktemp dirname ; do
+    for com in "$@" awk uname basename tar gzip mktemp dirname ; do
         command_exists "${com}" || {
             _missing_commands="${_missing_commands} ${com}"
         }
     done
     unset com
+
+    # darwin uses tar's built-in xz decompression
+    if test "${mydistro}" != "darwin"; then
+        command_exists xz || {
+            _missing_commands="${_missing_commands} xz"
+        }
+    fi
 
     if [ -n "${_missing_commands}" ] ; then
         printf "%s" "${_missing_commands}"
