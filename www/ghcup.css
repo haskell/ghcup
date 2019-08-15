@@ -119,6 +119,7 @@ hr {
     margin-right: auto;
     padding-top: 1rem;
     padding-bottom: 1rem;
+    padding-right: 1rem;
     text-align: center;
     border-radius: 3px;
     box-shadow: inset 0px 0px 20px 0px #333333;
@@ -159,4 +160,9 @@ hr {
     margin-left: auto;
     margin-right: auto;
     padding: 1em;
+}
+
+.ghcup-command:before {
+    color: #999;
+    content: " $ ";
 }
