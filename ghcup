@@ -589,6 +589,7 @@ command_exists() {
 # @RETURNS: 0 if all command exists, non-zero otherwise
 check_required_commands() {
     _missing_commands=
+    mydistro=$(get_distro_alias "$(get_distro_name)")
 
     for com in "$@" awk uname basename tar gzip mktemp dirname ; do
         command_exists "${com}" || {
@@ -606,10 +607,10 @@ check_required_commands() {
 
     if [ -n "${_missing_commands}" ] ; then
         printf "%s" "${_missing_commands}"
-        unset _missing_commands
+        unset _missing_commands mydistro
         return 1
     else
-        unset _missing_commands
+        unset _missing_commands mydistro
         return 0
     fi
 }
