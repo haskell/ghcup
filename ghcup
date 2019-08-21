@@ -1527,7 +1527,7 @@ set_ghc() {
         edo ln $(optionv "-v") -sf "haddock-ghc${target_suffix}" "${BIN_LOCATION}/haddock${target_suffix}"
     fi
 
-    status_message "Done, make sure \"${BIN_LOCATION}\" is in your PATH!"
+    status_message "Done"
 
     unset myghcver inst_location f target_suffix
 }
@@ -1560,7 +1560,7 @@ upgrade() {
 
     ) || die "failed to install"
 
-    status_message "Done, make sure \"${target_location}\" is in your PATH!"
+    status_message "Done"
 
     unset target_location
 }
@@ -1702,11 +1702,6 @@ install_cabal() {
     status_message "Successfully installed cabal-install into"
     status_message "  ${BIN_LOCATION}"
     status_message ""
-    status_message "You may want to run the following to get the really latest version:"
-    status_message "    cabal new-install cabal-install"
-    status_message ""
-    status_message "And make sure that \"~/.cabal/bin\" comes *before* \"${BIN_LOCATION}\""
-    status_message "in your PATH!"
 
     unset mycabalver myarch inst_location download_url download_tarball_name tmp_dir
 }
