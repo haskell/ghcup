@@ -32,8 +32,8 @@ echo "PATH components."
 echo
 
 if [ -z "${BOOTSTRAP_HASKELL_NONINTERACTIVE}" ] ; then
-	echo "To proceed with the ghcup installation press enter, to cancel press ctrl-c."
-	echo "Note that this script can be re-run at any given time."
+	printf "\\033[0;35m%s\\033[0m\\n" "To proceed with the ghcup installation press ENTER, to cancel press ctrl-c."
+	printf "\\033[0;35m%s\\033[0m\\n" "Note that this script can be re-run at any given time."
 	echo
 	# Wait for user input to continue.
 	# shellcheck disable=SC2034
@@ -58,14 +58,13 @@ else
 fi
 
 echo
-echo "To install and run GHC you need the following dependencies:"
+printf "\\033[0;35m%s\\033[0m\\n" "To install and run GHC you need the following dependencies:"
 echo "  $(ghcup print-system-reqs)"
 echo
 
 if [ -z "${BOOTSTRAP_HASKELL_NONINTERACTIVE}" ] ; then
-	echo "You may want to install these now, then press enter to proceed"
-	echo "or press ctrl-c to abort."
-	echo "Installation may take a while."
+	printf "\\033[0;35m%s\\033[0m\\n" "You may want to install these now, then press ENTER to proceed"
+	printf "\\033[0;35m%s\\033[0m\\n" "or press ctrl-c to abort. Installation may take a while."
 	echo
 
 	# Wait for user input to continue.
@@ -83,9 +82,28 @@ edo cabal new-update
 printf "\\033[0;35m%s\\033[0m\\n" ""
 printf "\\033[0;35m%s\\033[0m\\n" "Installation done!"
 printf "\\033[0;35m%s\\033[0m\\n" ""
-printf "\\033[0;35m%s\\033[0m\\n" "Don't forget to source $GHCUP_INSTALL_BASE_PREFIX/.ghcup/env in your ~/.bashrc or similar."
-printf "\\033[0;35m%s\\033[0m\\n" ""
+echo "In order to run ghc and cabal, you need to adjust your PATH variable."
+echo "You may want to source '$GHCUP_INSTALL_BASE_PREFIX/.ghcup/env' in your shell"
+echo "configuration to do so (e.g. ~/.bashrc)."
 
+if [ -e "$HOME/.bashrc" ] ; then
+    printf "\\033[0;35m%s\\033[0m\\n" ""
+    printf "\\033[0;35m%s\\033[0m\\n" "Detected ~/.bashrc on your system..."
+    printf "\\033[0;35m%s\\033[0m\\n" "If you want ghcup to automatically fix your ~/.bashrc to include the required PATH variable"
+    printf "\\033[0;35m%s\\033[0m\\n" "answer with YES and press ENTER (at your own risk)."
+    printf "\\033[0;35m%s\\033[0m\\n" "Otherwise press ctrl-c to abort."
+    printf "\\033[0;35m%s\\033[0m\\n" ""
+
+    read -r next_answer </dev/tty
+
+    case $next_answer in
+        [Yy]*)
+            echo "source $GHCUP_INSTALL_BASE_PREFIX/.ghcup/env" >> "${HOME}/.bashrc"
+            ;;
+        *)
+            exit 0;;
+    esac
+fi
 
 )
 
