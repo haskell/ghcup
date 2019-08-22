@@ -103,6 +103,23 @@ if [ -e "$HOME/.bashrc" ] ; then
         *)
             exit 0;;
     esac
+elif [ -e "$HOME/.bash_profile" ] ; then
+    printf "\\033[0;35m%s\\033[0m\\n" ""
+    printf "\\033[0;35m%s\\033[0m\\n" "Detected ~/.bash_profile on your system..."
+    printf "\\033[0;35m%s\\033[0m\\n" "If you want ghcup to automatically fix your ~/.bash_profile to include the required PATH variable"
+    printf "\\033[0;35m%s\\033[0m\\n" "answer with YES and press ENTER (at your own risk)."
+    printf "\\033[0;35m%s\\033[0m\\n" "Otherwise press ctrl-c to abort."
+    printf "\\033[0;35m%s\\033[0m\\n" ""
+
+    read -r next_answer </dev/tty
+
+    case $next_answer in
+        [Yy]*)
+            echo "source $GHCUP_INSTALL_BASE_PREFIX/.ghcup/env" >> "${HOME}/.bash_profile"
+            ;;
+        *)
+            exit 0;;
+    esac
 fi
 
 )
