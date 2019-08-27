@@ -112,3 +112,7 @@ cabal-install   2.4.1.0     x86_64  darwin                         https://downl
 cabal-install   2.4.1.0     x86_64  alpine                         https://downloads.haskell.org/cabal/cabal-install-2.4.1.0/cabal-install-2.4.1.0-x86_64-alpine-linux-musl.tar.xz
 cabal-install   2.4.1.0     i386    unknown                        https://downloads.haskell.org/cabal/cabal-install-2.4.1.0/cabal-install-2.4.1.0-i386-unknown-linux.tar.xz
 cabal-install   2.4.1.0     x86_64  unknown                        https://downloads.haskell.org/cabal/cabal-install-2.4.1.0/cabal-install-2.4.1.0-x86_64-unknown-linux.tar.xz
+
+cabal-install   3.0.0.0     x86_64  darwin                         https://downloads.haskell.org/cabal/cabal-install-3.0.0.0/cabal-install-3.0.0.0-x86_64-apple-darwin17.7.0.tar.xz
+cabal-install   3.0.0.0     i386    unknown                        https://downloads.haskell.org/cabal/cabal-install-3.0.0.0/cabal-install-3.0.0.0-i386-unknown-linux.tar.xz
+cabal-install   3.0.0.0     x86_64  unknown                        https://downloads.haskell.org/cabal/cabal-install-3.0.0.0/cabal-install-3.0.0.0-x86_64-unknown-linux.tar.xz
