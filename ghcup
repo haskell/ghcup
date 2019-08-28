@@ -1776,7 +1776,7 @@ compile_ghc() {
         if echo "${myghcver}" | sed 's/[.]//g' | awk '{ exit ($0 < 881) ? 0 : 1 }' ; then
             edo ./configure --prefix="${inst_location}" --with-ghc="${bootstrap_ghc}"
         else
-            GHC=$(which "${bootstrap_ghc}") edo ./configure --prefix="${inst_location}"
+            GHC=$(command -v "${bootstrap_ghc}") edo ./configure --prefix="${inst_location}"
         fi
         emake -j${JOBS}
         emake install
