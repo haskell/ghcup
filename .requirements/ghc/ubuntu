@@ -1,1 +1,1 @@
-build-essential curl libgmp-dev libffi-dev libncurses-dev libtinfo5 xz-utils
+build-essential curl libgmp-dev libffi-dev libncurses-dev libtinfo5
