@@ -1042,15 +1042,15 @@ unpack() {
               ( tar xf "${filename}" ) || die "unpacking failed!"
             else
               debug_message "xz -cd \"${filename}\" | tar -xf -"
-              ( xz -cd "${filename}" | tar -xf - ; ) || die "unpacking failed!"
+              ( xz -cd "${filename}" | tar xf - ; ) || die "unpacking failed!"
             fi
             ;;
         gz)
             debug_message "gzip -cd \"${filename}\" | tar -xf -"
-            ( gzip -cd "${filename}" | tar -xf - ; ) || die "unpacking failed!"
+            ( gzip -cd "${filename}" | tar xf - ; ) || die "unpacking failed!"
             ;;
         tar)
-            edo tar -xf "${filename}"
+            edo tar xf "${filename}"
             ;;
         *)
             die "Unknown file extension: \"${file_ext}\""
