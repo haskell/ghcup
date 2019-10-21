@@ -162,4 +162,4 @@ Mainly because the implementation is fairly straight-forward and the script is h
 
 5. Why not support windows?
 
-Portability between linux and windows is difficult. However ghcup doesn't have to be only POSIX based, so a separate windows-specific PowerShell script might be the way to go. Contributions are welcome.
+Consider using [Chocolatey](https://chocolatey.org/search?q=ghc). Also see [#114](https://gitlab.haskell.org/haskell/ghcup/issues/114) for a discussion.
