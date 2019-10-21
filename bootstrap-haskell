@@ -92,7 +92,7 @@ if [ -z "${BOOTSTRAP_HASKELL_NONINTERACTIVE}" ] ; then
         printf "\\033[0;35m%s\\033[0m\\n" ""
         printf "\\033[0;35m%s\\033[0m\\n" "Detected ~/.bashrc on your system..."
         printf "\\033[0;35m%s\\033[0m\\n" "If you want ghcup to automatically fix your ~/.bashrc to include the required PATH variable"
-        printf "\\033[0;35m%s\\033[0m\\n" "answer with YES and press ENTER (at your own risk)."
+        printf "\\033[0;35m%s\\033[0m\\n" "answer with YES and press ENTER."
         printf "\\033[0;35m%s\\033[0m\\n" "Otherwise press ctrl-c to abort."
         printf "\\033[0;35m%s\\033[0m\\n" ""
 
@@ -109,7 +109,7 @@ if [ -z "${BOOTSTRAP_HASKELL_NONINTERACTIVE}" ] ; then
         printf "\\033[0;35m%s\\033[0m\\n" ""
         printf "\\033[0;35m%s\\033[0m\\n" "Detected ~/.bash_profile on your system..."
         printf "\\033[0;35m%s\\033[0m\\n" "If you want ghcup to automatically fix your ~/.bash_profile to include the required PATH variable"
-        printf "\\033[0;35m%s\\033[0m\\n" "answer with YES and press ENTER (at your own risk)."
+        printf "\\033[0;35m%s\\033[0m\\n" "answer with YES and press ENTER."
         printf "\\033[0;35m%s\\033[0m\\n" "Otherwise press ctrl-c to abort."
         printf "\\033[0;35m%s\\033[0m\\n" ""
 
