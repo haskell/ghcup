@@ -15,6 +15,14 @@ edo()
     "$@" || die "\"$*\" failed!"
 }
 
+eghcup() {
+	if [ -z "${BOOTSTRAP_HASKELL_VERBOSE}" ] ; then
+		edo ghcup "$@"
+	else
+		edo ghcup --verbose "$@"
+	fi
+}
+
 echo
 echo "Welcome to Haskell!"
 echo
@@ -44,7 +52,7 @@ edo mkdir -p "${GHCUP_INSTALL_BASE_PREFIX}"/.ghcup/bin
 
 if command -V "ghcup" >/dev/null 2>&1 ; then
 	if [ -z "${BOOTSTRAP_HASKELL_NO_UPGRADE}" ] ; then
-		edo ghcup upgrade
+		eghcup upgrade
 	fi
 else
 	edo curl --silent https://gitlab.haskell.org/haskell/ghcup/raw/master/ghcup > "${GHCUP_INSTALL_BASE_PREFIX}"/.ghcup/bin/ghcup
@@ -72,10 +80,10 @@ if [ -z "${BOOTSTRAP_HASKELL_NONINTERACTIVE}" ] ; then
 	read -r answer </dev/tty
 fi
 
-edo ghcup --cache install
+eghcup --cache install
 
-edo ghcup set
-edo ghcup --cache install-cabal
+eghcup set
+eghcup --cache install-cabal
 
 edo cabal new-update
 
@@ -97,7 +105,7 @@ if [ -z "${BOOTSTRAP_HASKELL_NONINTERACTIVE}" ] ; then
         printf "\\033[0;35m%s\\033[0m\\n" ""
 
         read -r next_answer </dev/tty
-    
+
         case $next_answer in
             [Yy]*)
                 echo "source $GHCUP_INSTALL_BASE_PREFIX/.ghcup/env" >> "${HOME}/.bashrc"
