@@ -974,7 +974,7 @@ download_to_cache() {
     _dtc_download_tarball_name=$(basename "${_dtc_download_url}")
 
     rm_tarball() {
-        if [ -e "${CACHE_LOCATION}/${_dtc_download_tarball_name}" ] ; then
+        if [ -f "${CACHE_LOCATION}/${_dtc_download_tarball_name}" ] ; then
             rm "${CACHE_LOCATION}/${_dtc_download_tarball_name}"
         fi
     }
@@ -1188,7 +1188,7 @@ get_meta_version_file() {
     meta_file_name="$(basename "${META_VERSION_URL}")"
     meta_filepath="${CACHE_LOCATION}/${meta_file_name}"
 
-    if [ ! -e "${meta_filepath}" ] ; then
+    if [ ! -f "${meta_filepath}" ] ; then
         (
             edo cd "${CACHE_LOCATION}"
             download_silent "${META_VERSION_URL}"
@@ -1215,7 +1215,7 @@ get_meta_download_file() {
     meta_file_name="$(basename "${META_DOWNLOAD_URL}")"
     meta_filepath="${CACHE_LOCATION}/${meta_file_name}"
 
-    if [ ! -e "${meta_filepath}" ] ; then
+    if [ ! -f "${meta_filepath}" ] ; then
         (
             edo cd "${CACHE_LOCATION}"
             download_silent "${META_DOWNLOAD_URL}"
@@ -1311,7 +1311,7 @@ show_ghc_installed() {
     real_ghc=$(posix_realpath "${current_ghc}")
 
     if [ -L "${current_ghc}" ] ; then # is symlink
-        if [ -e "${real_ghc}" ] ; then # exists (posix_realpath was called)
+        if [ -f "${real_ghc}" ] ; then # exists (posix_realpath was called)
             real_ghc="$(basename "${real_ghc}" | sed 's#ghc-##')"
             printf "%s" "${real_ghc}"
         else # is a broken symlink
@@ -1344,7 +1344,7 @@ get_full_ghc_ver() {
     latest_ghc=0
 
     for current_ghc in "${BIN_LOCATION}/ghc-${mymajorghcver}."* ; do
-        [ -e "${current_ghc}" ] || break
+        [ -f "${current_ghc}" ] || break
         real_ghc=$(posix_realpath "${current_ghc}")
         real_ghc="$(basename "${real_ghc}" | sed 's#ghc-##')"
         if [ "$(expr "${real_ghc}" \> "${latest_ghc}")" = 1 ] ; then
@@ -1418,7 +1418,7 @@ install_ghc() {
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
         if ${CACHING} ; then
-            if [ ! -e "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
+            if [ ! -f "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
                 download_to_cache "${download_url}"
             fi
             edo cd "${tmp_dir}"
@@ -1438,10 +1438,10 @@ install_ghc() {
 
         # clean up
         edo cd ..
-        [ -e "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
+        [ -f "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
         [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
     ) || {
-        [ -e "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
+        [ -f "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
         [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
 
         if ${first_install} ; then
@@ -1455,7 +1455,7 @@ install_ghc() {
     }
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
-        [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
+        [ -f "${f}" ] || die "Something went wrong, ${f} does not exist!"
         fn=$(basename "${f}")
         # shellcheck disable=SC2046
         edo ln $(optionv "-v") -sf ../ghc/"${myghcver}/bin/${fn}" "${BIN_LOCATION}/${fn}"
@@ -1469,7 +1469,7 @@ install_ghc() {
     edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/hp2ps "${BIN_LOCATION}/hp2ps-${myghcver}"
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/hpc "${BIN_LOCATION}/hpc-${myghcver}"
-    if [ -e "${inst_location}/bin/haddock" ] ; then
+    if [ -f "${inst_location}/bin/haddock" ] ; then
         # shellcheck disable=SC2046
         edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/haddock "${BIN_LOCATION}/haddock-${myghcver}"
     fi
@@ -1507,7 +1507,7 @@ set_ghc() {
     status_message "Setting GHC to ${myghcver}"
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
-        [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
+        [ -f "${f}" ] || die "Something went wrong, ${f} does not exist!"
         source_fn=$(basename "${f}")
         target_fn="$(echo "${source_fn}" | sed "s#-${myghcver}##")${target_suffix}"
         # shellcheck disable=SC2046
@@ -1523,7 +1523,7 @@ set_ghc() {
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf "hpc-${myghcver}" "${BIN_LOCATION}/hpc${target_suffix}"
     # not all bindists install haddock...
-    if [ -e "${inst_location}/bin/haddock" ] ; then
+    if [ -f "${inst_location}/bin/haddock" ] ; then
         # shellcheck disable=SC2046
         edo ln $(optionv "-v") -sf "haddock-ghc${target_suffix}" "${BIN_LOCATION}/haddock${target_suffix}"
     fi
@@ -1683,7 +1683,7 @@ install_cabal() {
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
         if ${CACHING} ; then
-            if [ ! -e "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
+            if [ ! -f "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
                 download_to_cache "${download_url}"
             fi
             edo cd "${tmp_dir}"
@@ -1695,7 +1695,7 @@ install_cabal() {
         fi
 
         edo mv -f cabal "${inst_location}"/cabal
-        if [ -e "${tmp_dir}/${download_tarball_name}" ] ; then
+        if [ -f "${tmp_dir}/${download_tarball_name}" ] ; then
             rm "${tmp_dir}/${download_tarball_name}"
         fi
     ) || die "Failed to install cabal-install"
@@ -1729,7 +1729,7 @@ compile_ghc() {
             /*) build_config=$3 ;;
             *) build_config="$(pwd)/$3" ;;
         esac
-        [ -e "${build_config}" ] || die "specified build config \"${build_config}\" file does not exist!"
+        [ -f "${build_config}" ] || die "specified build config \"${build_config}\" file does not exist!"
     fi
 
     if ghc_already_installed "${myghcver}" ; then
@@ -1745,7 +1745,7 @@ compile_ghc() {
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
         if ${CACHING} ; then
-            if [ ! -e "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
+            if [ ! -f "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
                 download_to_cache "${download_url}"
             fi
             edo cd "${tmp_dir}"
@@ -1779,10 +1779,10 @@ compile_ghc() {
 
         # clean up
         edo cd ..
-        [ -e "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
+        [ -f "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
         [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
     ) || {
-        [ -e "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
+        [ -f "${tmp_dir}/${download_tarball_name}" ] && rm "${tmp_dir}/${download_tarball_name}"
         [ -e "${tmp_dir}/ghc-${myghcver}" ] && rm -r "${tmp_dir}/ghc-${myghcver}"
         die "Failed to install, consider updating this script via:
     ${SCRIPT} upgrade
@@ -1790,7 +1790,7 @@ Also check https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux for 
     }
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
-        [ -e "${f}" ] || die "Something went wrong, ${f} does not exist!"
+        [ -f "${f}" ] || die "Something went wrong, ${f} does not exist!"
         fn=$(basename "${f}")
         # shellcheck disable=SC2046
         edo ln $(optionv "-v") -sf ../ghc/"${myghcver}/bin/${fn}" "${BIN_LOCATION}/${fn}"
@@ -1804,7 +1804,7 @@ Also check https://ghc.haskell.org/trac/ghc/wiki/Building/Preparation/Linux for 
     edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/hp2ps "${BIN_LOCATION}/hp2ps-${myghcver}"
     # shellcheck disable=SC2046
     edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/hpc "${BIN_LOCATION}/hpc-${myghcver}"
-    if [ -e "${inst_location}/bin/haddock" ] ; then
+    if [ -f "${inst_location}/bin/haddock" ] ; then
         # shellcheck disable=SC2046
         edo ln $(optionv "-v") -sf ../ghc/"${myghcver}"/bin/haddock "${BIN_LOCATION}/haddock-${myghcver}"
     fi
@@ -2089,10 +2089,10 @@ upgrade"
        edo mkdir -p "${CACHE_LOCATION}"
 
        # clean up old meta files
-       if [ -e "${CACHE_LOCATION}/$(basename "${META_VERSION_URL}")" ] ; then
+       if [ -f "${CACHE_LOCATION}/$(basename "${META_VERSION_URL}")" ] ; then
            edo rm "${CACHE_LOCATION}/$(basename "${META_VERSION_URL}")"
        fi
-       if [ -e "${CACHE_LOCATION}/$(basename "${META_DOWNLOAD_URL}")" ] ; then
+       if [ -f "${CACHE_LOCATION}/$(basename "${META_DOWNLOAD_URL}")" ] ; then
            edo rm "${CACHE_LOCATION}/$(basename "${META_DOWNLOAD_URL}")"
        fi
 
