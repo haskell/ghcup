@@ -1414,7 +1414,7 @@ install_ghc() {
         first_install=false
     fi
 
-    tmp_dir=$(mktemp -d)
+    tmp_dir=$(mktemp -d -t ghcup.XXXXXXXX)
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
         if ${CACHING} ; then
