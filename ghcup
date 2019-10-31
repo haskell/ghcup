@@ -1554,7 +1554,7 @@ upgrade() {
     status_message "Updating ${SCRIPT}"
 
     (
-        edo cd "$(mktemp -d)"
+        edo cd "$(mktemp -d -t ghcup.XXXXXXXX)"
         download "${SCRIPT_UPDATE_URL}"
         edo chmod +x ghcup
         edo mv -f ghcup "${target_location}"/ghcup
@@ -1679,7 +1679,7 @@ install_cabal() {
 
     edo mkdir -p "${inst_location}"
 
-    tmp_dir=$(mktemp -d)
+    tmp_dir=$(mktemp -d -t ghcup.XXXXXXXX)
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
         if ${CACHING} ; then
@@ -1741,7 +1741,7 @@ compile_ghc() {
     fi
 
     status_message "Compiling GHC for version ${myghcver} from source"
-    tmp_dir=$(mktemp -d)
+    tmp_dir=$(mktemp -d -t ghcup.XXXXXXXX)
     [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
     (
         if ${CACHING} ; then
