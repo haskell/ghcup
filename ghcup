@@ -1022,16 +1022,15 @@ download_to_stdout() {
 
 # @FUNCTION: mktempdir
 # @DESCRIPTION:
-# Makes a temporary directory, placing the path in $tmp_dir.
+# Makes a temporary directory.
 mktempdir() {
     if test "${mydistro}" = "darwin"; then
         debug_message "mktemp -d -t ghcup"
-	tmp_dir=$(mktemp -d -t ghcup)
+        mktemp -d -t ghcup
     else
         debug_message "mktemp -d"
-	tmp_dir=$(mktemp -d)
+        mktemp -d
     fi
-    [ -z "${tmp_dir}" ] && die "Failed to create temporary directory"
 }
 
 # @FUNCTION: unpack
@@ -1428,7 +1427,8 @@ install_ghc() {
         first_install=false
     fi
 
-    mktempdir
+    tmp_dir=$(mktempdir)
+    { [ -z "${tmp_dir}" ] || ! [ -d "${tmp_dir}" ] ; } && die "Failed to create temporary directory"
     (
         if ${CACHING} ; then
             if [ ! -f "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
@@ -1567,8 +1567,7 @@ upgrade() {
     status_message "Updating ${SCRIPT}"
 
     (
-        mktempdir
-        edo cd "${tmp_dir}"
+        edo cd "$(mktempdir)"
         download "${SCRIPT_UPDATE_URL}"
         edo chmod +x ghcup
         edo mv -f ghcup "${target_location}"/ghcup
@@ -1693,7 +1692,8 @@ install_cabal() {
 
     edo mkdir -p "${inst_location}"
 
-    mktempdir
+    tmp_dir=$(mktempdir)
+    { [ -z "${tmp_dir}" ] || ! [ -d "${tmp_dir}" ] ; } && die "Failed to create temporary directory"
     (
         if ${CACHING} ; then
             if [ ! -f "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
@@ -1754,7 +1754,8 @@ compile_ghc() {
     fi
 
     status_message "Compiling GHC for version ${myghcver} from source"
-    mktempdir
+    tmp_dir=$(mktempdir)
+    { [ -z "${tmp_dir}" ] || ! [ -d "${tmp_dir}" ] ; } && die "Failed to create temporary directory"
     (
         if ${CACHING} ; then
             if [ ! -f "${CACHE_LOCATION}/${download_tarball_name}" ] ; then
