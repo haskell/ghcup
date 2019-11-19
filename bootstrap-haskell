@@ -129,6 +129,8 @@ if [ -z "${BOOTSTRAP_HASKELL_NONINTERACTIVE}" ] ; then
         case $next_answer in
             [Yy]*)
                 echo "source $GHCUP_INSTALL_BASE_PREFIX/.ghcup/env" >> "${GHCUP_PROFILE_FILE}"
+                printf "\\033[0;35m%s\\033[0m\\n" "OK! ${GHCUP_PROFILE_FILE} has been modified. Restart your terminal for the changes to take effect,"
+                printf "\\033[0;35m%s\\033[0m\\n" "or type \"source ${GHCUP_INSTALL_BASE_PREFIX}/.ghcup/env\" to apply them in your current terminal session."
                 exit 0;;
             [Nn]*)
                 exit 0;;
