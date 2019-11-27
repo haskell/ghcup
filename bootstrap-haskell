@@ -96,39 +96,50 @@ if [ -z "${BOOTSTRAP_HASKELL_NONINTERACTIVE}" ] ; then
     echo "You may want to source '$GHCUP_INSTALL_BASE_PREFIX/.ghcup/env' in your shell"
     echo "configuration to do so (e.g. ~/.bashrc)."
 
-    if [ -f "$HOME/.bashrc" ] ; then
-        GHCUP_PROFILE_FILE="$HOME/.bashrc"
-    elif [ -f "$HOME/.bash_profile" ] ; then
-        GHCUP_PROFILE_FILE="$HOME/.bash_profile"
-    else
-        # most complaints we get are from mac users who
-        # need assistance of setting up their shell, so suggest
-        # to create .bash_profile, which is a good guess
-        GHCUP_PROFILE_FILE="$HOME/.bash_profile"
-    fi
+	case $SHELL in
+		*/zsh) # login shell is zsh
+			GHCUP_PROFILE_FILE="$HOME/.zshrc"
+			MY_SHELL="zsh" ;;
+		*/bash) # login shell is bash
+			if [ -f "$HOME/.bashrc" ] ; then # bashrc is not sourced by default, so assume it isn't if file does not exist
+				GHCUP_PROFILE_FILE="$HOME/.bashrc"
+			else
+				GHCUP_PROFILE_FILE="$HOME/.bash_profile"
+			fi
 
-    if [ -f "${GHCUP_PROFILE_FILE}" ] ; then
-        printf "\\033[0;35m%s\\033[0m\\n" ""
-        printf "\\033[0;35m%s\\033[0m\\n" "Detected \"${GHCUP_PROFILE_FILE}\" on your system..."
-        printf "\\033[0;35m%s\\033[0m\\n" "If you want ghcup to automatically fix your \"${GHCUP_PROFILE_FILE}\" to include the required PATH variable"
-        printf "\\033[0;35m%s\\033[0m\\n" "answer with YES, otherwise with NO and press ENTER."
-        printf "\\033[0;35m%s\\033[0m\\n" ""
-    elif [ -n "${BASH}" ] ; then # only suggest to create .bash_profile if we are in a bash shell
-        printf "\\033[0;35m%s\\033[0m\\n" ""
-        printf "\\033[0;35m%s\\033[0m\\n" "Detected bash shell on your system..."
-        printf "\\033[0;35m%s\\033[0m\\n" "If you want ghcup to automatically create \"${GHCUP_PROFILE_FILE}\" and include the required PATH variable"
-        printf "\\033[0;35m%s\\033[0m\\n" "answer with YES, otherwise with NO and press ENTER."
-        printf "\\033[0;35m%s\\033[0m\\n" ""
-    else
-        exit 0
-    fi
+			MY_SHELL="bash" ;;
+		*/sh) # login shell is sh, but might be a symlink to bash or zsh
+			if [ -n "${BASH}" ] ; then
+				if [ -f "$HOME/.bashrc" ] ; then # bashrc is not sourced by default, so assume it isn't if file does not exist
+					GHCUP_PROFILE_FILE="$HOME/.bashrc"
+				else
+					GHCUP_PROFILE_FILE="$HOME/.bash_profile"
+				fi
+
+				MY_SHELL="bash"
+			elif [ -n "${ZSH_VERSION}" ] ; then
+				GHCUP_PROFILE_FILE="$HOME/.zshrc"
+				MY_SHELL="zsh"
+			else
+				exit 0
+			fi
+			;;
+		*) exit 0 ;;
+	esac
+
+
+	printf "\\033[0;35m%s\\033[0m\\n" ""
+	printf "\\033[0;35m%s\\033[0m\\n" "Detected ${MY_SHELL} shell on your system..."
+	printf "\\033[0;35m%s\\033[0m\\n" "If you want ghcup to automatically add the required PATH variable to \"${GHCUP_PROFILE_FILE}\""
+	printf "\\033[0;35m%s\\033[0m\\n" "answer with YES, otherwise with NO and press ENTER."
+	printf "\\033[0;35m%s\\033[0m\\n" ""
 
     while true; do
         read -r next_answer </dev/tty
 
         case $next_answer in
             [Yy]*)
-                echo "source $GHCUP_INSTALL_BASE_PREFIX/.ghcup/env" >> "${GHCUP_PROFILE_FILE}"
+                echo "[ -f \"\${GHCUP_INSTALL_BASE_PREFIX:=\$HOME}/.ghcup/env\" ] && source \"\${GHCUP_INSTALL_BASE_PREFIX:=\$HOME}/.ghcup/env\"" >> "${GHCUP_PROFILE_FILE}"
                 printf "\\033[0;35m%s\\033[0m\\n" "OK! ${GHCUP_PROFILE_FILE} has been modified. Restart your terminal for the changes to take effect,"
                 printf "\\033[0;35m%s\\033[0m\\n" "or type \"source ${GHCUP_INSTALL_BASE_PREFIX}/.ghcup/env\" to apply them in your current terminal session."
                 exit 0;;
