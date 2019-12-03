@@ -1657,6 +1657,8 @@ rm_ghc() {
                 fi
             done
             unset t known_tools
+            # remove share directory
+            edo rm "${BIN_LOCATION}/../share"
 
             warning_message "Done."
             warning_message "You may now want to set currently active GHC to a different version via:"
