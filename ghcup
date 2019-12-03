@@ -1540,7 +1540,7 @@ set_ghc() {
         # shellcheck disable=SC2046
         edo ln $(optionv "-v") -sf "haddock-ghc${target_suffix}" "${BIN_LOCATION}/haddock${target_suffix}"
     fi
-    if [ -z "${target_suffix}" ] && [ -f "${inst_location}/share" ] ; then
+    if [ -z "${target_suffix}" ] && [ -d "${inst_location}/share" ] ; then
         # shellcheck disable=SC2046
         edo ln $(optionv "-v") -sf ghc/"${myghcver}"/share "${BIN_LOCATION}/../share"
     fi
