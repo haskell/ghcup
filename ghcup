@@ -1024,13 +1024,17 @@ download_to_stdout() {
 # @DESCRIPTION:
 # Makes a temporary directory.
 mktempdir() {
-    if test "${mydistro}" = "darwin"; then
+    mktemp_mydistro=$(get_distro_alias "$(get_distro_name)")
+
+    if test "${mktemp_mydistro}" = "darwin"; then
         debug_message "mktemp -d -t ghcup"
         mktemp -d -t ghcup
     else
         debug_message "mktemp -d"
         mktemp -d
     fi
+
+    unset mktemp_mydistro
 }
 
 # @FUNCTION: unpack
