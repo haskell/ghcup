@@ -162,4 +162,4 @@ Mainly because the implementation is fairly straight-forward and the script is h
 
 5. Why not support windows?
 
-Consider using [Chocolatey](https://chocolatey.org/search?q=ghc). Also see [#114](https://gitlab.haskell.org/haskell/ghcup/issues/114) for a discussion.
+Consider using [Chocolatey](https://chocolatey.org/search?q=ghc) or [ghcups](https://github.com/kakkun61/ghcups).
