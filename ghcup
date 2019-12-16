@@ -1790,10 +1790,12 @@ compile_ghc() {
 
 
         edo ./boot
-        if echo "${myghcver}" | sed 's/[.]//g' | awk '{ exit ($0 < 881) ? 0 : 1 }' ; then
-            edo ./configure --prefix="${inst_location}" --with-ghc="${bootstrap_ghc}"
-        else
+        if [ "$(echo "${myghcver}" | awk -F. '{printf"%d%03d",$1,$2;}')" -ge 8008 ]; then
+            status_message "GHC-8.8"
             GHC=$(command -v "${bootstrap_ghc}") edo ./configure --prefix="${inst_location}"
+        else
+            status_message "GHC-8.6"
+            edo ./configure --prefix="${inst_location}" --with-ghc="${bootstrap_ghc}"
         fi
         emake -j${JOBS}
         emake install
