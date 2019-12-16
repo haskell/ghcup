@@ -1127,22 +1127,22 @@ get_distro_alias() {
         "CentOS Linux"|"CentOS"|"centos"|"Red Hat Enterprise Linux"*)
             distro_alias=centos
             ;;
-        "Alpine Linux"|"Alpine")
+        "Alpine Linux"|"Alpine"|"alpine")
             distro_alias=alpine
             ;;
-        "Linux Mint"|"LinuxMint")
+        "Linux Mint"|"LinuxMint"|"linuxmint")
             distro_alias=mint
             ;;
-        "Amazon Linux AMI")
+        "Amazon Linux AMI"|"amazonlinux")
             distro_alias=amazonlinux
             ;;
-        "AIX")
+        "AIX"|"aix")
             distro_alias=aix
             ;;
-        "FreeBSD")
+        "FreeBSD"|"freebsd")
             distro_alias=freebsd
             ;;
-        "Darwin")
+        "Darwin"|"darwin")
             distro_alias=darwin
             ;;
     esac
