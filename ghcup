@@ -225,7 +225,7 @@ USAGE:
 
 FLAGS:
     -h, --help       Prints help information
-    -f, --force      Overwrite already existing installation
+    -f, --force      Overwrite already existing installation$(${VERBOSE} && printf "\n    -o, --os         Overwrite OS detection with the given string (must be a correct OS alias, e.g. 'alpine')")
 
 ARGS:
     [VERSION|TAG]    E.g. \"8.4.3\" or \"8.6.1\" or
@@ -807,7 +807,7 @@ check_meta_file_version() {
 }
 
 # @FUNCTION: get_download_url
-# @USAGE: <tool> <version>
+# @USAGE: <tool> <version> [os-overwrite]
 # @DESCRIPTION:
 # Gets the download url for the given tool and version
 # and the current distro and architecture (which it tries to discover).
@@ -820,7 +820,11 @@ get_download_url() {
     myver=$2
     myarch=$(get_arch)
     [ -z "${myarch}" ] && die "failed to get architecture"
-    mydistro=$(get_distro_alias "$(get_distro_name)")
+    if [ -n "$3" ] ; then
+        mydistro=$(get_distro_alias "$3")
+    else
+        mydistro=$(get_distro_alias "$(get_distro_name)")
+    fi
     mydistrover=$(get_distro_ver)
     meta_file="$(get_meta_download_file)"
     [ -z "${meta_file}" ] && die "failed to get meta file"
@@ -1127,22 +1131,22 @@ get_distro_alias() {
         "CentOS Linux"|"CentOS"|"centos"|"Red Hat Enterprise Linux"*)
             distro_alias=centos
             ;;
-        "Alpine Linux"|"Alpine")
+        "Alpine Linux"|"Alpine"|"alpine")
             distro_alias=alpine
             ;;
-        "Linux Mint"|"LinuxMint")
+        "Linux Mint"|"LinuxMint"|"linuxmint")
             distro_alias=mint
             ;;
-        "Amazon Linux AMI")
+        "Amazon Linux AMI"|"amazonlinux")
             distro_alias=amazonlinux
             ;;
-        "AIX")
+        "AIX"|"aix")
             distro_alias=aix
             ;;
-        "FreeBSD")
+        "FreeBSD"|"freebsd")
             distro_alias=freebsd
             ;;
-        "Darwin")
+        "Darwin"|"darwin")
             distro_alias=darwin
             ;;
     esac
@@ -1402,7 +1406,7 @@ set_ghc_major() {
 
 
 # @FUNCTION: install_ghc
-# @USAGE: <ghcversion>
+# @USAGE: <ghcversion> [os-overwrite]
 # @DESCRIPTION:
 # Installs the given ghc version with a lot of side effects.
 install_ghc() {
@@ -1411,7 +1415,7 @@ install_ghc() {
     myghcver=$1
     inst_location=$(get_ghc_location "$1")
     [ -z "${inst_location}" ] && die "failed to get install location"
-    download_url=$(get_download_url "ghc" "${myghcver}")
+    download_url=$(get_download_url "ghc" "${myghcver}" "$2")
     if [ -z "${download_url}" ] ; then
         die "Could not find an appropriate download for the requested GHC-${myghcver} on your system! Please report a bug at ${BUG_URL}"
     fi
@@ -1419,7 +1423,7 @@ install_ghc() {
     first_install=true
 
 
-    status_message "Installing GHC-${myghcver} for $(get_distro_name) on architecture $(get_arch)"
+    status_message "Installing GHC-${myghcver} for $(if [ -n "$2" ] ; then echo "$2" ; else get_distro_name ; fi) on architecture $(get_arch)"
 
     if ghc_already_installed "${myghcver}" ; then
         if ${FORCE} ; then
@@ -2128,6 +2132,8 @@ upgrade"
                    -h|--help) install_usage;;
                    -f|--force) FORCE=true
                        shift 1;;
+                   -o|--os) MY_OS=$2
+                       shift 2;;
                    *) GHC_VER=$1
                       break;;
                esac
@@ -2137,13 +2143,13 @@ upgrade"
                if [ -z "${_tool_ver}" ] ; then
                    die "Could not find a recommended GHC version, please report a bug at ${BUG_URL}!"
                fi
-               install_ghc "${_tool_ver}"
+               install_ghc "${_tool_ver}" "${MY_OS}"
            else
                # could be a version or a tag, let's check
                if array_contains "${GHC_VER}" "$(known_tool_versions "ghc")" ; then
-                   install_ghc "${GHC_VER}"
+                   install_ghc "${GHC_VER}" "${MY_OS}"
                elif array_contains "${GHC_VER}" "$(known_tool_tags "ghc")" ; then
-                   install_ghc "$(get_tool_ver_from_tag "ghc" "${GHC_VER}")"
+                   install_ghc "$(get_tool_ver_from_tag "ghc" "${GHC_VER}")" "${MY_OS}"
                else
                    die "\"${GHC_VER}\" is not a known version or tag!"
                fi
