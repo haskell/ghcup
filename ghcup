@@ -1525,7 +1525,7 @@ set_ghc() {
 
     [ -e "${inst_location}" ] || die "GHC ${myghcver} not installed yet, use: ${SCRIPT} install ${myghcver}"
 
-    status_message "Setting GHC to ${myghcver}"
+    status_message "Setting GHC${target_suffix} to ${myghcver}"
 
     for f in "${inst_location}"/bin/*-"${myghcver}" ; do
         [ -f "${f}" ] || die "Something went wrong, ${f} does not exist!"
