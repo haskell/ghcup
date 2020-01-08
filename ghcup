@@ -1548,6 +1548,10 @@ set_ghc() {
         # shellcheck disable=SC2046
         edo ln $(optionv "-v") -sf "haddock-ghc${target_suffix}" "${BIN_LOCATION}/haddock${target_suffix}"
     fi
+    if [ -z "${target_suffix}" ] && [ -d "${inst_location}/share" ] ; then
+        # shellcheck disable=SC2046
+        edo ln $(optionv "-v") -sfT ghc/"${myghcver}"/share "${BIN_LOCATION}/../share"
+    fi
 
     status_message "Done"
 
@@ -1661,6 +1665,10 @@ rm_ghc() {
                 fi
             done
             unset t known_tools
+            # remove dangling symlink to share directory
+            if [ -h "${BIN_LOCATION}/../share" ] && [ ! -e "${BIN_LOCATION}/../share" ] ; then
+                edo rm "${BIN_LOCATION}/../share"
+            fi
 
             warning_message "Done."
             warning_message "You may now want to set currently active GHC to a different version via:"
