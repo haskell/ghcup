@@ -1542,7 +1542,7 @@ set_ghc() {
     fi
     if [ -z "${target_suffix}" ] && [ -d "${inst_location}/share" ] ; then
         # shellcheck disable=SC2046
-        edo ln $(optionv "-v") -sf ghc/"${myghcver}"/share "${BIN_LOCATION}/../share"
+        edo ln $(optionv "-v") -sfT ghc/"${myghcver}"/share "${BIN_LOCATION}/../share"
     fi
 
     status_message "Done"
