@@ -82,6 +82,7 @@ handles your haskell packages and can demand that [a specific version](https://c
 ### Manpages
 
 For man pages to work you need [man-db](http://man-db.nongnu.org/) as your `man` provider, then issue `man ghc`. Manpages only work for the currently set ghc.
+`MANPATH` may be required to be unset.
 
 ## Design goals
 
