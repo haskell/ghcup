@@ -11,6 +11,7 @@ Similar in scope to [rustup](https://github.com/rust-lang-nursery/rustup.rs), [p
 
    * [Installation](#installation)
    * [Usage](#usage)
+     * [Manpages](#manpages)
    * [Design goals](#design-goals)
    * [How](#how)
    * [Known users](#known-users)
