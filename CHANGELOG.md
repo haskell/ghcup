@@ -39,7 +39,7 @@ Other:
 * add manpage support when using man-db
 
 
-## [0.0.7](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.8) (2019-01-07)
+## [0.0.7](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.7) (2019-01-07)
 
 Release 0.0.7
 
@@ -74,32 +74,32 @@ API changes:
 - `self-update` was renamed to `upgrade`
 
 
-## [0.0.6](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.8) (2018-10-30)
+## [0.0.6](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.6) (2018-10-30)
 
 Release 0.0.6
 
 
-## [0.0.5](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.8) (2018-10-16)
+## [0.0.5](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.5) (2018-10-16)
 
 Release 0.0.5
 
 
-## [0.0.4](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.8) (2018-10-09)
+## [0.0.4](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.4) (2018-10-09)
 
 Release 0.0.4
 
 
-## [0.0.3](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.8) (2018-09-30)
+## [0.0.3](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.3) (2018-09-30)
 
 Release 0.0.3
 
 
-## [0.0.2](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.8) (2018-09-30)
+## [0.0.2](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.2) (2018-09-30)
 
 Release 0.0.2
 
 
-## [0.0.1](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.8) (2018-09-29)
+## [0.0.1](https://gitlab.haskell.org/haskell/ghcup/-/tags/0.0.1) (2018-09-29)
 
 Release 0.0.1
 
