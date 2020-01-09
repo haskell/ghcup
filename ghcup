@@ -1549,8 +1549,13 @@ set_ghc() {
         edo ln $(optionv "-v") -sf "haddock-ghc${target_suffix}" "${BIN_LOCATION}/haddock${target_suffix}"
     fi
     if [ -z "${target_suffix}" ] && [ -d "${inst_location}/share" ] ; then
+        # Make sure we don't link "${BIN_LOCATION}/../share/share".
+        # POSIX doesn't allow '-T' for 'ln'.
+        if [ -e "${BIN_LOCATION}/../share" ] ; then
+            edo rm "${BIN_LOCATION}/../share"
+        fi
         # shellcheck disable=SC2046
-        edo ln $(optionv "-v") -sfT ghc/"${myghcver}"/share "${BIN_LOCATION}/../share"
+        edo ln $(optionv "-v") -sf ghc/"${myghcver}"/share "${BIN_LOCATION}/../share"
     fi
 
     status_message "Done"
