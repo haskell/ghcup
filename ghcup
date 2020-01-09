@@ -191,7 +191,7 @@ FLAGS:
     -V, --version    Prints version information
     -w, --wget       Use wget instead of curl
     -c, --cache      Use \"${CACHE_LOCATION}\" for caching tarballs
-                     (these will not be removed by ghcup)
+                     (these will not be removed by ghcup)$(${VERBOSE} && printf "\n    -o, --os         Overwrite OS detection with the given string (must be a correct OS alias, e.g. 'alpine')")
 
 SUBCOMMANDS:
     install            Install GHC$(${VERBOSE} && printf "\n    compile          Compile and install GHC from source (UNSTABLE!!!)")
@@ -225,7 +225,7 @@ USAGE:
 
 FLAGS:
     -h, --help       Prints help information
-    -f, --force      Overwrite already existing installation$(${VERBOSE} && printf "\n    -o, --os         Overwrite OS detection with the given string (must be a correct OS alias, e.g. 'alpine')")
+    -f, --force      Overwrite already existing installation
 
 ARGS:
     [VERSION|TAG]    E.g. \"8.4.3\" or \"8.6.1\" or
@@ -1692,7 +1692,7 @@ rm_ghc() {
 
 
 # @FUNCTION: install_cabal
-# @USAGE: <cabalversion>
+# @USAGE: <cabalversion> [os-overwrite]
 # @DESCRIPTION:
 # Installs the given cabal version.
 install_cabal() {
@@ -1702,14 +1702,14 @@ install_cabal() {
     myarch=$(get_arch)
     [ -z "${myarch}" ] && die "failed to get architecture"
     inst_location=$BIN_LOCATION
-    download_url=$(get_download_url "cabal-install" "${mycabalver}")
+    download_url=$(get_download_url "cabal-install" "${mycabalver}" "$2")
     download_tarball_name=$(basename "${download_url}")
 
     if [ -z "${download_url}" ] ; then
         die "Could not find an appropriate download for the requested cabal-install-${mycabalver} on your system! Please report a bug at ${BUG_URL}"
     fi
 
-    status_message "Installing cabal-install-${mycabalver} into \"${inst_location}\""
+    status_message "Installing cabal-install-${mycabalver} for $(if [ -n "$2" ] ; then echo "$2" ; else get_distro_name ; fi) on architecture $(get_arch)"
 
     edo mkdir -p "${inst_location}"
 
@@ -2117,6 +2117,9 @@ upgrade"
             usage
         fi
         ;;
+    -o|--os) MY_OS=$2
+        shift 2;;
+
     *) ## startup tasks ##
 
        edo mkdir -p "${INSTALL_BASE}"
@@ -2145,8 +2148,6 @@ upgrade"
                    -h|--help) install_usage;;
                    -f|--force) FORCE=true
                        shift 1;;
-                   -o|--os) MY_OS=$2
-                       shift 2;;
                    *) GHC_VER=$1
                       break;;
                esac
@@ -2244,9 +2245,9 @@ upgrade"
            if [ -n "${CABAL_VER}" ] ; then
                # could be a version or a tag, let's check
                if array_contains "${CABAL_VER}" "$(known_tool_versions "cabal-install")" ; then
-                   install_cabal "${CABAL_VER}"
+                   install_cabal "${CABAL_VER}" "${MY_OS}"
                elif array_contains "${CABAL_VER}" "$(known_tool_tags "cabal-install")" ; then
-                   install_cabal "$(get_tool_ver_from_tag "cabal-install" "${CABAL_VER}")"
+                   install_cabal "$(get_tool_ver_from_tag "cabal-install" "${CABAL_VER}")" "${MY_OS}"
                else
                    die "\"${CABAL_VER}\" is not a known version or tag!"
                fi
@@ -2255,7 +2256,7 @@ upgrade"
                if [ -z "${_cabal_ver}" ] ; then
                    die "Could not find a recommended cabal-install version, please report a bug at ${BUG_URL}!"
                fi
-               install_cabal "${_cabal_ver}"
+               install_cabal "${_cabal_ver}" "${MY_OS}"
            fi
            break;;
        compile)
