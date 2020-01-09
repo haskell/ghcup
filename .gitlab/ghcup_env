@@ -1,0 +1,8 @@
+GHCUP_META_DOWNLOAD_URL="file://${CI_PROJECT_DIR}/.download-urls"
+export GHCUP_META_DOWNLOAD_URL
+GHCUP_META_VERSION_URL="file://${CI_PROJECT_DIR}/.available-versions"
+export GHCUP_META_VERSION_URL
+
+export GHCUP_INSTALL_BASE_PREFIX="$CI_PROJECT_DIR"
+export PATH="$CI_PROJECT_DIR/.ghcup/bin:$CI_PROJECT_DIR/.local/bin:$PATH"
+

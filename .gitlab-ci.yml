@@ -8,10 +8,199 @@ variables:
 # CI Step
 ############################################################
 
-test:
+.debian:
   image: "registry.gitlab.haskell.org/ghc/ci-images/x86_64-linux-deb9:$DOCKER_REV"
-  script:
-    - ./.github-ci.sh
-  dependencies: []
   tags:
     - x86_64-linux
+
+.darwin:
+  tags:
+    - x86_64-darwin
+
+.test_ghcup_version:
+  script:
+    - ./.gitlab/script/ghcup_version.sh
+
+.test_ghcup_version:linux:
+  extends:
+    - .test_ghcup_version
+    - .debian
+  before_script:
+    - ./.gitlab/before_script/linux/install_deps.sh
+
+.test_ghcup_version:darwin:
+  extends:
+    - .test_ghcup_version
+    - .darwin
+  before_script:
+    - ./.gitlab/before_script/darwin/install_deps.sh
+
+
+######## shellcheck ########
+
+test:shellcheck:
+  extends: .debian
+  before_script:
+    - ./.gitlab/before_script/linux/install_shellcheck.sh
+  script: ./.gitlab/script/shellcheck.sh
+
+
+######## tarball caching ########
+
+test:tarball_cache:
+  extends: .debian
+  variables:
+    GHC_VERSION: "8.6.5"
+  script:
+    - ./.gitlab/script/ghcup_cached_tarball.sh
+
+
+######## linux ########
+
+test:linux:recommended:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "recommended"
+
+test:linux:latest:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "latest"
+
+test:linux:8.0.2:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.0.2"
+
+test:linux:8.2.2:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.2.2"
+
+test:linux:8.4.1:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.4.1"
+
+test:linux:8.4.2:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.4.2"
+
+test:linux:8.4.3:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.4.3"
+
+test:linux:8.4.4:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.4.4"
+
+test:linux:8.6.1:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.6.1"
+
+test:linux:8.6.2:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.6.2"
+
+test:linux:8.6.3:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.6.3"
+
+test:linux:8.6.4:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.6.4"
+
+test:linux:8.6.5:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.6.5"
+
+test:linux:8.8.1:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.8.1"
+
+
+######## darwin ########
+
+test:mac:recommended:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "recommended"
+
+test:mac:latest:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "latest"
+
+test:mac:8.0.2:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.0.2"
+
+test:mac:8.2.2:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.2.2"
+
+test:mac:8.4.1:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.4.1"
+
+test:mac:8.4.2:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.4.2"
+
+test:mac:8.4.3:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.4.3"
+
+test:mac:8.4.4:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.4.4"
+
+test:mac:8.6.1:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.6.1"
+  # TODO: dyld: Library not loaded: /usr/local/opt/gmp/lib/libgmp.10.dylib
+  allow_failure: true
+
+test:mac:8.6.2:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.6.2"
+  # TODO: dyld: Library not loaded: /usr/local/opt/gmp/lib/libgmp.10.dylib
+  allow_failure: true
+
+test:mac:8.6.3:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.6.3"
+
+test:mac:8.6.4:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.6.4"
+
+test:mac:8.6.5:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.6.5"
+
+test:mac:8.8.1:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.8.1"
+
