@@ -1031,8 +1031,8 @@ mktempdir() {
     mktemp_mydistro=$(get_distro_alias "$(get_distro_name)")
 
     if test "${mktemp_mydistro}" = "darwin"; then
-        debug_message "mktemp -d -t ghcup"
-        mktemp -d -t ghcup
+        debug_message "mktemp -d -t ghcup.XXXXXXX"
+        mktemp -d -t ghcup.XXXXXXX
     else
         debug_message "mktemp -d"
         mktemp -d
