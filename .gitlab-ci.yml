@@ -127,6 +127,11 @@ test:linux:8.8.1:
   variables:
     GHC_VERSION: "8.8.1"
 
+test:linux:8.8.2:
+  extends: .test_ghcup_version:linux
+  variables:
+    GHC_VERSION: "8.8.2"
+
 
 ######## darwin ########
 
@@ -204,3 +209,7 @@ test:mac:8.8.1:
   variables:
     GHC_VERSION: "8.8.1"
 
+test:mac:8.8.2:
+  extends: .test_ghcup_version:darwin
+  variables:
+    GHC_VERSION: "8.8.2"
