@@ -124,6 +124,9 @@ ghc 8.8.2   x86_64  debian=9,debian,ubuntu=16.04,ubuntu=18.04,mint https://downl
 ghc 8.8.2   x86_64  fedora=27,fedora,ubuntu,unknown                https://downloads.haskell.org/~ghc/8.8.2/ghc-8.8.2-x86_64-fedora27-linux.tar.xz
 ghc 8.8.2   x86_64  centos=7,centos,amazonlinux                    https://downloads.haskell.org/~ghc/8.8.2/ghc-8.8.2-x86_64-centos7-linux.tar.xz
 ghc 8.8.2   x86_64  darwin                                         https://downloads.haskell.org/~ghc/8.8.2/ghc-8.8.2-x86_64-apple-darwin.tar.xz
+ghc 8.8.2   i386    alpine                                         https://github.com/redneb/ghc-alt-libc/releases/download/ghc-8.8.2-musl/ghc-8.8.2-i386-unknown-linux-musl.tar.xz
+ghc 8.8.2   x86_64  alpine                                         https://github.com/redneb/ghc-alt-libc/releases/download/ghc-8.8.2-musl/ghc-8.8.2-x86_64-unknown-linux-musl.tar.xz
+
 
 cabal-install   2.2.0.0     i386    unknown                        https://downloads.haskell.org/~cabal/cabal-install-2.2.0.0/cabal-install-2.2.0.0-i386-unknown-linux.tar.gz
 cabal-install   2.2.0.0     x86_64  darwin                         https://downloads.haskell.org/~cabal/cabal-install-2.2.0.0/cabal-install-2.2.0.0-x86_64-apple-darwin-sierra.tar.gz
