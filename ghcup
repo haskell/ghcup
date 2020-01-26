@@ -1070,6 +1070,10 @@ unpack() {
             debug_message "gzip -cd \"${filename}\" | tar -xf -"
             ( gzip -cd "${filename}" | tar xf - ; ) || die "unpacking failed!"
             ;;
+        bz2)
+            debug_message "bzip2 -cd \"${filename}\" | tar -xf -"
+            ( bzip2 -cd "${filename}" | tar xf - ; ) || die "unpacking failed!"
+            ;;
         tar)
             edo tar xf "${filename}"
             ;;
