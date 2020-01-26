@@ -13,6 +13,15 @@
 #
 # tool | version | arch | supported-distros for given url | url |
 
+ghc 7.10.3   x86_64  centos=6,centos,amazonlinux                    https://downloads.haskell.org/~ghc/7.10.3/ghc-7.10.3-x86_64-centos67-linux.tar.bz2
+ghc 7.10.3   i386    centos=6,centos,amazonlinux                    https://downloads.haskell.org/~ghc/7.10.3/ghc-7.10.3-i386-centos67-linux.tar.bz2
+ghc 7.10.3   x86_64  debian=8,debian,ubuntu,mint,unknown            https://downloads.haskell.org/~ghc/7.10.3/ghc-7.10.3-x86_64-deb8-linux.tar.bz2
+ghc 7.10.3   i386    debian=8,debian,ubuntu,mint,unknown            https://downloads.haskell.org/~ghc/7.10.3/ghc-7.10.3-i386-deb8-linux.tar.bz2
+ghc 7.10.3   x86_64  darwin                                         https://downloads.haskell.org/~ghc/7.10.3/ghc-7.10.3-x86_64-apple-darwin.tar.bz2
+ghc 7.10.3   x86_64  freebsd=9,freebsd=10,freebsd=11                https://downloads.haskell.org/~ghc/7.10.3/ghc-7.10.3-x86_64-portbld-freebsd.tar.bz2
+ghc 7.10.3   i386    freebsd=9,freebsd=10,freebsd=11                https://downloads.haskell.org/~ghc/7.10.3/ghc-7.10.3-i386-portbld-freebsd.tar.bz2
+ghc 7.10.3   x86_64  alpine                                         https://github.com/redneb/ghc-alt-libc/releases/download/ghc-7.10.3-musl/ghc-7.10.3-x86_64-unknown-linux-musl.tar.xz
+
 ghc 8.0.2   x86_64  debian=7                                       https://downloads.haskell.org/~ghc/8.0.2/ghc-8.0.2-x86_64-deb7-linux.tar.xz
 ghc 8.0.2   i386    debian=7                                       https://downloads.haskell.org/~ghc/8.0.2/ghc-8.0.2-i386-deb7-linux.tar.xz
 ghc 8.0.2   x86_64  debian=8,debian,ubuntu,mint,unknown            https://downloads.haskell.org/~ghc/8.0.2/ghc-8.0.2-x86_64-deb8-linux.tar.xz
