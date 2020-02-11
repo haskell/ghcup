@@ -148,6 +148,16 @@ function fill_in_bug_report_values() {
     nav_app.textContent = navigator.appVersion;
 }
 
+function copyToClipboard() {
+  const text = document.getElementsByClassName("ghcup-command").item(0).innerText;
+  const el = document.createElement('textarea');
+  el.value = text;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+}
+
 (function () {
     adjust_for_platform();
     set_up_cycle_button();
