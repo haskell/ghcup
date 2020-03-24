@@ -1456,6 +1456,11 @@ install_ghc() {
 
         edo cd "./ghc-${myghcver}"
 
+        # https://gitlab.haskell.org/ghc/ghc/issues/17418
+        if [ "$(get_distro_alias "$(get_distro_name)")" = "darwin" ] ; then
+            edo xattr -cr .
+        fi
+
         debug_message "Installing GHC into ${inst_location}"
 
         edo ./configure --prefix="${inst_location}"
@@ -1732,6 +1737,11 @@ install_cabal() {
             unpack "${download_tarball_name}"
         fi
 
+        # https://gitlab.haskell.org/ghc/ghc/issues/17418
+        if [ "$(get_distro_alias "$(get_distro_name)")" = "darwin" ] ; then
+            edo xattr -cr .
+        fi
+
         edo mv -f cabal "${inst_location}"/cabal
         if [ -f "${tmp_dir}/${download_tarball_name}" ] ; then
             rm "${tmp_dir}/${download_tarball_name}"
@@ -1795,6 +1805,11 @@ compile_ghc() {
         fi
 
         edo cd "./ghc-${myghcver}"
+
+        # https://gitlab.haskell.org/ghc/ghc/issues/17418
+        if [ "$(get_distro_alias "$(get_distro_name)")" = "darwin" ] ; then
+            edo xattr -cr .
+        fi
 
         if [ -n "${build_config}" ] ; then
             edo cat "${build_config}" > mk/build.mk
