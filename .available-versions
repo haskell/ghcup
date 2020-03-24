@@ -20,10 +20,11 @@ ghc              8.6.1    bad
 ghc              8.6.2
 ghc              8.6.3
 ghc              8.6.4
-ghc              8.6.5    recommended,8.6
+ghc              8.6.5    8.6
 ghc              8.8.1
 ghc              8.8.2
-ghc              8.8.3    latest,8.8
+ghc              8.8.3    recommended,8.8
+ghc              8.10.1   latest,8.10
 cabal-install    2.2.0.0
 cabal-install    2.4.0.0
 cabal-install    2.4.1.0
