@@ -1041,6 +1041,19 @@ mktempdir() {
     unset mktemp_mydistro
 }
 
+# @FUNCTION: darwin_notarization
+# @USAGE: <path>
+# @DESCRIPTION:
+# https://gitlab.haskell.org/ghc/ghc/issues/17418
+# Can safely be invoked without distro check.
+darwin_notarization() {
+    [ -z "$1" ] && die "Internal error: no argument given to darwin_notarization"
+
+    if [ "$(get_distro_alias "$(get_distro_name)")" = "darwin" ] ; then
+        edo xattr -r -d com.apple.quarantine "$1"
+    fi
+}
+
 # @FUNCTION: unpack
 # @USAGE: <tarball>
 # @DESCRIPTION:
@@ -1456,10 +1469,7 @@ install_ghc() {
 
         edo cd "./ghc-${myghcver}"
 
-        # https://gitlab.haskell.org/ghc/ghc/issues/17418
-        if [ "$(get_distro_alias "$(get_distro_name)")" = "darwin" ] ; then
-            edo xattr -cr .
-        fi
+        darwin_notarization .
 
         debug_message "Installing GHC into ${inst_location}"
 
@@ -1737,10 +1747,7 @@ install_cabal() {
             unpack "${download_tarball_name}"
         fi
 
-        # https://gitlab.haskell.org/ghc/ghc/issues/17418
-        if [ "$(get_distro_alias "$(get_distro_name)")" = "darwin" ] ; then
-            edo xattr -cr .
-        fi
+        darwin_notarization .
 
         edo mv -f cabal "${inst_location}"/cabal
         if [ -f "${tmp_dir}/${download_tarball_name}" ] ; then
@@ -1806,10 +1813,7 @@ compile_ghc() {
 
         edo cd "./ghc-${myghcver}"
 
-        # https://gitlab.haskell.org/ghc/ghc/issues/17418
-        if [ "$(get_distro_alias "$(get_distro_name)")" = "darwin" ] ; then
-            edo xattr -cr .
-        fi
+        darwin_notarization .
 
         if [ -n "${build_config}" ] ; then
             edo cat "${build_config}" > mk/build.mk
