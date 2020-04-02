@@ -28,4 +28,5 @@ ghc              8.10.1   latest,8.10
 cabal-install    2.2.0.0
 cabal-install    2.4.0.0
 cabal-install    2.4.1.0
-cabal-install    3.0.0.0  latest,recommended
+cabal-install    3.0.0.0
+cabal-install    3.2.0.0  latest,recommended
