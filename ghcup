@@ -1603,10 +1603,56 @@ upgrade() {
     status_message "Updating ${SCRIPT}"
 
     (
+        _plat="$(uname -s)"
+        _arch=$(uname -m)
+
+        case "${_plat}" in
+            "linux"|"Linux")
+                case "${_arch}" in
+                    x86_64|amd64)
+                        _url=https://downloads.haskell.org/~ghcup/x86_64-linux-ghcup
+                        ;;
+                    i*86)
+                        _url=https://downloads.haskell.org/~ghcup/i386-linux-ghcup
+                        ;;
+                    *) die "Unknown architecture: ${_arch}"
+                        ;;
+                esac
+                ;;
+            "FreeBSD"|"freebsd")
+                case "${_arch}" in
+                    x86_64|amd64)
+                        ;;
+                    i*86)
+                        die "i386 currently not supported!"
+                        ;;
+                    *) die "Unknown architecture: ${_arch}"
+                        ;;
+                esac
+                _url=https://downloads.haskell.org/~ghcup/x86_64-portbld-freebsd-ghcup
+                ;;
+            "Darwin"|"darwin")
+                case "${_arch}" in
+                    x86_64|amd64)
+                        ;;
+                    i*86)
+                        die "i386 currently not supported!"
+                        ;;
+                    *) die "Unknown architecture: ${_arch}"
+                        ;;
+                esac
+                _url=https://downloads.haskell.org/~ghcup/x86_64-apple-darwin-ghcup ;;
+            *) die "Unknown platform: ${_plat}"
+                ;;
+        esac
+
+
         edo cd "$(mktempdir)"
-        download "${SCRIPT_UPDATE_URL}"
+        download_to_stdout "${_url}" > ghcup
         edo chmod +x ghcup
         edo mv -f ghcup "${target_location}"/ghcup
+
+        unset _plat _arch _url
 
     ) || die "failed to install"
 
@@ -2088,6 +2134,10 @@ fi
 if [ ! -d "${GHCUP_INSTALL_BASE_PREFIX}" ] ; then
     die "${GHCUP_INSTALL_BASE_PREFIX} does not exist"
 fi
+
+
+
+>&2 warning_message "ghcup has been rewritten in haskell. Please upgrade again via 'ghcup upgrade'"
 
 
 
