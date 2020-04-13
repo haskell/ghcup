@@ -1,3 +1,7 @@
+**THIS PROJECT IS NOW DEPRECATED IN FAVOR OF [ghcup-hs](https://github.com/hasufell/ghcup-hs)**
+
+--
+
 `ghcup` makes it easy to install specific versions of `ghc` on GNU/Linux as well as macOS (aka Darwin), and can also bootstrap a fresh Haskell developer environment from scratch.
 It follows the unix UNIX philosophy of [do one thing and do it well](https://en.wikipedia.org/wiki/Unix_philosophy#Do_One_Thing_and_Do_It_Well).
 
