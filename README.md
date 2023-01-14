@@ -1,4 +1,4 @@
-**THIS PROJECT IS NOW DEPRECATED IN FAVOR OF [ghcup-hs](https://gitlab.haskell.org/haskell/ghcup-hs)**
+**THIS PROJECT IS NOW DEPRECATED IN FAVOR OF [ghcup-hs](https://github.com/haskell/ghcup-hs)**
 
 --
 
